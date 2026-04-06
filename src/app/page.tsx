@@ -346,7 +346,7 @@ export default function LandingPage() {
             </div>
             <span className="text-sm font-medium text-zinc-400">ESINA</span>
             <span className="text-zinc-700 text-sm">·</span>
-            <span className="text-sm text-zinc-600">Built for the agent era</span>
+            <span className="text-sm text-zinc-600">Built for the AI era</span>
           </div>
           <div className="flex items-center gap-6">
             <Link href="/audits" className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors">
