@@ -215,14 +215,21 @@ function TextInput({ value, onChange, placeholder, maxLength, className = "" }: 
   );
 }
 
-function TextArea({ value, onChange, placeholder, maxLength, rows = 4 }: {
+function TextArea({ value: initialValue, onChange, placeholder, maxLength, rows = 4 }: {
   value: string; onChange: (v: string) => void; placeholder?: string; maxLength?: number; rows?: number;
 }) {
+  const [value, setValue] = useState(initialValue);
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setValue(e.target.value);
+    onChange(e.target.value);
+  };
+
   return (
     <div className="relative">
       <textarea
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={handleChange}
         placeholder={placeholder}
         maxLength={maxLength}
         rows={rows}
