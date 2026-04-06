@@ -39,7 +39,7 @@ export default function LandingPage() {
         <div className="relative max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-esina-800/60 bg-esina-950/40 text-esina-300 text-xs font-medium mb-8 tracking-wide">
             <span className="w-1.5 h-1.5 rounded-full bg-esina-400 animate-pulse" />
-            Brand Intelligence for the Agent Era
+            Brand Intelligence for the AI Era
           </div>
 
           <h1 className="text-5xl sm:text-6xl font-bold leading-tight tracking-tight mb-6">
