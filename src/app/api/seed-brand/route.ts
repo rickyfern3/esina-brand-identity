@@ -285,6 +285,7 @@ export async function POST(req: NextRequest) {
         origin_story: profile.origin_story || null,
         differentiation_claim: profile.differentiation_claim || null,
         // Depop seller-specific metadata stored in origin_location
+        contact_email: `${(sellerUsername || String(profile.brand_name)).toLowerCase().replace(/[^a-z0-9]/g, '')}@depop.seller`,
         origin_location: sellerUsername ? `depop:${sellerUsername}` : null,
         profile_status: "complete",
         profile_completeness: 0.85,
