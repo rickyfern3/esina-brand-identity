@@ -301,16 +301,16 @@ export async function POST(req: NextRequest) {
         values: (profile.values as string[]) || [],
         anti_values: (profile.anti_values as string[]) || [],
         style_tags: (profile.style_tags as string[]) || [],
-        design_language: (['clean','ornate','handcrafted','architectural','raw','refined','playful','geometric','fluid','eclectic'] as const).includes(profile.design_language as never) ? String(profile.design_language) : null,
-        visual_tone: (['muted','bold','earthy','monochrome','vibrant','pastel','dark','washed','saturated'] as const).includes(profile.visual_tone as never) ? String(profile.visual_tone) : null,
-        // Enum fields: validate strictly against DB check constraints before inserting
-        voice_tone: (['formal','casual','irreverent','authoritative','warm','edgy'] as const).includes(profile.voice_tone as never) ? String(profile.voice_tone) : null,
-        humor_level: (['none','subtle','moderate','heavy'] as const).includes(profile.humor_level as never) ? String(profile.humor_level) : null,
+        design_language: (['clean','ornate','handcrafted','architectural','raw','refined','playful','geometric','fluid','eclectic'] as const).includes(profile.design_language as never) ? String(profile.design_language) : 'eclectic',
+        visual_tone: (['muted','bold','earthy','monochrome','vibrant','pastel','dark','washed','saturated'] as const).includes(profile.visual_tone as never) ? String(profile.visual_tone) : 'muted',
+        // Enum fields: validate strictly against DB check constraints; use safe defaults if GPT value is out of range
+        voice_tone: (['formal','casual','irreverent','authoritative','warm','edgy'] as const).includes(profile.voice_tone as never) ? String(profile.voice_tone) : 'casual',
+        humor_level: (['none','subtle','moderate','heavy'] as const).includes(profile.humor_level as never) ? String(profile.humor_level) : 'none',
         emotional_resonance: profile.emotional_resonance || null,
-        sustainability_level: (['none','partial','committed','core'] as const).includes(profile.sustainability_level as never) ? String(profile.sustainability_level) : null,
-        status_signal_type: (['conspicuous','quiet_luxury','counterculture','accessible_premium','anti_status'] as const).includes(profile.status_signal_type as never) ? String(profile.status_signal_type) : null,
-        logo_visibility: (['hidden','subtle','visible','prominent'] as const).includes(profile.logo_visibility as never) ? String(profile.logo_visibility) : null,
-        exclusivity_level: (['mass','accessible','selective','exclusive'] as const).includes(profile.exclusivity_level as never) ? String(profile.exclusivity_level) : null,
+        sustainability_level: (['none','partial','committed','core'] as const).includes(profile.sustainability_level as never) ? String(profile.sustainability_level) : 'partial',
+        status_signal_type: (['conspicuous','quiet_luxury','counterculture','accessible_premium','anti_status'] as const).includes(profile.status_signal_type as never) ? String(profile.status_signal_type) : 'counterculture',
+        logo_visibility: (['hidden','subtle','visible','prominent'] as const).includes(profile.logo_visibility as never) ? String(profile.logo_visibility) : 'hidden',
+        exclusivity_level: (['mass','accessible','selective','exclusive'] as const).includes(profile.exclusivity_level as never) ? String(profile.exclusivity_level) : 'accessible',
         communities: (profile.communities as string[]) || [],
         identity_statements: (profile.identity_statements as string[]) || [],
         origin_story: profile.origin_story || null,
@@ -328,7 +328,17 @@ export async function POST(req: NextRequest) {
 
     if (insertErr || !brand) {
       return NextResponse.json(
-        { error: `Failed to insert brand profile: ${insertErr?.message}` },
+        { error: `Failed to insert brand profile: ${insertErr?.message}`, debug: {
+          exclusivity_level: profile.exclusivity_level,
+          design_language: profile.design_language,
+          visual_tone: profile.visual_tone,
+          voice_tone: profile.voice_tone,
+          humor_level: profile.humor_level,
+          sustainability_level: profile.sustainability_level,
+          status_signal_type: profile.status_signal_type,
+          logo_visibility: profile.logo_visibility,
+          price_tier: profile.price_tier,
+        }},
         { status: 500 }
       );
     }
