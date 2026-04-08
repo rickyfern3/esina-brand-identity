@@ -32,11 +32,16 @@ CREATE TABLE IF NOT EXISTS public.match_events (
 CREATE INDEX IF NOT EXISTS match_events_expires_at_status_idx
   ON public.match_events (expires_at, attribution_status);
 
--- 3. RLS: service role only (no public reads)
+-- 3. Explicit GRANT — required when creating tables via SQL Editor
+--    (Dashboard-created tables get these automatically; SQL-created tables do not)
+GRANT ALL ON public.match_events TO service_role;
+GRANT SELECT, INSERT ON public.match_events TO authenticated;
+
+-- 4. RLS: service role can do everything; authenticated users can insert/read their own
 ALTER TABLE public.match_events ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "service_role_all" ON public.match_events
-  FOR ALL TO service_role USING (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 -- 4. Cleanup function — deletes pending rows past their expiry
 --    Call this via the /api/cleanup-expired-matches route or pg_cron
