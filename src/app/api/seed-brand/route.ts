@@ -218,6 +218,36 @@ export async function POST(req: NextRequest) {
     // Override brand_name with the exact shopName provided
     profile.brand_name = shopName.trim();
 
+    // ── Step 1b: Sanitize controlled vocabulary fields ───────────────
+    const VALID = {
+      category: ['fashion','jewelry','accessories','beauty','homeware','lifestyle','streetwear','vintage','art'],
+      price_tier: ['budget','value','mid','premium','luxury'],
+      status_signal_type: ['conspicuous','quiet_luxury','counterculture','accessible_premium','anti_status'],
+      voice_tone: ['formal','casual','irreverent','authoritative','warm','edgy'],
+      humor_level: ['none','subtle','moderate','heavy'],
+      sustainability_level: ['none','partial','committed','core'],
+      logo_visibility: ['hidden','subtle','visible','prominent'],
+      exclusivity_level: ['mass','accessible','selective','exclusive'],
+      design_language: ['clean','ornate','handcrafted','architectural','raw','refined','playful','geometric','fluid','eclectic'],
+      visual_tone: ['muted','bold','earthy','monochrome','vibrant','pastel','dark','washed','saturated'],
+    };
+    function sanitize(val: unknown, allowed: string[]): string | null {
+      if (!val || typeof val !== 'string') return null;
+      const v = val.toLowerCase().replace(/[_\s-]+/g, '_');
+      return allowed.includes(val as string) ? (val as string) :
+             allowed.find(a => a === v || v.includes(a) || a.includes(val.toString().toLowerCase())) || null;
+    }
+    profile.category = sanitize(profile.category, VALID.category) || 'fashion';
+    profile.price_tier = sanitize(profile.price_tier, VALID.price_tier);
+    profile.status_signal_type = sanitize(profile.status_signal_type, VALID.status_signal_type);
+    profile.voice_tone = sanitize(profile.voice_tone, VALID.voice_tone);
+    profile.humor_level = sanitize(profile.humor_level, VALID.humor_level);
+    profile.sustainability_level = sanitize(profile.sustainability_level, VALID.sustainability_level);
+    profile.logo_visibility = sanitize(profile.logo_visibility, VALID.logo_visibility);
+    profile.exclusivity_level = sanitize(profile.exclusivity_level, VALID.exclusivity_level);
+    profile.design_language = sanitize(profile.design_language, VALID.design_language);
+    profile.visual_tone = sanitize(profile.visual_tone, VALID.visual_tone);
+
     // ── Step 2: Build identity text ───────────────────────────────────
     // Use GPT's identity_text blob if provided and substantial; otherwise generate from fields
     const gptIdentityText = typeof profile.identity_text === "string" && profile.identity_text.length > 50
