@@ -17,7 +17,10 @@ export default function LandingPage() {
               Audits
             </Link>
             <Link href="/match" className="text-sm text-zinc-400 hover:text-white transition-colors">
-              Matching Demo
+              Match Demo
+            </Link>
+            <Link href="/translate" className="text-sm text-zinc-400 hover:text-white transition-colors">
+              Translate
             </Link>
             <Link
               href="/questionnaire"
@@ -353,7 +356,10 @@ export default function LandingPage() {
               Audit Reports
             </Link>
             <Link href="/match" className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors">
-              Matching Demo
+              Match Demo
+            </Link>
+            <Link href="/translate" className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors">
+              Identity Translator
             </Link>
             <Link href="/questionnaire" className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors">
               Get Audited
