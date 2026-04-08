@@ -110,7 +110,7 @@ export default function TranslatePage() {
 
       const res = await fetch("/api/translate-identity", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-esina-internal": "1" },
         body: JSON.stringify(payload),
       });
 

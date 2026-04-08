@@ -40,7 +40,7 @@ export default function MatchPage() {
       const [esinaRes, genericRes] = await Promise.all([
         fetch("/api/run-match", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "x-esina-internal": "1" },
           body: JSON.stringify({ preferenceText: text }),
         }),
         fetch("/api/generic-ai", {

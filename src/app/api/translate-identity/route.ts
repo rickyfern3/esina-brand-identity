@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { checkApiKey } from "@/lib/api-auth";
 import OpenAI from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -65,11 +66,18 @@ Rules:
 - Weight archetypes honestly — most people have 2-3 dominant ones
 - Anti-preferences should reflect genuine avoidance patterns visible in the signals
 - style_tags should match the aesthetic vocabulary used in brand profiles (e.g. minimalist, maximalist, artisanal, avant_garde, classic, bohemian, heritage, organic, elevated_basics, streetwear, techwear, preppy)
+- Use ONLY the exact controlled vocabulary from the brand schema. Do not invent new terms.
 - Return ONLY valid JSON, no markdown, no explanation`;
 
 // ── Route ─────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  // ── Auth + rate limit ──────────────────────────────────────────────
+  const auth = checkApiKey(req);
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status ?? 401 });
+  }
+
   try {
     const body: ConsumerSignals = await req.json();
 

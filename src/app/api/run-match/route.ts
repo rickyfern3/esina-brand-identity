@@ -1,11 +1,18 @@
 export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { checkApiKey } from "@/lib/api-auth";
 import OpenAI from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(req: NextRequest) {
+  // ── Auth + rate limit ──────────────────────────────────────────────
+  const auth = checkApiKey(req);
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status ?? 401 });
+  }
+
   try {
     const { preferenceText } = await req.json();
 
