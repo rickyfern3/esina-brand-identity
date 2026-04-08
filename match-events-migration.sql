@@ -17,6 +17,10 @@ CREATE TABLE IF NOT EXISTS public.match_events (
   brand_name         text,
   similarity_score   numeric(5,4),                -- 0.0000 – 1.0000
 
+  -- Consumer context (stored at match time for attribution analysis)
+  consumer_signals   jsonb,                        -- raw signal input (purchase_history, search_queries, etc.)
+  translated_profile jsonb,                        -- GPT-translated identity profile (translate-identity only)
+
   -- Conversion tracking
   attribution_status text NOT NULL DEFAULT 'pending'  -- pending | converted | expired
     CHECK (attribution_status IN ('pending', 'converted', 'expired')),

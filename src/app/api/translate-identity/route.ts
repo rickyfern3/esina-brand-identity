@@ -35,6 +35,7 @@ export interface BrandMatch {
   score: number;
   rawSimilarity: number;
   snippet: string;
+  matchToken: string;
 }
 
 // ── System prompt ──────────────────────────────────────────────────────
@@ -179,28 +180,53 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const brandMatches: BrandMatch[] = (matches || []).map(
-      (m: {
-        brand_id: string;
-        brand_name: string;
-        category: string;
-        similarity: number;
-        identity_text: string;
-      }) => {
-        const sentences = (m.identity_text || "").match(/[^.!?]+[.!?]+/g) || [];
-        const snippet = sentences.slice(0, 2).join("").trim();
-        return {
-          brandId: m.brand_id,
-          brandName: m.brand_name,
-          category: m.category,
-          score: Math.round(m.similarity * 100),
-          rawSimilarity: m.similarity,
-          snippet,
-        };
-      }
+    // ── Step 6: Format matches, generate tokens, insert match_events ───
+    const brandMatches: BrandMatch[] = await Promise.all(
+      (matches || []).map(
+        async (m: {
+          brand_id: string;
+          brand_name: string;
+          category: string;
+          similarity: number;
+          identity_text: string;
+        }) => {
+          const sentences = (m.identity_text || "").match(/[^.!?]+[.!?]+/g) || [];
+          const snippet = sentences.slice(0, 2).join("").trim();
+
+          // Generate a unique token for this match event
+          const matchToken = crypto.randomUUID();
+
+          // Insert match event with full consumer context (non-fatal)
+          const { error: insertError } = await supabase
+            .from("match_events")
+            .insert({
+              id: matchToken,
+              brand_profile_id: m.brand_id,
+              brand_name: m.brand_name,
+              similarity_score: m.similarity,
+              preference_text: embeddingText,       // the embedding text used for matching
+              consumer_signals: body,               // raw input signals as jsonb
+              translated_profile: profile,          // GPT-translated identity profile as jsonb
+            });
+
+          if (insertError) {
+            console.error("match_events insert failed:", insertError.message);
+          }
+
+          return {
+            brandId: m.brand_id,
+            brandName: m.brand_name,
+            category: m.category,
+            score: Math.round(m.similarity * 100),
+            rawSimilarity: m.similarity,
+            snippet,
+            matchToken,
+          };
+        }
+      )
     );
 
-    // ── Step 6: Return full result ─────────────────────────────────────
+    // ── Step 7: Return full result ─────────────────────────────────────
     return NextResponse.json({
       translatedProfile: profile,
       embeddingText,

@@ -48,28 +48,50 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Format results with percentage scores and text snippets
-    const results = (matches || []).map(
-      (m: {
-        brand_id: string;
-        brand_name: string;
-        category: string;
-        similarity: number;
-        identity_text: string;
-      }) => {
-        // Extract first 2 sentences from identity_text for the snippet
-        const sentences = (m.identity_text || "").match(/[^.!?]+[.!?]+/g) || [];
-        const snippet = sentences.slice(0, 2).join("").trim();
+    // 3. Format results, generate a match token per brand, and insert match_events
+    const results = await Promise.all(
+      (matches || []).map(
+        async (m: {
+          brand_id: string;
+          brand_name: string;
+          category: string;
+          similarity: number;
+          identity_text: string;
+        }) => {
+          // Extract first 2 sentences from identity_text for the snippet
+          const sentences = (m.identity_text || "").match(/[^.!?]+[.!?]+/g) || [];
+          const snippet = sentences.slice(0, 2).join("").trim();
 
-        return {
-          brandId: m.brand_id,
-          brandName: m.brand_name,
-          category: m.category,
-          score: Math.round(m.similarity * 100),
-          rawSimilarity: m.similarity,
-          snippet,
-        };
-      }
+          // Generate a unique token for this match event
+          const matchToken = crypto.randomUUID();
+
+          // Insert match event (non-fatal — log error but don't fail the response)
+          const { error: insertError } = await supabase
+            .from("match_events")
+            .insert({
+              id: matchToken,
+              brand_profile_id: m.brand_id,
+              brand_name: m.brand_name,
+              similarity_score: m.similarity,
+              preference_text: preferenceText,
+              // consumer_signals and translated_profile are null for raw-text matches
+            });
+
+          if (insertError) {
+            console.error("match_events insert failed:", insertError.message);
+          }
+
+          return {
+            brandId: m.brand_id,
+            brandName: m.brand_name,
+            category: m.category,
+            score: Math.round(m.similarity * 100),
+            rawSimilarity: m.similarity,
+            snippet,
+            matchToken,
+          };
+        }
+      )
     );
 
     return NextResponse.json({ matches: results });
