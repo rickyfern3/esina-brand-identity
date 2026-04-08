@@ -62,30 +62,29 @@ anti_values (max 3): fast-fashion, mass-production, conformity, logos, wastefuln
 style_tags (max 5): minimalist, maximalist, vintage, contemporary, artisanal, streetwear, preppy, bohemian,
   romantic, utilitarian, androgynous, feminine, sculptural, organic, graphic, monochrome, earthy, playful
 
-design_language (pick ONE): clean, ornate, handcrafted, architectural, raw, refined, playful, geometric, fluid, eclectic
+design_language (pick ONE): clean, ornate, raw, polished, eclectic, industrial
 
-visual_tone (pick ONE): muted, bold, earthy, monochrome, vibrant, pastel, dark, washed, saturated
+visual_tone (pick ONE): serious, playful, ironic, aspirational, authentic, provocative
 
 voice_tone (pick ONE): formal, casual, irreverent, authoritative, warm, edgy
 
-humor_level (pick ONE): none, subtle, moderate, heavy
+humor_level (pick ONE): none, subtle, moderate, central_to_brand
 
-emotional_resonance (pick ONE): joy, nostalgia, confidence, calm, rebellion, belonging, aspiration, intimacy,
-  wonder, pride, discovery
+emotional_resonance (pick ONE): serenity, empowerment, belonging, excitement, rebellion, nostalgia, joy, confidence, comfort
 
-sustainability_level (pick ONE): none, partial, committed, core
+sustainability_level (pick ONE): none, basic, committed, leader, regenerative
 
 status_signal_type (pick ONE): conspicuous, quiet_luxury, counterculture, accessible_premium, anti_status
 
-logo_visibility (pick ONE): hidden, subtle, visible, prominent
+logo_visibility (pick ONE): prominent, subtle, hidden, ironic
 
-exclusivity_level (pick ONE): mass, accessible, selective, exclusive
+exclusivity_level (pick ONE): mass_market, widely_available, selective, limited, ultra_exclusive
 
 communities (max 5): vintage-lovers, thrifters, sustainability-advocates, fashion-students, artists, creatives,
   slow-fashion-community, upcyclers, streetwear-heads, independent-fashion, craft-enthusiasts, jewellery-lovers,
   Depop-community, London-fashion-scene, NYC-fashion-scene, the-sartorialist, archival-fashion
 
-price_tier (pick ONE): budget, value, mid, premium
+price_tier (pick ONE): budget, value, mid, premium, luxury, ultra_luxury
 
 Return a JSON object with ALL of these fields:
 {
@@ -221,15 +220,16 @@ export async function POST(req: NextRequest) {
     // ── Step 1b: Sanitize controlled vocabulary fields ───────────────
     const VALID = {
       category: ['fashion','jewelry','accessories','beauty','homeware','lifestyle','streetwear','vintage','art'],
-      price_tier: ['budget','value','mid','premium','luxury'],
+      price_tier: ['budget','value','mid','premium','luxury','ultra_luxury'],
       status_signal_type: ['conspicuous','quiet_luxury','counterculture','accessible_premium','anti_status'],
       voice_tone: ['formal','casual','irreverent','authoritative','warm','edgy'],
-      humor_level: ['none','subtle','moderate','heavy'],
-      sustainability_level: ['none','partial','committed','core'],
-      logo_visibility: ['hidden','subtle','visible','prominent'],
-      exclusivity_level: ['mass','accessible','selective','exclusive'],
-      design_language: ['clean','ornate','handcrafted','architectural','raw','refined','playful','geometric','fluid','eclectic'],
-      visual_tone: ['muted','bold','earthy','monochrome','vibrant','pastel','dark','washed','saturated'],
+      humor_level: ['none','subtle','moderate','central_to_brand'],
+      sustainability_level: ['none','basic','committed','leader','regenerative'],
+      logo_visibility: ['prominent','subtle','hidden','ironic'],
+      exclusivity_level: ['mass_market','widely_available','selective','limited','ultra_exclusive'],
+      design_language: ['clean','ornate','raw','polished','eclectic','industrial'],
+      visual_tone: ['serious','playful','ironic','aspirational','authentic','provocative'],
+      emotional_resonance: ['serenity','empowerment','belonging','excitement','rebellion','nostalgia','joy','confidence','comfort'],
     };
     const sanitize = (val: unknown, allowed: string[]): string | null => {
       if (!val || typeof val !== 'string') return null;
@@ -247,6 +247,7 @@ export async function POST(req: NextRequest) {
     profile.exclusivity_level = sanitize(profile.exclusivity_level, VALID.exclusivity_level);
     profile.design_language = sanitize(profile.design_language, VALID.design_language);
     profile.visual_tone = sanitize(profile.visual_tone, VALID.visual_tone);
+    profile.emotional_resonance = sanitize(profile.emotional_resonance, VALID.emotional_resonance);
 
     // ── Step 2: Build identity text ───────────────────────────────────
     // Use GPT's identity_text blob if provided and substantial; otherwise generate from fields
@@ -296,21 +297,21 @@ export async function POST(req: NextRequest) {
         brand_name: String(profile.brand_name),
         category: String(profile.category || "fashion"),
         subcategories: (profile.subcategories as string[]) || [],
-        price_tier: (['budget','value','mid','premium','luxury'] as const).includes(profile.price_tier as never) ? String(profile.price_tier) : null,
+        price_tier: (['budget','value','mid','premium','luxury','ultra_luxury'] as const).includes(profile.price_tier as never) ? String(profile.price_tier) : null,
         archetypes: (profile.archetypes as object[]) || [],
         values: (profile.values as string[]) || [],
         anti_values: (profile.anti_values as string[]) || [],
         style_tags: (profile.style_tags as string[]) || [],
-        design_language: (['clean','ornate','handcrafted','architectural','raw','refined','playful','geometric','fluid','eclectic'] as const).includes(profile.design_language as never) ? String(profile.design_language) : 'eclectic',
-        visual_tone: (['muted','bold','earthy','monochrome','vibrant','pastel','dark','washed','saturated'] as const).includes(profile.visual_tone as never) ? String(profile.visual_tone) : 'muted',
-        // Enum fields: validate strictly against DB check constraints; use safe defaults if GPT value is out of range
+        design_language: (['clean','ornate','raw','polished','eclectic','industrial'] as const).includes(profile.design_language as never) ? String(profile.design_language) : 'eclectic',
+        visual_tone: (['serious','playful','ironic','aspirational','authentic','provocative'] as const).includes(profile.visual_tone as never) ? String(profile.visual_tone) : 'authentic',
+        // Enum fields: validated against exact DB check constraint values; safe defaults if GPT value is out of range
         voice_tone: (['formal','casual','irreverent','authoritative','warm','edgy'] as const).includes(profile.voice_tone as never) ? String(profile.voice_tone) : 'casual',
-        humor_level: (['none','subtle','moderate','heavy'] as const).includes(profile.humor_level as never) ? String(profile.humor_level) : 'none',
-        emotional_resonance: profile.emotional_resonance || null,
-        sustainability_level: (['none','partial','committed','core'] as const).includes(profile.sustainability_level as never) ? String(profile.sustainability_level) : 'partial',
+        humor_level: (['none','subtle','moderate','central_to_brand'] as const).includes(profile.humor_level as never) ? String(profile.humor_level) : 'none',
+        emotional_resonance: (['serenity','empowerment','belonging','excitement','rebellion','nostalgia','joy','confidence','comfort'] as const).includes(profile.emotional_resonance as never) ? String(profile.emotional_resonance) : null,
+        sustainability_level: (['none','basic','committed','leader','regenerative'] as const).includes(profile.sustainability_level as never) ? String(profile.sustainability_level) : 'none',
         status_signal_type: (['conspicuous','quiet_luxury','counterculture','accessible_premium','anti_status'] as const).includes(profile.status_signal_type as never) ? String(profile.status_signal_type) : 'counterculture',
-        logo_visibility: (['hidden','subtle','visible','prominent'] as const).includes(profile.logo_visibility as never) ? String(profile.logo_visibility) : 'hidden',
-        exclusivity_level: (['mass','accessible','selective','exclusive'] as const).includes(profile.exclusivity_level as never) ? String(profile.exclusivity_level) : 'accessible',
+        logo_visibility: (['prominent','subtle','hidden','ironic'] as const).includes(profile.logo_visibility as never) ? String(profile.logo_visibility) : 'subtle',
+        exclusivity_level: (['mass_market','widely_available','selective','limited','ultra_exclusive'] as const).includes(profile.exclusivity_level as never) ? String(profile.exclusivity_level) : 'widely_available',
         communities: (profile.communities as string[]) || [],
         identity_statements: (profile.identity_statements as string[]) || [],
         origin_story: profile.origin_story || null,
