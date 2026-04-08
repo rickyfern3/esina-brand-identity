@@ -231,12 +231,12 @@ export async function POST(req: NextRequest) {
       design_language: ['clean','ornate','handcrafted','architectural','raw','refined','playful','geometric','fluid','eclectic'],
       visual_tone: ['muted','bold','earthy','monochrome','vibrant','pastel','dark','washed','saturated'],
     };
-    function sanitize(val: unknown, allowed: string[]): string | null {
+    const sanitize = (val: unknown, allowed: string[]): string | null => {
       if (!val || typeof val !== 'string') return null;
       const v = val.toLowerCase().replace(/[_\s-]+/g, '_');
       return allowed.includes(val as string) ? (val as string) :
              allowed.find(a => a === v || v.includes(a) || a.includes(val.toString().toLowerCase())) || null;
-    }
+    };
     profile.category = sanitize(profile.category, VALID.category) || 'fashion';
     profile.price_tier = sanitize(profile.price_tier, VALID.price_tier);
     profile.status_signal_type = sanitize(profile.status_signal_type, VALID.status_signal_type);
