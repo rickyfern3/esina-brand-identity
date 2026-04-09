@@ -793,15 +793,163 @@ function StepReview({ data, onEdit }: { data: FormData; onEdit: (step: number) =
   );
 }
 
+// ── Install Step ────────────────────────────────────────────────────
+
+function StepInstall({ brandId, brandName }: { brandId: string; brandName: string }) {
+  const [copied, setCopied] = useState(false);
+  const embedCode = `<script src="https://esina-brand-identity.vercel.app/esina.js?brand=${brandId}"></script>`;
+  const brandMdUrl = `https://esina-brand-identity.vercel.app/api/brand/${brandId}`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(embedCode).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  return (
+    <div>
+      {/* Success header */}
+      <div className="text-center mb-10">
+        <div className="w-16 h-16 rounded-full bg-emerald-950/50 border border-emerald-700/40 flex items-center justify-center mx-auto mb-4">
+          <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h2 className="text-2xl font-bold text-white mb-2">
+          {brandName} is live on ESINA.
+        </h2>
+        <p className="text-zinc-400">
+          Your brand identity profile and AI perception audit are ready.
+          Now install the attribution pixel to close the loop.
+        </p>
+      </div>
+
+      {/* Step 1: Embed code */}
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-6 h-6 rounded-full bg-violet-900/60 text-violet-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
+            1
+          </div>
+          <p className="text-sm font-semibold text-white">Add this line to your website</p>
+        </div>
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-start gap-3">
+          <code className="text-sm text-violet-200 flex-1 break-all leading-relaxed font-mono">
+            {embedCode}
+          </code>
+          <button
+            type="button"
+            onClick={handleCopy}
+            className={`flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
+              copied
+                ? "bg-emerald-900/60 text-emerald-300 border border-emerald-700/40"
+                : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white border border-zinc-700"
+            }`}
+          >
+            {copied ? "Copied!" : "Copy"}
+          </button>
+        </div>
+        <p className="text-xs text-zinc-500 mt-2 leading-relaxed">
+          Paste into your <code className="text-zinc-400">&lt;head&gt;</code> tag, before{" "}
+          <code className="text-zinc-400">&lt;/body&gt;</code>, or via your tag manager.
+          Works on Shopify, Squarespace, Webflow, or any website.
+        </p>
+      </div>
+
+      {/* What it does */}
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5 mb-6">
+        <p className="text-xs text-zinc-500 uppercase tracking-widest mb-3">What this does</p>
+        <div className="space-y-3">
+          {[
+            {
+              icon: "🔍",
+              title: "AI agent discovery",
+              desc: "Adds a machine-readable link tag so AI agents crawling your site can find your full brand identity profile automatically.",
+            },
+            {
+              icon: "🍪",
+              title: "Session token capture",
+              desc: "When ESINA sends a consumer to your site, we include an esina_token in the URL. The script captures and stores it in a first-party cookie.",
+            },
+            {
+              icon: "📊",
+              title: "Conversion attribution",
+              desc: "When a customer completes a purchase on your Shopify store, the script fires a conversion event back to ESINA automatically — no extra setup needed.",
+            },
+          ].map((item) => (
+            <div key={item.title} className="flex gap-3">
+              <span className="text-lg flex-shrink-0">{item.icon}</span>
+              <div>
+                <p className="text-sm font-medium text-white">{item.title}</p>
+                <p className="text-xs text-zinc-400 leading-relaxed">{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Step 2: Brand.md preview */}
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-6 h-6 rounded-full bg-violet-900/60 text-violet-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
+            2
+          </div>
+          <p className="text-sm font-semibold text-white">Your brand.md is live</p>
+        </div>
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-center justify-between gap-3">
+          <code className="text-sm text-zinc-300 truncate">{brandMdUrl}</code>
+          <a
+            href={brandMdUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white border border-zinc-700 transition-all"
+          >
+            Preview ↗
+          </a>
+        </div>
+        <p className="text-xs text-zinc-500 mt-2">
+          AI agents discover this endpoint via the link tag. It returns your full identity profile as
+          structured markdown with matching instructions.
+        </p>
+      </div>
+
+      {/* Pricing note */}
+      <div className="border border-violet-800/20 bg-violet-950/10 rounded-xl p-4 mb-6 text-center">
+        <p className="text-sm text-zinc-300">
+          <span className="text-white font-medium">You only pay when you make money.</span>{" "}
+          Attribution is free. ESINA takes a small revenue share only on verified conversions.
+        </p>
+      </div>
+
+      {/* CTA buttons */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <a
+          href={`/audit/${brandId}`}
+          className="flex-1 text-center px-6 py-3 bg-violet-700 hover:bg-violet-600 text-white font-semibold rounded-xl transition-colors"
+        >
+          View AI Perception Audit →
+        </a>
+        <a
+          href="/brands"
+          className="flex-1 text-center px-6 py-3 border border-zinc-700 hover:border-zinc-600 text-zinc-300 hover:text-white font-medium rounded-xl transition-colors"
+        >
+          Browse Brand Directory
+        </a>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Page ────────────────────────────────────────────────────────
 
 export default function QuestionnairePage() {
-  const router = useRouter();
+  useRouter(); // kept for future navigation; currently replaced by completedBrandId state
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [submitting, setSubmitting] = useState(false);
   const [submitStage, setSubmitStage] = useState("");
   const [error, setError] = useState("");
+  const [completedBrandId, setCompletedBrandId] = useState<string | null>(null);
 
   const update = useCallback((key: keyof FormData, value: unknown) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -835,10 +983,13 @@ export default function QuestionnairePage() {
         throw new Error(data.error || "Submission failed");
       }
 
-      setSubmitStage("Building your report...");
+      setSubmitStage("Setting up your attribution pixel...");
       const { brandId } = await res.json();
-      await new Promise((r) => setTimeout(r, 500));
-      router.push(`/audit/${brandId}`);
+      await new Promise((r) => setTimeout(r, 600));
+      // Show install step instead of immediately redirecting
+      setCompletedBrandId(brandId);
+      setSubmitting(false);
+      setSubmitStage("");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Something went wrong";
       setError(message);
@@ -847,7 +998,32 @@ export default function QuestionnairePage() {
     }
   };
 
+
   const progress = ((step - 1) / (TOTAL_STEPS - 1)) * 100;
+
+  // ── Install screen (shown after successful submission) ──────────────
+  if (completedBrandId) {
+    return (
+      <div className="min-h-screen bg-[#09090b]">
+        <header className="border-b border-zinc-800/60">
+          <div className="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
+            <Link href="/match" className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center">
+                <span className="text-white font-bold text-xs">E</span>
+              </div>
+              <span className="text-base font-semibold text-white tracking-tight">ESINA</span>
+            </Link>
+            <span className="text-xs text-zinc-500">Install Tracking</span>
+          </div>
+          {/* Progress bar — full */}
+          <div className="h-0.5 bg-violet-600" />
+        </header>
+        <main className="max-w-2xl mx-auto px-6 py-10">
+          <StepInstall brandId={completedBrandId} brandName={form.brand_name} />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#09090b]">
