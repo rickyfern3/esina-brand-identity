@@ -60,7 +60,23 @@ const EMPTY_FORM: FormData = {
 
 // ── Controlled vocabulary ────────────────────────────────────────────
 
-const CATEGORIES = ["Fashion", "Food & Beverage", "Beauty & Personal Care", "Health & Wellness", "Home & Lifestyle", "Tech & Accessories", "Other"];
+const CATEGORIES = [
+  "Fashion & Apparel",
+  "Food & Beverage",
+  "Beauty & Personal Care",
+  "Health & Wellness",
+  "Home & Lifestyle",
+  "Hospitality & Travel",
+  "Tech & Accessories",
+  "Sports & Outdoor",
+  "Entertainment & Media",
+  "Automotive",
+  "Pets",
+  "Baby & Kids",
+  "Financial Services",
+  "Education",
+  "Other",
+];
 const PLATFORMS = ["Shopify", "Depop", "Etsy", "Amazon", "Squarespace", "Standalone website", "Instagram shop", "Other"];
 const PRICE_TIERS = [
   { id: "budget", label: "Budget", desc: "Accessible pricing for everyone" },
@@ -130,8 +146,8 @@ const LOGO_VISIBILITY = [
   { id: "hidden", label: "Hidden", desc: "Those who know, know" },
   { id: "ironic", label: "Ironic", desc: "Logo as commentary on itself" },
 ];
-const COMMUNITIES = ["Skate", "Yoga / Wellness", "Tech", "Streetwear", "Outdoor / Adventure", "Fitness", "Art", "Music", "Gaming", "Fashion", "Food / Cooking", "Travel", "Sustainability", "Parenting", "Luxury", "Startup / Entrepreneur", "Creative"];
-const TREND_ALIGNMENT = ["quiet_luxury", "anti_corporate", "functional_fashion", "clean_beauty", "regenerative", "slow_fashion", "gender_neutral", "founder_led", "community_commerce", "ai_native", "heritage_revival", "dopamine_dressing"];
+const COMMUNITIES = ["Skate", "Yoga / Wellness", "Tech", "Streetwear", "Outdoor / Adventure", "Fitness", "Art", "Music", "Gaming", "Fashion", "Food / Cooking", "Coffee Culture", "Travel", "Sustainability", "Parenting", "Pets", "Luxury", "Startup / Entrepreneur", "Creative", "Sports", "Film & Cinema", "Home Cooking", "Mindfulness", "Education"];
+const TREND_ALIGNMENT = ["quiet_luxury", "anti_corporate", "functional_fashion", "clean_beauty", "regenerative", "slow_fashion", "gender_neutral", "founder_led", "community_commerce", "ai_native", "heritage_revival", "dopamine_dressing", "craft_first", "wellness_culture", "local_first", "experience_economy", "radical_transparency", "accessible_premium"];
 
 const TOTAL_STEPS = 7;
 
@@ -278,6 +294,9 @@ function StepBasics({ data, update }: { data: FormData; update: (k: keyof FormDa
             </OptionCard>
           ))}
         </div>
+        <p className="text-xs text-zinc-600 mt-2">
+          Identity schema — archetypes, values, aesthetics, community, status signal — applies universally across all categories.
+        </p>
       </FieldGroup>
 
       <FieldGroup label="Where do you sell?" hint="Select all that apply.">
