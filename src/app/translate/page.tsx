@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import type { TranslatedConsumerProfile, BrandMatch } from "@/app/api/translate-identity/route";
+import type { TranslatedConsumerProfile, BrandMatch, IdentityBlend } from "@/app/api/translate-identity/route";
 
 // ── Seed examples ──────────────────────────────────────────────────────
 
@@ -32,16 +32,51 @@ const SEED_SIGNALS = {
   ],
   free_text:
     "I care deeply about craft and who made something. I buy things to last, not to signal status. I'm drawn to brands that feel considered — that have a point of view, not just a product range.",
+  music: [
+    "Arca",
+    "Floating Points",
+    "Japanese city pop",
+    "ECM Records artists",
+    "Harold Budd",
+  ],
+  films_tv: [
+    "Wes Anderson films",
+    "Chantal Akerman",
+    "The Favourite",
+    "A24 productions",
+    "Slow cinema",
+  ],
+  art_design: [
+    "Bauhaus",
+    "Agnes Martin",
+    "Dieter Rams",
+    "Yayoi Kusama",
+    "wabi-sabi ceramics",
+  ],
+  social_follows: [
+    "@apartamentomagazine",
+    "@ssense",
+    "@thisisgroundwork",
+    "Kinfolk",
+    "The School of Life",
+  ],
+  saved_content: [
+    "Essay on slow fashion supply chains",
+    "Profile of Lemaire creative director",
+    "Guide to natural dye techniques",
+    "Interview with Naoto Fukasawa on designing nothing",
+  ],
 };
 
 // ── Helper components ─────────────────────────────────────────────────
 
-function Tag({ children, color = "zinc" }: { children: string; color?: "esina" | "zinc" | "amber" | "red" }) {
+function Tag({ children, color = "zinc" }: { children: string; color?: "esina" | "zinc" | "amber" | "red" | "violet" }) {
   const styles = {
     esina: "bg-esina-950/50 border-esina-800/40 text-esina-300",
     zinc: "bg-zinc-800/60 border-zinc-700/40 text-zinc-300",
     amber: "bg-amber-950/40 border-amber-800/40 text-amber-300",
     red: "bg-red-950/30 border-red-800/40 text-red-400",
+    violet: "bg-violet-950/40 border-violet-800/40 text-violet-300",
   };
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-md border text-xs font-medium ${styles[color]}`}>
@@ -74,13 +109,112 @@ function ArchetypeBar({ archetype, weight, primary }: { archetype: string; weigh
   );
 }
 
+function BlendCard({ blend }: { blend: IdentityBlend }) {
+  const strengthPct = Math.round(blend.blend_strength * 100);
+  return (
+    <div className="bg-zinc-800/30 border border-violet-900/40 rounded-xl p-4">
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <div>
+          <span className="text-sm font-semibold text-violet-300">{blend.blend_name}</span>
+        </div>
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <div className="w-16 h-1 bg-zinc-700 rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full bg-violet-500"
+              style={{ width: `${strengthPct}%` }}
+            />
+          </div>
+          <span className="text-xs text-zinc-500 font-mono">{strengthPct}%</span>
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-1.5 mb-2">
+        {blend.blend_dimensions.map((d) => (
+          <Tag key={d} color="violet">{d}</Tag>
+        ))}
+      </div>
+      <p className="text-xs text-zinc-400 leading-relaxed">{blend.blend_description}</p>
+    </div>
+  );
+}
+
+// ── Section divider for inputs ────────────────────────────────────────
+
+function InputSection({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label className="block text-xs font-medium text-zinc-400 mb-2">
+        {label}{" "}
+        {hint && <span className="text-zinc-600 font-normal">{hint}</span>}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+// ── Collapsible panel for multimodal signals ──────────────────────────
+
+function CollapsiblePanel({
+  title,
+  badge,
+  children,
+  defaultOpen = false,
+}: {
+  title: string;
+  badge?: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="border border-zinc-800/60 rounded-xl overflow-hidden">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-4 py-3 bg-zinc-900/60 hover:bg-zinc-800/40 transition-colors text-left"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-zinc-300 uppercase tracking-widest">{title}</span>
+          {badge && (
+            <span className="text-[10px] text-violet-400 bg-violet-950/40 border border-violet-800/40 rounded-full px-1.5 py-0.5">
+              {badge}
+            </span>
+          )}
+        </div>
+        <svg
+          className={`w-4 h-4 text-zinc-500 transition-transform ${open ? "rotate-180" : ""}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {open && <div className="p-4 space-y-4 bg-zinc-900/20">{children}</div>}
+    </div>
+  );
+}
+
 // ── Main page ─────────────────────────────────────────────────────────
 
 export default function TranslatePage() {
+  // Core signals
   const [purchaseHistory, setPurchaseHistory] = useState(SEED_SIGNALS.purchase_history.join("\n"));
   const [searchQueries, setSearchQueries] = useState(SEED_SIGNALS.search_queries.join("\n"));
   const [interests, setInterests] = useState(SEED_SIGNALS.interests.join("\n"));
   const [freeText, setFreeText] = useState(SEED_SIGNALS.free_text);
+  // Multimodal signals
+  const [music, setMusic] = useState("");
+  const [filmsTv, setFilmsTv] = useState("");
+  const [artDesign, setArtDesign] = useState("");
+  const [socialFollows, setSocialFollows] = useState("");
+  const [savedContent, setSavedContent] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -106,6 +240,11 @@ export default function TranslatePage() {
         search_queries: parseLines(searchQueries),
         interests: parseLines(interests),
         free_text: freeText.trim() || undefined,
+        music: parseLines(music).length > 0 ? parseLines(music) : undefined,
+        films_tv: parseLines(filmsTv).length > 0 ? parseLines(filmsTv) : undefined,
+        art_design: parseLines(artDesign).length > 0 ? parseLines(artDesign) : undefined,
+        social_follows: parseLines(socialFollows).length > 0 ? parseLines(socialFollows) : undefined,
+        saved_content: parseLines(savedContent).length > 0 ? parseLines(savedContent) : undefined,
       };
 
       const res = await fetch("/api/translate-identity", {
@@ -131,6 +270,11 @@ export default function TranslatePage() {
     setSearchQueries(SEED_SIGNALS.search_queries.join("\n"));
     setInterests(SEED_SIGNALS.interests.join("\n"));
     setFreeText(SEED_SIGNALS.free_text);
+    setMusic(SEED_SIGNALS.music.join("\n"));
+    setFilmsTv(SEED_SIGNALS.films_tv.join("\n"));
+    setArtDesign(SEED_SIGNALS.art_design.join("\n"));
+    setSocialFollows(SEED_SIGNALS.social_follows.join("\n"));
+    setSavedContent(SEED_SIGNALS.saved_content.join("\n"));
   }
 
   const hasResults = profile !== null;
@@ -164,7 +308,7 @@ export default function TranslatePage() {
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">Consumer Identity Translator</h1>
             <p className="text-zinc-400 max-w-2xl leading-relaxed">
-              Paste in raw behavioral signals — purchases, searches, interests, free text. Esina translates them into a structured identity profile and matches it against the brand database.
+              Paste in raw behavioral signals — purchases, searches, music, film, art, follows. Esina translates them into a structured identity profile with blend signatures and matches against the brand database.
             </p>
           </div>
           <button
@@ -177,68 +321,98 @@ export default function TranslatePage() {
 
         <div className="grid lg:grid-cols-2 gap-8">
           {/* ── Input panel ── */}
-          <div className="space-y-5">
+          <div className="space-y-4">
+
+            {/* Core signals */}
             <div className="bg-zinc-900/40 border border-zinc-800/60 rounded-2xl p-6 space-y-5">
               <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-widest">
-                Behavioral Signals
+                Core Signals
               </h2>
 
-              {/* Purchase history */}
-              <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-2">
-                  Purchase history{" "}
-                  <span className="text-zinc-600 font-normal">— one brand or item per line</span>
-                </label>
+              <InputSection label="Purchase history" hint="— one brand or item per line">
                 <TextareaField
                   value={purchaseHistory}
                   onChange={setPurchaseHistory}
                   placeholder={"Alighieri jewelry\nAesop skincare\nMargaret Howell trousers"}
                   rows={5}
                 />
-              </div>
+              </InputSection>
 
-              {/* Search queries */}
-              <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-2">
-                  Recent searches{" "}
-                  <span className="text-zinc-600 font-normal">— one per line</span>
-                </label>
+              <InputSection label="Recent searches" hint="— one per line">
                 <TextareaField
                   value={searchQueries}
                   onChange={setSearchQueries}
                   placeholder={"quiet luxury brands\nminimalist jewelry no logo\nslow fashion womenswear"}
                   rows={4}
                 />
-              </div>
+              </InputSection>
 
-              {/* Interests */}
-              <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-2">
-                  Interests / accounts followed / communities{" "}
-                  <span className="text-zinc-600 font-normal">— one per line</span>
-                </label>
+              <InputSection label="Interests / accounts followed / communities" hint="— one per line">
                 <TextareaField
                   value={interests}
                   onChange={setInterests}
                   placeholder={"architecture\ncontemporary art\nindependent bookshops"}
                   rows={4}
                 />
-              </div>
+              </InputSection>
 
-              {/* Free text */}
-              <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-2">
-                  Free text description{" "}
-                  <span className="text-zinc-600 font-normal">— any natural language</span>
-                </label>
+              <InputSection label="Free text description" hint="— any natural language">
                 <TextareaField
                   value={freeText}
                   onChange={setFreeText}
                   placeholder="Describe this consumer in your own words..."
                   rows={3}
                 />
-              </div>
+              </InputSection>
             </div>
+
+            {/* Multimodal signals — collapsible */}
+            <CollapsiblePanel title="Cultural Signals" badge="new · stronger identity markers">
+              <InputSection label="Music" hint="— artists, genres, playlists (one per line)">
+                <TextareaField
+                  value={music}
+                  onChange={setMusic}
+                  placeholder={"Floating Points\nJapanese city pop\nECM Records artists"}
+                  rows={3}
+                />
+              </InputSection>
+
+              <InputSection label="Films & TV" hint="— movies, shows, directors (one per line)">
+                <TextareaField
+                  value={filmsTv}
+                  onChange={setFilmsTv}
+                  placeholder={"Wes Anderson films\nChantal Akerman\nA24 productions"}
+                  rows={3}
+                />
+              </InputSection>
+
+              <InputSection label="Art & design" hint="— artists, movements, aesthetics (one per line)">
+                <TextareaField
+                  value={artDesign}
+                  onChange={setArtDesign}
+                  placeholder={"Bauhaus\nAgnes Martin\nDieter Rams"}
+                  rows={3}
+                />
+              </InputSection>
+
+              <InputSection label="Social follows" hint="— accounts or creators (one per line)">
+                <TextareaField
+                  value={socialFollows}
+                  onChange={setSocialFollows}
+                  placeholder={"@apartamentomagazine\n@ssense\nKinfolk"}
+                  rows={3}
+                />
+              </InputSection>
+
+              <InputSection label="Saved content" hint="— descriptions of bookmarked/saved items (one per line)">
+                <TextareaField
+                  value={savedContent}
+                  onChange={setSavedContent}
+                  placeholder={"Essay on slow fashion supply chains\nInterview with Naoto Fukasawa"}
+                  rows={3}
+                />
+              </InputSection>
+            </CollapsiblePanel>
 
             <button
               onClick={handleTranslate}
@@ -275,7 +449,7 @@ export default function TranslatePage() {
                   </svg>
                 </div>
                 <p className="text-zinc-500 text-sm leading-relaxed max-w-xs mx-auto">
-                  Paste behavioral signals on the left and click Translate to see the consumer&apos;s identity profile and matching brands.
+                  Paste behavioral signals on the left and click Translate to see the consumer&apos;s identity profile, blend signatures, and matching brands.
                 </p>
               </div>
             )}
@@ -368,6 +542,29 @@ export default function TranslatePage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Identity Blend Signatures */}
+                {profile.blends && profile.blends.length > 0 && (
+                  <div className="bg-zinc-900/40 border border-violet-900/40 rounded-2xl overflow-hidden">
+                    <div className="px-6 py-4 border-b border-violet-900/30 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-white">Identity Blend Signatures</span>
+                        <span className="text-[10px] text-violet-400 bg-violet-950/40 border border-violet-800/40 rounded-full px-1.5 py-0.5">
+                          cross-dimensional
+                        </span>
+                      </div>
+                      <span className="text-xs text-zinc-500">{profile.blends.length} patterns detected</span>
+                    </div>
+                    <div className="p-5 space-y-3">
+                      <p className="text-xs text-zinc-600 leading-relaxed mb-4">
+                        Blend signatures capture cross-dimensional patterns that are more specific and predictive than any single identity dimension alone.
+                      </p>
+                      {profile.blends.map((blend, i) => (
+                        <BlendCard key={i} blend={blend} />
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Brand Matches */}
                 <div className="bg-zinc-900/40 border border-zinc-800/60 rounded-2xl overflow-hidden">
