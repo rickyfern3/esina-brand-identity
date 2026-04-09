@@ -27,13 +27,11 @@ export async function GET(request: NextRequest) {
     if (eventsError) throw eventsError;
 
     // ── 2. Brand profiles for category lookups ────────────────────────────
-    const brandProfileIds = [
-      ...new Set(
-        (allEvents ?? [])
-          .map((e) => e.brand_profile_id)
-          .filter(Boolean)
-      ),
-    ];
+    const brandProfileIds = Array.from(new Set(
+      (allEvents ?? [])
+        .map((e) => e.brand_profile_id)
+        .filter(Boolean)
+    ));
 
     let brandCategories: Record<string, string> = {};
     if (brandProfileIds.length > 0) {

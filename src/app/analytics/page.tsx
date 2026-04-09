@@ -5,6 +5,33 @@ import Link from "next/link";
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
+interface SchemaCandidateRow {
+  id: string;
+  candidate_name: string;
+  candidate_type: string;
+  definition: string;
+  confidence_score: number;
+  sample_count: number;
+  evidence_count: number;
+  first_detected: string;
+  last_updated: string;
+  status: string;
+  approved_at: string | null;
+}
+
+interface SchemaEvolutionData {
+  generated_at: string;
+  total_converted_analyzed: number;
+  novel_traits_detected: number;
+  qualified_candidates: number;
+  emerging_clusters: Array<{
+    combo: string[];
+    count: number;
+    event_ids: string[];
+  }>;
+  all_candidates: SchemaCandidateRow[];
+}
+
 interface IdentityTrendsData {
   generated_at: string;
   summary: {
@@ -149,8 +176,50 @@ export default function AnalyticsDashboard() {
   const [apiKey, setApiKey] = useState("");
   const [inputKey, setInputKey] = useState("");
   const [data, setData] = useState<IdentityTrendsData | null>(null);
+  const [schemaData, setSchemaData] = useState<SchemaEvolutionData | null>(null);
+  const [schemaLoading, setSchemaLoading] = useState(false);
+  const [approving, setApproving] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const fetchSchemaEvolution = useCallback(async (key: string) => {
+    setSchemaLoading(true);
+    try {
+      const res = await fetch("/api/analytics/schema-evolution", {
+        headers: { Authorization: `Bearer ${key}` },
+      });
+      if (res.ok) {
+        const json: SchemaEvolutionData = await res.json();
+        setSchemaData(json);
+      }
+    } catch {
+      // Schema evolution is supplementary — don't block the dashboard
+    } finally {
+      setSchemaLoading(false);
+    }
+  }, []);
+
+  const handleCandidateAction = useCallback(async (candidateId: string, action: "approve" | "reject") => {
+    setApproving(candidateId);
+    try {
+      const res = await fetch("/api/analytics/schema-evolution/approve", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({ candidate_id: candidateId, action }),
+      });
+      if (res.ok) {
+        // Refresh schema data after action
+        await fetchSchemaEvolution(apiKey);
+      }
+    } catch {
+      // silent — user can retry
+    } finally {
+      setApproving(null);
+    }
+  }, [apiKey, fetchSchemaEvolution]);
 
   const fetchData = useCallback(
     async (key: string) => {
@@ -167,13 +236,15 @@ export default function AnalyticsDashboard() {
         const json: IdentityTrendsData = await res.json();
         setData(json);
         setApiKey(key);
+        // Also fetch schema evolution data
+        fetchSchemaEvolution(key);
       } catch (err) {
         setError(err instanceof Error ? err.message : String(err));
       } finally {
         setLoading(false);
       }
     },
-    []
+    [fetchSchemaEvolution]
   );
 
   // ── Auth gate ─────────────────────────────────────────────────────────
@@ -525,6 +596,175 @@ export default function AnalyticsDashboard() {
             </div>
 
           </div>
+        </section>
+
+        {/* Schema Evolution — Candidate Dimensions */}
+        <section className="bg-zinc-900/40 border border-zinc-800/60 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <SectionTitle>Schema Evolution — Candidate Dimensions</SectionTitle>
+            {schemaLoading && (
+              <div className="w-4 h-4 border-2 border-esina-500 border-t-transparent rounded-full animate-spin" />
+            )}
+          </div>
+          <p className="text-xs text-zinc-600 mb-6">
+            Identity traits detected in converted matches that fall outside the current controlled vocabulary.
+            Candidates with 10+ converted matches are flagged for review. Approving adds them to the GPT prompts
+            used for brand profiling and consumer translation.
+          </p>
+
+          {!schemaData ? (
+            <p className="text-sm text-zinc-600">Loading schema evolution data…</p>
+          ) : schemaData.all_candidates.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-sm text-zinc-500">No candidate dimensions detected yet.</p>
+              <p className="text-xs text-zinc-600 mt-1">
+                Candidates appear when 10+ converted matches share traits outside the controlled vocabulary.
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Summary stats for schema evolution */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                <StatCard
+                  label="Converted Analyzed"
+                  value={schemaData.total_converted_analyzed}
+                />
+                <StatCard
+                  label="Novel Traits"
+                  value={schemaData.novel_traits_detected}
+                />
+                <StatCard
+                  label="Qualified"
+                  value={schemaData.qualified_candidates}
+                  sub="10+ converted matches"
+                />
+                <StatCard
+                  label="Emerging Clusters"
+                  value={schemaData.emerging_clusters.length}
+                />
+              </div>
+
+              {/* Emerging clusters */}
+              {schemaData.emerging_clusters.length > 0 && (
+                <div className="mb-6">
+                  <p className="text-xs text-zinc-500 uppercase tracking-widest mb-3">Recurring Archetype + Value Combos</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {schemaData.emerging_clusters.slice(0, 6).map((cluster, i) => (
+                      <div
+                        key={i}
+                        className="bg-zinc-800/40 border border-zinc-700/40 rounded-xl p-3"
+                      >
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          {cluster.combo.map((trait, j) => (
+                            <span
+                              key={j}
+                              className="text-xs bg-violet-950/40 text-violet-300 border border-violet-800/40 rounded-full px-2 py-0.5"
+                            >
+                              {trait}
+                            </span>
+                          ))}
+                        </div>
+                        <p className="text-xs text-zinc-500 mt-1">{cluster.count} converted matches</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Candidate dimensions table */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-xs text-zinc-500 uppercase tracking-widest border-b border-zinc-800/60">
+                      <th className="pb-3 pr-4 font-medium">Name</th>
+                      <th className="pb-3 pr-4 font-medium">Type</th>
+                      <th className="pb-3 pr-4 font-medium">Definition</th>
+                      <th className="pb-3 pr-4 font-medium text-right">Evidence</th>
+                      <th className="pb-3 pr-4 font-medium text-right">Confidence</th>
+                      <th className="pb-3 pr-4 font-medium">Status</th>
+                      <th className="pb-3 font-medium text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-800/40">
+                    {schemaData.all_candidates.map((c) => (
+                      <tr key={c.id} className="hover:bg-zinc-800/20 transition-colors">
+                        <td className="py-3 pr-4">
+                          <span className="text-zinc-200 font-medium">{c.candidate_name}</span>
+                        </td>
+                        <td className="py-3 pr-4">
+                          <span className={`text-xs rounded-full px-2 py-0.5 border ${
+                            c.candidate_type === "archetype"
+                              ? "bg-esina-950/40 text-esina-400 border-esina-800/40"
+                              : c.candidate_type === "value"
+                              ? "bg-amber-950/40 text-amber-400 border-amber-800/40"
+                              : c.candidate_type === "style_tag"
+                              ? "bg-emerald-950/40 text-emerald-400 border-emerald-800/40"
+                              : "bg-blue-950/40 text-blue-400 border-blue-800/40"
+                          }`}>
+                            {c.candidate_type}
+                          </span>
+                        </td>
+                        <td className="py-3 pr-4 text-zinc-400 text-xs max-w-xs truncate" title={c.definition}>
+                          {c.definition}
+                        </td>
+                        <td className="py-3 pr-4 text-zinc-400 text-right">
+                          {c.sample_count}
+                          <span className="text-zinc-600 ml-1">({c.evidence_count} events)</span>
+                        </td>
+                        <td className="py-3 pr-4 text-right">
+                          <span className={`font-medium ${
+                            c.confidence_score >= 0.7
+                              ? "text-emerald-400"
+                              : c.confidence_score >= 0.4
+                              ? "text-amber-400"
+                              : "text-zinc-400"
+                          }`}>
+                            {Math.round(c.confidence_score * 100)}%
+                          </span>
+                        </td>
+                        <td className="py-3 pr-4">
+                          <span className={`text-xs rounded-full px-2 py-0.5 ${
+                            c.status === "approved"
+                              ? "bg-emerald-950/40 text-emerald-400 border border-emerald-800/40"
+                              : c.status === "rejected"
+                              ? "bg-red-950/30 text-red-400 border border-red-800/40"
+                              : "bg-zinc-800/40 text-zinc-400 border border-zinc-700/40"
+                          }`}>
+                            {c.status}
+                          </span>
+                        </td>
+                        <td className="py-3 text-right">
+                          {c.status === "candidate" && (
+                            <div className="flex items-center gap-2 justify-end">
+                              <button
+                                onClick={() => handleCandidateAction(c.id, "approve")}
+                                disabled={approving === c.id}
+                                className="text-xs bg-emerald-900/40 hover:bg-emerald-800/50 text-emerald-400 border border-emerald-800/40 rounded-lg px-3 py-1 transition-colors disabled:opacity-50"
+                              >
+                                {approving === c.id ? "…" : "Approve"}
+                              </button>
+                              <button
+                                onClick={() => handleCandidateAction(c.id, "reject")}
+                                disabled={approving === c.id}
+                                className="text-xs bg-zinc-800/40 hover:bg-zinc-700/50 text-zinc-400 border border-zinc-700/40 rounded-lg px-3 py-1 transition-colors disabled:opacity-50"
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          )}
+                          {c.status === "approved" && c.approved_at && (
+                            <span className="text-xs text-zinc-600">
+                              {new Date(c.approved_at).toLocaleDateString()}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
         </section>
 
         {/* Footer */}

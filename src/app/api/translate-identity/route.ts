@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { checkApiKey } from "@/lib/api-auth";
+import { getVocabularyPromptExtension } from "@/lib/approved-vocabulary";
 import OpenAI from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -116,12 +117,16 @@ export async function POST(req: NextRequest) {
     const userMessage = `Analyze these behavioral signals and translate them into a structured consumer identity profile:\n\n${signalParts.join("\n\n")}`;
 
     // ── Step 2: GPT-4o-mini identity translation ───────────────────────
+    // Extend the system prompt with any approved schema candidates
+    const vocabExtension = await getVocabularyPromptExtension();
+    const systemPrompt = TRANSLATION_SYSTEM_PROMPT + vocabExtension;
+
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       temperature: 0.3,
       max_tokens: 1200,
       messages: [
-        { role: "system", content: TRANSLATION_SYSTEM_PROMPT },
+        { role: "system", content: systemPrompt },
         { role: "user", content: userMessage },
       ],
     });
