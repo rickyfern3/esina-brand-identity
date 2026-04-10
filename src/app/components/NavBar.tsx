@@ -72,28 +72,37 @@ export default function NavBar({ links = DEFAULT_LINKS }: NavBarProps) {
         borderBottom: "1px solid rgba(255,255,255,0.08)",
       }}
     >
-      <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div
+        className="max-w-6xl mx-auto px-6 py-4"
+        style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center" }}
+      >
+        {/* Left links */}
+        <nav className="flex items-center gap-8 justify-start">
+          {links.slice(0, 2).map((link) =>
+            link.primary ? (
+              <Link key={link.href} href={link.href} className="btn-primary px-4 py-2 text-xs inline-block">{link.label}</Link>
+            ) : (
+              <Link key={link.href} href={link.href} className="nav-link">{link.label}</Link>
+            )
+          )}
+        </nav>
+
+        {/* Center logo */}
         <Link
           href="/"
           className="font-goldman text-white uppercase"
-          style={{ fontSize: "32px", letterSpacing: "3px", fontWeight: 700 }}
+          style={{ fontSize: "32px", letterSpacing: "3px", fontWeight: 700, textAlign: "center" }}
         >
           ESINA
         </Link>
-        <nav className="flex items-center gap-8">
-          {links.map((link) =>
+
+        {/* Right links */}
+        <nav className="flex items-center gap-8 justify-end">
+          {links.slice(2).map((link) =>
             link.primary ? (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="btn-primary px-4 py-2 text-xs inline-block"
-              >
-                {link.label}
-              </Link>
+              <Link key={link.href} href={link.href} className="btn-primary px-4 py-2 text-xs inline-block">{link.label}</Link>
             ) : (
-              <Link key={link.href} href={link.href} className="nav-link">
-                {link.label}
-              </Link>
+              <Link key={link.href} href={link.href} className="nav-link">{link.label}</Link>
             )
           )}
         </nav>
