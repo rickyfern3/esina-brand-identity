@@ -2,31 +2,133 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* ── Fonts ──────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap');
 
+/* ── Design tokens ───────────────────────────────────────────────────── */
 :root {
-  --bg-primary: #09090b;
-  --bg-secondary: #18181b;
-  --bg-tertiary: #27272a;
-  --border: #3f3f46;
-  --text-primary: #fafafa;
-  --text-secondary: #a1a1aa;
-  --accent: #33a6ff;
+  --bg-gradient-top: #7A7A76;
+  --bg-gradient-bottom: #B0B0AC;
+
+  --text-100: rgba(255, 255, 255, 1);
+  --text-45: rgba(255, 255, 255, 0.45);
+  --text-35: rgba(255, 255, 255, 0.35);
+  --text-25: rgba(255, 255, 255, 0.25);
+
+  --btn-primary-bg: #ffffff;
+  --btn-primary-text: #4A4A46;
+  --btn-secondary-border: rgba(255, 255, 255, 0.2);
+
+  --divider: rgba(255, 255, 255, 0.08);
+  --card-bg: rgba(0, 0, 0, 0.12);
+  --code-bg: rgba(0, 0, 0, 0.25);
+
+  --radius-card: 2px;
+  --radius-btn: 2px;
+}
+
+/* ── Base ────────────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: 'Inter', system-ui, sans-serif;
+  background: linear-gradient(180deg, var(--bg-gradient-top) 0%, var(--bg-gradient-bottom) 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: var(--text-100);
+  font-family: 'General Sans', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-primary); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+/* ── Typography ──────────────────────────────────────────────────────── */
+.font-goldman {
+  font-family: 'Goldman', 'General Sans', system-ui, sans-serif;
+}
 
-/* Smooth score bar animation */
+h1, h2, h3, h4 {
+  font-family: 'Goldman', 'General Sans', system-ui, sans-serif;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+/* ── Utility classes ─────────────────────────────────────────────────── */
+
+/* Dividers */
+.esina-divider {
+  border-color: var(--divider);
+}
+
+/* Cards */
+.esina-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+}
+
+/* Buttons */
+.btn-primary {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border-radius: var(--radius-btn);
+  font-family: 'General Sans', system-ui, sans-serif;
+  font-weight: 500;
+  transition: opacity 0.15s ease;
+  cursor: pointer;
+}
+.btn-primary:hover { opacity: 0.88; }
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--btn-secondary-border);
+  color: rgba(255,255,255,0.8);
+  border-radius: var(--radius-btn);
+  font-family: 'General Sans', system-ui, sans-serif;
+  font-weight: 400;
+  transition: border-color 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+}
+.btn-secondary:hover {
+  border-color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,1);
+}
+
+/* Code blocks */
+.esina-code {
+  background: var(--code-bg);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  border-radius: 2px;
+}
+
+/* Nav links */
+.nav-link {
+  color: rgba(255,255,255,0.55);
+  transition: color 0.15s ease;
+  font-size: 0.8125rem;
+  letter-spacing: 0.01em;
+}
+.nav-link:hover { color: rgba(255,255,255,1); }
+
+/* Section tags */
+.section-tag {
+  font-family: 'General Sans', system-ui, sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: lowercase;
+  color: var(--text-35);
+}
+
+/* Score bar animation */
 @keyframes fillBar {
   from { width: 0%; }
 }
@@ -34,11 +136,26 @@ body {
   animation: fillBar 0.8s ease-out forwards;
 }
 
-/* Pulse glow for the run button */
-@keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(51, 166, 255, 0.4); }
-  50% { box-shadow: 0 0 20px 4px rgba(51, 166, 255, 0.15); }
+/* Page fade-in */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-.btn-glow:hover {
-  animation: pulseGlow 2s ease-in-out infinite;
+.fade-up {
+  animation: fadeUp 0.5s ease-out forwards;
+}
+.fade-up-1 { animation: fadeUp 0.5s 0.05s ease-out both; }
+.fade-up-2 { animation: fadeUp 0.5s 0.1s ease-out both; }
+.fade-up-3 { animation: fadeUp 0.5s 0.15s ease-out both; }
+.fade-up-4 { animation: fadeUp 0.5s 0.2s ease-out both; }
+.fade-up-5 { animation: fadeUp 0.5s 0.25s ease-out both; }
+.fade-up-6 { animation: fadeUp 0.5s 0.3s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-up, .fade-up-1, .fade-up-2, .fade-up-3,
+  .fade-up-4, .fade-up-5, .fade-up-6 {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }

@@ -160,11 +160,7 @@ function OptionCard({ selected, onClick, children, className = "" }: {
     <button
       type="button"
       onClick={onClick}
-      className={`border rounded-xl px-4 py-3 text-left transition-all ${
-        selected
-          ? "border-violet-500 bg-violet-950/40 text-white"
-          : "border-zinc-800 bg-zinc-900/40 text-zinc-300 hover:border-zinc-600 hover:text-white"
-      } ${className}`}
+      style={selected ? { background: "rgba(255,255,255,0.15)", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.6)" } : { background: "rgba(0,0,0,0.12)", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.1)" }}
     >
       {children}
     </button>
@@ -189,11 +185,8 @@ function MultiSelect({ options, selected, onChange, max, renderOption }: {
           key={o}
           type="button"
           onClick={() => toggle(o)}
-          className={`rounded-full px-3 py-1.5 text-sm border transition-all ${
-            selected.includes(o)
-              ? "border-violet-500 bg-violet-950/40 text-violet-200"
-              : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
-          }`}
+          style={selected.includes(o) ? { background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.6)", borderRadius: "2px", color: "white" } : { background: "rgba(0,0,0,0.12)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "2px", color: "rgba(255,255,255,0.65)" }}
+          className="px-3 py-1.5 text-sm transition-all"
         >
           {renderOption ? renderOption(o) : o}
         </button>
@@ -203,14 +196,14 @@ function MultiSelect({ options, selected, onChange, max, renderOption }: {
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs text-zinc-500 uppercase tracking-widest mb-3">{children}</p>;
+  return <p className="section-tag">{children}</p>;
 }
 
 function FieldGroup({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div className="mb-8">
-      <p className="text-sm font-medium text-white mb-1">{label}</p>
-      {hint && <p className="text-xs text-zinc-500 mb-3">{hint}</p>}
+      <p style={{ color: "white" }} className="text-sm font-medium mb-1">{label}</p>
+      {hint && <p style={{ color: "rgba(255,255,255,0.35)" }} className="text-xs mb-3">{hint}</p>}
       {children}
     </div>
   );
@@ -226,7 +219,8 @@ function TextInput({ value, onChange, placeholder, maxLength, className = "" }: 
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       maxLength={maxLength}
-      className={`w-full bg-zinc-900/60 border border-zinc-800 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors text-sm ${className}`}
+      style={{ background: "rgba(0,0,0,0.15)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "2px", color: "white" }}
+      className="w-full px-4 py-3 text-sm"
     />
   );
 }
@@ -249,10 +243,11 @@ function TextArea({ value: initialValue, onChange, placeholder, maxLength, rows 
         placeholder={placeholder}
         maxLength={maxLength}
         rows={rows}
-        className="w-full bg-zinc-900/60 border border-zinc-800 rounded-lg px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors text-sm resize-none"
+        style={{ background: "rgba(0,0,0,0.15)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "2px", color: "white" }}
+        className="w-full px-4 py-3 text-sm resize-none"
       />
       {maxLength && (
-        <p className="text-right text-xs text-zinc-600 mt-1">
+        <p className="text-right text-xs mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>
           {value.length}/{maxLength}
         </p>
       )}
@@ -266,8 +261,8 @@ function StepBasics({ data, update }: { data: FormData; update: (k: keyof FormDa
   return (
     <div>
       <SectionLabel>Step 1 of 7 — The Basics</SectionLabel>
-      <h2 className="text-2xl font-bold text-white mb-1">Let's start with the essentials.</h2>
-      <p className="text-zinc-400 mb-8">Basic info to set up your brand profile.</p>
+      <h2 className="font-goldman text-2xl text-white mb-1">Let's start with the essentials.</h2>
+      <p style={{ color: "rgba(255,255,255,0.45)" }} className=" mb-8">Basic info to set up your brand profile.</p>
 
       <FieldGroup label="Brand Name *">
         <TextInput value={data.brand_name} onChange={(v) => update("brand_name", v)} placeholder="e.g. Liquid Death" />
@@ -309,11 +304,7 @@ function StepBasics({ data, update }: { data: FormData; update: (k: keyof FormDa
                 const curr = data.platforms as string[];
                 update("platforms", curr.includes(p) ? curr.filter((x) => x !== p) : [...curr, p]);
               }}
-              className={`rounded-full px-3 py-1.5 text-sm border transition-all ${
-                (data.platforms as string[]).includes(p)
-                  ? "border-violet-500 bg-violet-950/40 text-violet-200"
-                  : "border-zinc-800 text-zinc-400 hover:border-zinc-600"
-              }`}
+              style={(data.platforms as string[]).includes(p) ? { background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.6)", borderRadius: "2px", color: "white" } : { background: "rgba(0,0,0,0.12)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "2px", color: "rgba(255,255,255,0.65)" }} className="px-3 py-1.5 text-sm transition-all"
             >
               {p}
             </button>
@@ -327,7 +318,7 @@ function StepBasics({ data, update }: { data: FormData; update: (k: keyof FormDa
             <OptionCard key={t.id} selected={data.price_tier === t.id} onClick={() => update("price_tier", t.id)}>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">{t.label}</span>
-                <span className="text-xs text-zinc-500">{t.desc}</span>
+                <span style={{ color: "rgba(255,255,255,0.35)" }} className="text-xs">{t.desc}</span>
               </div>
             </OptionCard>
           ))}
@@ -367,8 +358,8 @@ function StepIdentity({ data, update }: { data: FormData; update: (k: keyof Form
   return (
     <div>
       <SectionLabel>Step 2 of 7 — Identity</SectionLabel>
-      <h2 className="text-2xl font-bold text-white mb-1">Who are you?</h2>
-      <p className="text-zinc-400 mb-8">Define the core of your brand identity.</p>
+      <h2 className="font-goldman text-2xl text-white mb-1">Who are you?</h2>
+      <p style={{ color: "rgba(255,255,255,0.45)" }} className=" mb-8">Define the core of your brand identity.</p>
 
       <FieldGroup
         label="What does choosing your brand say about the person who buys it?"
@@ -411,16 +402,10 @@ function StepIdentity({ data, update }: { data: FormData; update: (k: keyof Form
                 type="button"
                 onClick={() => toggleArchetype(a.id)}
                 disabled={!isSelected && selectedArchetypes.length >= 3}
-                className={`border rounded-xl p-4 text-left transition-all relative ${
-                  isSelected
-                    ? "border-violet-500 bg-violet-950/40"
-                    : selectedArchetypes.length >= 3
-                    ? "border-zinc-800 bg-zinc-900/20 opacity-40 cursor-not-allowed"
-                    : "border-zinc-800 bg-zinc-900/40 hover:border-zinc-600"
-                }`}
+                style={isSelected ? { background: "rgba(255,255,255,0.15)", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.6)", position: "relative" } : selectedArchetypes.length >= 3 ? { background: "rgba(0,0,0,0.12)", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.1)", opacity: 0.3, cursor: "not-allowed", position: "relative" } : { background: "rgba(0,0,0,0.12)", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.1)", position: "relative" }}
               >
                 {rank && (
-                  <span className="absolute top-2 right-2 text-[10px] font-semibold text-violet-300 bg-violet-900/60 px-1.5 py-0.5 rounded-full">
+                  <span style={{ background: "rgba(255,255,255,0.2)", color: "white", borderRadius: "2px", fontSize: "10px", padding: "2px 6px" }}>
                     {rank}
                   </span>
                 )}
@@ -439,8 +424,8 @@ function StepValues({ data, update }: { data: FormData; update: (k: keyof FormDa
   return (
     <div>
       <SectionLabel>Step 3 of 7 — Values & Impact</SectionLabel>
-      <h2 className="text-2xl font-bold text-white mb-1">What do you stand for?</h2>
-      <p className="text-zinc-400 mb-8">Your values define what your brand attracts and what it repels.</p>
+      <h2 className="font-goldman text-2xl text-white mb-1">What do you stand for?</h2>
+      <p style={{ color: "rgba(255,255,255,0.45)" }} className=" mb-8">Your values define what your brand attracts and what it repels.</p>
 
       <FieldGroup label="Core Values" hint={`Select up to 5 in priority order. First selected = most important. ${(data.values as string[]).length}/5 selected.`}>
         <MultiSelect options={VALUES} selected={data.values as string[]} onChange={(v) => update("values", v)} max={5}
@@ -460,7 +445,7 @@ function StepValues({ data, update }: { data: FormData; update: (k: keyof FormDa
             <OptionCard key={s.id} selected={data.sustainability_level === s.id} onClick={() => update("sustainability_level", s.id)}>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">{s.label}</span>
-                <span className="text-xs text-zinc-500">{s.desc}</span>
+                <span style={{ color: "rgba(255,255,255,0.35)" }} className="text-xs">{s.desc}</span>
               </div>
             </OptionCard>
           ))}
@@ -484,8 +469,8 @@ function StepAesthetic({ data, update }: { data: FormData; update: (k: keyof For
   return (
     <div>
       <SectionLabel>Step 4 of 7 — Aesthetic</SectionLabel>
-      <h2 className="text-2xl font-bold text-white mb-1">How do you look and sound?</h2>
-      <p className="text-zinc-400 mb-8">Your visual and verbal identity signals.</p>
+      <h2 className="font-goldman text-2xl text-white mb-1">How do you look and sound?</h2>
+      <p style={{ color: "rgba(255,255,255,0.45)" }} className=" mb-8">Your visual and verbal identity signals.</p>
 
       <FieldGroup label="Style Tags" hint={`Pick up to 5 that describe your aesthetic. ${(data.style_tags as string[]).length}/5 selected.`}>
         <div className="flex flex-wrap gap-2">
@@ -497,11 +482,7 @@ function StepAesthetic({ data, update }: { data: FormData; update: (k: keyof For
                 const curr = data.style_tags as string[];
                 update("style_tags", curr.includes(tag) ? curr.filter((x) => x !== tag) : curr.length < 5 ? [...curr, tag] : curr);
               }}
-              className={`rounded-lg px-3 py-2 text-sm border transition-all ${
-                (data.style_tags as string[]).includes(tag)
-                  ? "border-violet-500 bg-violet-950/40 text-violet-200"
-                  : "border-zinc-800 text-zinc-400 hover:border-zinc-600"
-              }`}
+              style={(data.style_tags as string[]).includes(tag) ? { background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.6)", borderRadius: "2px", color: "white" } : { background: "rgba(0,0,0,0.12)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "2px", color: "rgba(255,255,255,0.65)" }} className="px-3 py-2 text-sm transition-all"
             >
               {tag.replace(/_/g, " ")}
             </button>
@@ -536,7 +517,7 @@ function StepAesthetic({ data, update }: { data: FormData; update: (k: keyof For
             <OptionCard key={v.id} selected={data.voice_tone === v.id} onClick={() => update("voice_tone", v.id)}>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">{v.label}</span>
-                <span className="text-xs text-zinc-500">{v.desc}</span>
+                <span style={{ color: "rgba(255,255,255,0.35)" }} className="text-xs">{v.desc}</span>
               </div>
             </OptionCard>
           ))}
@@ -572,8 +553,8 @@ function StepStatusCommunity({ data, update }: { data: FormData; update: (k: key
   return (
     <div>
       <SectionLabel>Step 5 of 7 — Status & Community</SectionLabel>
-      <h2 className="text-2xl font-bold text-white mb-1">Where do you fit in culture?</h2>
-      <p className="text-zinc-400 mb-8">How your brand signals status and which tribes it belongs to.</p>
+      <h2 className="font-goldman text-2xl text-white mb-1">Where do you fit in culture?</h2>
+      <p style={{ color: "rgba(255,255,255,0.45)" }} className=" mb-8">How your brand signals status and which tribes it belongs to.</p>
 
       <FieldGroup label="Status Signal" hint="How does your brand communicate its value in culture?">
         <div className="grid grid-cols-1 gap-2">
@@ -608,7 +589,7 @@ function StepStatusCommunity({ data, update }: { data: FormData; update: (k: key
                 const id = c.toLowerCase().replace(/\s*\/\s*/g, "_").replace(/\s+/g, "_");
                 update("communities", curr.includes(id) ? curr.filter((x) => x !== id) : curr.length < 5 ? [...curr, id] : curr);
               }}
-              className={`rounded-full px-3 py-1.5 text-sm border transition-all ${
+              className={` px-3 py-1.5 text-sm border transition-all ${
                 (data.communities as string[]).includes(c.toLowerCase().replace(/\s*\/\s*/g, "_").replace(/\s+/g, "_"))
                   ? "border-violet-500 bg-violet-950/40 text-violet-200"
                   : "border-zinc-800 text-zinc-400 hover:border-zinc-600"
@@ -630,11 +611,7 @@ function StepStatusCommunity({ data, update }: { data: FormData; update: (k: key
                 const curr = data.trend_alignment as string[];
                 update("trend_alignment", curr.includes(t) ? curr.filter((x) => x !== t) : [...curr, t]);
               }}
-              className={`rounded-full px-3 py-1.5 text-sm border transition-all ${
-                (data.trend_alignment as string[]).includes(t)
-                  ? "border-violet-500 bg-violet-950/40 text-violet-200"
-                  : "border-zinc-800 text-zinc-400 hover:border-zinc-600"
-              }`}
+              style={(data.trend_alignment as string[]).includes(t) ? { background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.6)", borderRadius: "2px", color: "white" } : { background: "rgba(0,0,0,0.12)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "2px", color: "rgba(255,255,255,0.65)" }} className="px-3 py-1.5 text-sm transition-all"
             >
               {t.replace(/_/g, " ")}
             </button>
@@ -653,14 +630,14 @@ function StepStatusCommunity({ data, update }: { data: FormData; update: (k: key
           <button
             type="button"
             onClick={addAdjacency}
-            className="px-4 py-2 bg-violet-800 hover:bg-violet-700 text-white rounded-lg text-sm transition-colors"
+            className="px-4 py-2 bg-violet-800 hover:bg-violet-700 text-white  text-sm transition-colors"
           >
             Add
           </button>
         </div>
         <div className="flex flex-wrap gap-2">
           {(data.brand_adjacencies as string[]).map((b) => (
-            <span key={b} className="flex items-center gap-1.5 bg-zinc-800 text-zinc-300 text-sm px-3 py-1 rounded-full">
+            <span key={b} style={{ color: "rgba(255,255,255,0.45)" }} className="flex items-center gap-1.5 bg-zinc-800 text-sm px-3 py-1 ">
               {b}
               <button
                 type="button"
@@ -681,8 +658,8 @@ function StepStory({ data, update }: { data: FormData; update: (k: keyof FormDat
   return (
     <div>
       <SectionLabel>Step 6 of 7 — Your Story</SectionLabel>
-      <h2 className="text-2xl font-bold text-white mb-1">Why do you exist?</h2>
-      <p className="text-zinc-400 mb-8">The narrative that makes your brand human. This goes directly into your identity profile.</p>
+      <h2 className="font-goldman text-2xl text-white mb-1">Why do you exist?</h2>
+      <p style={{ color: "rgba(255,255,255,0.45)" }} className=" mb-8">The narrative that makes your brand human. This goes directly into your identity profile.</p>
 
       <FieldGroup label="Origin Story" hint="How did this brand start? What problem were you trying to solve?">
         <TextArea value={data.origin_story} onChange={(v) => update("origin_story", v)} placeholder="e.g. We started Liquid Death because we were sick of plastic water bottles at music festivals..." maxLength={500} rows={4} />
@@ -718,7 +695,7 @@ function StepReview({ data, onEdit }: { data: FormData; onEdit: (step: number) =
   const completeness = Math.round((completedFields / 12) * 100);
 
   const Section = ({ title, step, children }: { title: string; step: number; children: React.ReactNode }) => (
-    <div className="border border-zinc-800 rounded-xl p-5 mb-4">
+    <div className="border border-zinc-800 p-5 mb-4">
       <div className="flex items-center justify-between mb-3">
         <p className="text-sm font-semibold text-white">{title}</p>
         <button type="button" onClick={() => onEdit(step)} className="text-xs text-violet-400 hover:text-violet-300 transition-colors">Edit</button>
@@ -728,12 +705,12 @@ function StepReview({ data, onEdit }: { data: FormData; onEdit: (step: number) =
   );
 
   const Tag = ({ children }: { children: React.ReactNode }) => (
-    <span className="inline-block bg-zinc-800 text-zinc-300 text-xs px-2 py-1 rounded-md mr-1.5 mb-1.5">{children}</span>
+    <span style={{ color: "rgba(255,255,255,0.45)" }} className="inline-block bg-zinc-800 text-xs px-2 py-1 mr-1.5 mb-1.5">{children}</span>
   );
 
   const Field = ({ label, value }: { label: string; value?: string | null }) => value ? (
     <div className="mb-2">
-      <span className="text-xs text-zinc-500">{label}: </span>
+      <span style={{ color: "rgba(255,255,255,0.35)" }} className="text-xs">{label}: </span>
       <span className="text-xs text-zinc-300">{value}</span>
     </div>
   ) : null;
@@ -741,16 +718,16 @@ function StepReview({ data, onEdit }: { data: FormData; onEdit: (step: number) =
   return (
     <div>
       <SectionLabel>Step 7 of 7 — Review & Submit</SectionLabel>
-      <h2 className="text-2xl font-bold text-white mb-1">Almost there.</h2>
-      <p className="text-zinc-400 mb-2">Review your brand profile before we run your AI Perception Audit.</p>
+      <h2 className="font-goldman text-2xl text-white mb-1">Almost there.</h2>
+      <p style={{ color: "rgba(255,255,255,0.45)" }} className=" mb-2">Review your brand profile before we run your AI Perception Audit.</p>
 
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5 mb-8 flex items-center justify-between">
+      <div className="bg-zinc-900/50 border border-zinc-800 p-5 mb-8 flex items-center justify-between">
         <div>
           <p className="text-sm text-zinc-400">Profile Completeness</p>
           <p className="text-2xl font-bold text-white">{completeness}%</p>
         </div>
-        <div className="w-32 h-2 bg-zinc-800 rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-violet-600 to-violet-400 rounded-full transition-all" style={{ width: `${completeness}%` }} />
+        <div className="w-32 h-2 bg-zinc-800  overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-violet-600 to-violet-400  transition-all" style={{ width: `${completeness}%` }} />
         </div>
       </div>
 
@@ -759,27 +736,27 @@ function StepReview({ data, onEdit }: { data: FormData; onEdit: (step: number) =
         <Field label="Category" value={data.category} />
         <Field label="Price" value={data.price_tier} />
         <Field label="Email" value={data.contact_email} />
-        {(data.platforms as string[]).length > 0 && <div><span className="text-xs text-zinc-500">Platforms: </span>{(data.platforms as string[]).map((p) => <Tag key={p}>{p}</Tag>)}</div>}
+        {(data.platforms as string[]).length > 0 && <div><span style={{ color: "rgba(255,255,255,0.35)" }} className="text-xs">Platforms: </span>{(data.platforms as string[]).map((p) => <Tag key={p}>{p}</Tag>)}</div>}
       </Section>
 
       <Section title="Identity" step={2}>
         {selectedArchetypes.length > 0 && (
-          <div className="mb-2"><span className="text-xs text-zinc-500">Archetypes: </span>{selectedArchetypes.map((a) => <Tag key={a.archetype}>{a.archetype}</Tag>)}</div>
+          <div className="mb-2"><span style={{ color: "rgba(255,255,255,0.35)" }} className="text-xs">Archetypes: </span>{selectedArchetypes.map((a) => <Tag key={a.archetype}>{a.archetype}</Tag>)}</div>
         )}
         {(data.identity_statements as string[]).filter(Boolean).map((s, i) => (
-          <p key={i} className="text-xs text-zinc-300 italic mb-1">"{s}"</p>
+          <p key={i} style={{ color: "rgba(255,255,255,0.45)" }} className="text-xs italic mb-1">"{s}"</p>
         ))}
       </Section>
 
       <Section title="Values & Impact" step={3}>
-        {(data.values as string[]).length > 0 && <div className="mb-2"><span className="text-xs text-zinc-500">Values: </span>{(data.values as string[]).map((v) => <Tag key={v}>{v.replace(/_/g, " ")}</Tag>)}</div>}
-        {(data.anti_values as string[]).length > 0 && <div className="mb-2"><span className="text-xs text-zinc-500">Not: </span>{(data.anti_values as string[]).map((v) => <Tag key={v}>{v.replace(/_/g, " ")}</Tag>)}</div>}
+        {(data.values as string[]).length > 0 && <div className="mb-2"><span style={{ color: "rgba(255,255,255,0.35)" }} className="text-xs">Values: </span>{(data.values as string[]).map((v) => <Tag key={v}>{v.replace(/_/g, " ")}</Tag>)}</div>}
+        {(data.anti_values as string[]).length > 0 && <div className="mb-2"><span style={{ color: "rgba(255,255,255,0.35)" }} className="text-xs">Not: </span>{(data.anti_values as string[]).map((v) => <Tag key={v}>{v.replace(/_/g, " ")}</Tag>)}</div>}
         <Field label="Sustainability" value={data.sustainability_level} />
         <Field label="Emotional resonance" value={data.emotional_resonance} />
       </Section>
 
       <Section title="Aesthetic" step={4}>
-        {(data.style_tags as string[]).length > 0 && <div className="mb-2"><span className="text-xs text-zinc-500">Style: </span>{(data.style_tags as string[]).map((t) => <Tag key={t}>{t.replace(/_/g, " ")}</Tag>)}</div>}
+        {(data.style_tags as string[]).length > 0 && <div className="mb-2"><span style={{ color: "rgba(255,255,255,0.35)" }} className="text-xs">Style: </span>{(data.style_tags as string[]).map((t) => <Tag key={t}>{t.replace(/_/g, " ")}</Tag>)}</div>}
         <Field label="Voice" value={data.voice_tone} />
         <Field label="Visual tone" value={data.visual_tone} />
         <Field label="Design" value={data.design_language} />
@@ -787,21 +764,21 @@ function StepReview({ data, onEdit }: { data: FormData; onEdit: (step: number) =
 
       <Section title="Status & Community" step={5}>
         <Field label="Status signal" value={data.status_signal_type?.replace(/_/g, " ")} />
-        {(data.communities as string[]).length > 0 && <div className="mb-2"><span className="text-xs text-zinc-500">Communities: </span>{(data.communities as string[]).map((c) => <Tag key={c}>{c.replace(/_/g, " ")}</Tag>)}</div>}
-        {(data.brand_adjacencies as string[]).length > 0 && <div><span className="text-xs text-zinc-500">Adjacent brands: </span>{(data.brand_adjacencies as string[]).map((b) => <Tag key={b}>{b}</Tag>)}</div>}
+        {(data.communities as string[]).length > 0 && <div className="mb-2"><span style={{ color: "rgba(255,255,255,0.35)" }} className="text-xs">Communities: </span>{(data.communities as string[]).map((c) => <Tag key={c}>{c.replace(/_/g, " ")}</Tag>)}</div>}
+        {(data.brand_adjacencies as string[]).length > 0 && <div><span style={{ color: "rgba(255,255,255,0.35)" }} className="text-xs">Adjacent brands: </span>{(data.brand_adjacencies as string[]).map((b) => <Tag key={b}>{b}</Tag>)}</div>}
       </Section>
 
       <Section title="Your Story" step={6}>
-        {data.origin_story && <p className="text-xs text-zinc-300 line-clamp-2 mb-1">{data.origin_story}</p>}
+        {data.origin_story && <p style={{ color: "rgba(255,255,255,0.45)" }} className="text-xs line-clamp-2 mb-1">{data.origin_story}</p>}
         {data.differentiation_claim && <p className="text-xs text-zinc-400 italic">"{data.differentiation_claim}"</p>}
       </Section>
 
-      <div className="bg-violet-950/30 border border-violet-800/30 rounded-xl p-5 mt-6">
+      <div style={{ background: "rgba(0,0,0,0.12)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "2px", padding: "20px", marginTop: "24px" }}>
         <p className="text-sm font-semibold text-white mb-1">What happens when you submit?</p>
         <ol className="space-y-1">
           {["Your profile is saved to ESINA's database", "We generate your brand's identity embedding", "We run an AI Perception Audit using GPT-4o-mini", "You're redirected to your Alignment Report"].map((step, i) => (
             <li key={i} className="flex items-center gap-2 text-xs text-zinc-400">
-              <span className="w-4 h-4 rounded-full bg-violet-900/60 text-violet-300 flex items-center justify-center text-[10px] font-bold flex-shrink-0">{i + 1}</span>
+              <span style={{ width: "16px", height: "16px", borderRadius: "50%", background: "rgba(255,255,255,0.15)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: "bold", flexShrink: 0 }}>{i + 1}</span>
               {step}
             </li>
           ))}
@@ -830,15 +807,15 @@ function StepInstall({ brandId, brandName }: { brandId: string; brandName: strin
     <div>
       {/* Success header */}
       <div className="text-center mb-10">
-        <div className="w-16 h-16 rounded-full bg-emerald-950/50 border border-emerald-700/40 flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div style={{ width: "64px", height: "64px", borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.1)" }} className="flex items-center justify-center mx-auto mb-4">
+          <svg style={{ width: "32px", height: "32px", color: "rgba(255,255,255,0.8)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">
+        <h2 className="font-goldman text-2xl text-white mb-2">
           {brandName} is live on ESINA.
         </h2>
-        <p className="text-zinc-400">
+        <p style={{ color: "rgba(255,255,255,0.45)" }}>
           Your brand identity profile and AI perception audit are ready.
           Now install the attribution pixel to close the loop.
         </p>
@@ -847,23 +824,19 @@ function StepInstall({ brandId, brandName }: { brandId: string; brandName: strin
       {/* Step 1: Embed code */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-6 h-6 rounded-full bg-violet-900/60 text-violet-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
+          <div className="w-6 h-6  bg-violet-900/60 text-violet-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
             1
           </div>
           <p className="text-sm font-semibold text-white">Add this line to your website</p>
         </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-start gap-3">
+        <div style={{ background: "rgba(0,0,0,0.12)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "2px" }} className="p-4 flex items-start gap-3">
           <code className="text-sm text-violet-200 flex-1 break-all leading-relaxed font-mono">
             {embedCode}
           </code>
           <button
             type="button"
             onClick={handleCopy}
-            className={`flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
-              copied
-                ? "bg-emerald-900/60 text-emerald-300 border border-emerald-700/40"
-                : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white border border-zinc-700"
-            }`}
+            className="flex-shrink-0 px-3 py-1.5 text-xs font-medium transition-all" style={copied ? { background: "rgba(255,255,255,0.15)", color: "white", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "2px" } : { background: "rgba(0,0,0,0.2)", color: "rgba(255,255,255,0.65)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "2px" }}
           >
             {copied ? "Copied!" : "Copy"}
           </button>
@@ -876,8 +849,8 @@ function StepInstall({ brandId, brandName }: { brandId: string; brandName: strin
       </div>
 
       {/* What it does */}
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5 mb-6">
-        <p className="text-xs text-zinc-500 uppercase tracking-widest mb-3">What this does</p>
+      <div style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.08)" }} className="p-5 mb-6">
+        <p className="section-tag">What this does</p>
         <div className="space-y-3">
           {[
             {
@@ -900,7 +873,7 @@ function StepInstall({ brandId, brandName }: { brandId: string; brandName: strin
               <span className="text-lg flex-shrink-0">{item.icon}</span>
               <div>
                 <p className="text-sm font-medium text-white">{item.title}</p>
-                <p className="text-xs text-zinc-400 leading-relaxed">{item.desc}</p>
+                <p style={{ color: "rgba(255,255,255,0.45)" }} className="text-xs leading-relaxed">{item.desc}</p>
               </div>
             </div>
           ))}
@@ -910,18 +883,18 @@ function StepInstall({ brandId, brandName }: { brandId: string; brandName: strin
       {/* Step 2: Brand.md preview */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-6 h-6 rounded-full bg-violet-900/60 text-violet-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
+          <div className="w-6 h-6  bg-violet-900/60 text-violet-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
             2
           </div>
           <p className="text-sm font-semibold text-white">Your brand.md is live</p>
         </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-center justify-between gap-3">
-          <code className="text-sm text-zinc-300 truncate">{brandMdUrl}</code>
+        <div style={{ background: "rgba(0,0,0,0.12)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "2px" }} className="p-4 flex items-center justify-between gap-3">
+          <code style={{ color: "rgba(255,255,255,0.45)" }} className="text-sm truncate">{brandMdUrl}</code>
           <a
             href={brandMdUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white border border-zinc-700 transition-all"
+            style={{ background: "rgba(0,0,0,0.2)", color: "rgba(255,255,255,0.65)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "2px" }} className="flex-shrink-0 px-3 py-1.5 text-xs font-medium transition-all hover:opacity-80"
           >
             Preview ↗
           </a>
@@ -933,7 +906,7 @@ function StepInstall({ brandId, brandName }: { brandId: string; brandName: strin
       </div>
 
       {/* Pricing note */}
-      <div className="border border-violet-800/20 bg-violet-950/10 rounded-xl p-4 mb-6 text-center">
+      <div style={{ background: "rgba(0,0,0,0.12)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "2px" }} className="p-4 mb-6 text-center">
         <p className="text-sm text-zinc-300">
           <span className="text-white font-medium">You only pay when you make money.</span>{" "}
           Attribution is free. ESINA takes a small revenue share only on verified conversions.
@@ -944,13 +917,13 @@ function StepInstall({ brandId, brandName }: { brandId: string; brandName: strin
       <div className="flex flex-col sm:flex-row gap-3">
         <a
           href={`/audit/${brandId}`}
-          className="flex-1 text-center px-6 py-3 bg-violet-700 hover:bg-violet-600 text-white font-semibold rounded-xl transition-colors"
+          className="btn-primary flex-1 text-center px-6 py-2.5 text-sm transition-colors"
         >
           View AI Perception Audit →
         </a>
         <a
           href="/brands"
-          className="flex-1 text-center px-6 py-3 border border-zinc-700 hover:border-zinc-600 text-zinc-300 hover:text-white font-medium rounded-xl transition-colors"
+          className="flex-1 text-center px-6 py-2.5 text-sm transition-colors" style={{ border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.45)", borderRadius: "2px" }}
         >
           Browse Brand Directory
         </a>
@@ -1017,22 +990,21 @@ export default function QuestionnairePage() {
     }
   };
 
-
   const progress = ((step - 1) / (TOTAL_STEPS - 1)) * 100;
 
   // ── Install screen (shown after successful submission) ──────────────
   if (completedBrandId) {
     return (
-      <div className="min-h-screen bg-[#09090b]">
+      <div className="min-h-screen">
         <header className="border-b border-zinc-800/60">
           <div className="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
             <Link href="/match" className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center">
+              <div className="w-7 h-7  bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center">
                 <span className="text-white font-bold text-xs">E</span>
               </div>
               <span className="text-base font-semibold text-white tracking-tight">ESINA</span>
             </Link>
-            <span className="text-xs text-zinc-500">Install Tracking</span>
+            <span style={{ color: "rgba(255,255,255,0.35)" }} className="text-xs">Install Tracking</span>
           </div>
           {/* Progress bar — full */}
           <div className="h-0.5 bg-violet-600" />
@@ -1045,34 +1017,34 @@ export default function QuestionnairePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b]">
+    <div className="min-h-screen">
       {/* Header */}
-      <header className="border-b border-zinc-800/60 sticky top-0 z-10 bg-[#09090b]/95 backdrop-blur">
+      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(12px)", background: "rgba(122,122,118,0.7)", position: "sticky", top: 0, zIndex: 10 }}>
         <div className="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/match" className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center">
+            <div className="w-7 h-7  bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center">
               <span className="text-white font-bold text-xs">E</span>
             </div>
             <span className="text-base font-semibold text-white tracking-tight">ESINA</span>
           </Link>
-          <span className="text-xs text-zinc-500">Brand Identity Questionnaire</span>
+          <span style={{ color: "rgba(255,255,255,0.35)" }} className="text-xs">Brand Identity Questionnaire</span>
         </div>
         {/* Progress bar */}
-        <div className="h-0.5 bg-zinc-900">
+        <div style={{ height: "1px", background: "rgba(255,255,255,0.12)" }}>
           <div
-            className="h-full bg-gradient-to-r from-violet-600 to-violet-400 transition-all duration-500"
-            style={{ width: `${progress}%` }}
+            style={{ height: "100%", background: "rgba(255,255,255,0.8)", width: `${progress}%` }}
+            className="transition-all duration-500"
           />
         </div>
       </header>
 
       {/* Loading overlay */}
       {submitting && (
-        <div className="fixed inset-0 bg-[#09090b]/90 backdrop-blur z-50 flex items-center justify-center">
+        <div style={{ position: "fixed", inset: "0", background: "rgba(100,100,96,0.92)", backdropFilter: "blur(12px)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div className="text-center">
-            <div className="w-12 h-12 border-2 border-violet-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <div style={{ width: "48px", height: "48px", border: "2px solid rgba(255,255,255,0.2)", borderTop: "2px solid rgba(255,255,255,0.9)", borderRadius: "50%", animation: "spin 1s linear infinite" }} className="mx-auto mb-4" />
             <p className="text-white font-medium mb-1">{submitStage || "Processing..."}</p>
-            <p className="text-zinc-500 text-sm">This takes about 15-20 seconds</p>
+            <p style={{ color: "rgba(255,255,255,0.35)" }} className="text-sm">This takes about 15-20 seconds</p>
           </div>
         </div>
       )}
@@ -1082,14 +1054,14 @@ export default function QuestionnairePage() {
 
         {/* Conversational onboarding banner — shown on step 1 only */}
         {step === 1 && (
-          <div className="mb-8 flex items-center justify-between gap-4 bg-violet-950/30 border border-violet-800/40 rounded-2xl px-5 py-4">
+          <div style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.08)", marginBottom: "32px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", padding: "16px 20px" }}>
             <div>
               <p className="text-sm font-medium text-violet-200 mb-0.5">Prefer to just talk about your brand?</p>
-              <p className="text-xs text-zinc-500">Try our conversational onboarding — it takes 3 minutes.</p>
+              <p style={{ color: "rgba(255,255,255,0.35)" }} className="text-xs">Try our conversational onboarding — it takes 3 minutes.</p>
             </div>
             <Link
               href="/onboard"
-              className="flex-shrink-0 text-xs px-4 py-2 bg-violet-800/60 hover:bg-violet-700/60 border border-violet-700/60 text-violet-200 rounded-lg transition-colors whitespace-nowrap"
+              className="flex-shrink-0 text-xs px-4 py-2 bg-violet-800/60 hover:bg-violet-700/60 border border-violet-700/60 text-violet-200  transition-colors whitespace-nowrap"
             >
               Try it →
             </Link>
@@ -1105,7 +1077,7 @@ export default function QuestionnairePage() {
         {step === 7 && <StepReview data={form} onEdit={(s) => setStep(s)} />}
 
         {error && (
-          <div className="mt-4 p-4 bg-red-950/40 border border-red-800/40 rounded-xl text-sm text-red-300">
+          <div className="mt-4 p-4 bg-red-950/40 border border-red-800/40 text-sm text-red-300">
             {error}
           </div>
         )}
@@ -1125,7 +1097,7 @@ export default function QuestionnairePage() {
             {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
               <div
                 key={i}
-                className={`rounded-full transition-all ${
+                className={` transition-all ${
                   i + 1 === step ? "w-4 h-2 bg-violet-500" :
                   i + 1 < step ? "w-2 h-2 bg-violet-700" :
                   "w-2 h-2 bg-zinc-700"
@@ -1139,7 +1111,7 @@ export default function QuestionnairePage() {
               type="button"
               onClick={() => setStep((s) => s + 1)}
               disabled={!canProceed()}
-              className="px-5 py-2.5 bg-violet-700 hover:bg-violet-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+              className="px-5 py-2.5 bg-violet-700 hover:bg-violet-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium  transition-colors"
             >
               Continue →
             </button>
@@ -1148,7 +1120,7 @@ export default function QuestionnairePage() {
               type="button"
               onClick={handleSubmit}
               disabled={submitting}
-              className="px-6 py-2.5 bg-violet-700 hover:bg-violet-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-lg transition-colors"
+              className="px-6 py-2.5 bg-violet-700 hover:bg-violet-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold  transition-colors"
             >
               Run My Audit →
             </button>

@@ -12,7 +12,7 @@ const WELCOME_MESSAGE: ChatMessage = {
     "Tell us about your brand. Don't overthink it — just talk. The more you share, the better we understand who you are.\n\nWhat's your brand called, why did you start it, who are your customers, what makes you different, what does your brand feel like? Just let it flow.",
 };
 
-// ── Install step (shown after successful submission) ──────────────────
+// ── Install step ──────────────────────────────────────────────────────
 
 function InstallStep({ brandId, brandName }: { brandId: string; brandName: string }) {
   const [copied, setCopied] = useState(false);
@@ -26,71 +26,72 @@ function InstallStep({ brandId, brandName }: { brandId: string; brandName: strin
   };
 
   return (
-    <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-lg">
-        {/* Success */}
-        <div className="text-center mb-10">
-          <div className="w-16 h-16 rounded-full bg-emerald-950/50 border border-emerald-700/40 flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+    <div className="min-h-screen flex items-center justify-center px-6 py-16">
+      <div className="w-full max-w-md fade-up-1">
+        {/* Success mark */}
+        <div className="mb-10">
+          <div
+            className="w-12 h-12 flex items-center justify-center mb-6"
+            style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px" }}
+          >
+            <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="1.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 10l5 5 7-8" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">{brandName} is live on ESINA.</h2>
-          <p className="text-zinc-400 text-sm leading-relaxed">
-            Your brand identity profile and AI perception audit are ready.
-            Now install the attribution pixel to close the loop.
+          <h2 className="font-goldman text-2xl text-white mb-2">{brandName} is live.</h2>
+          <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
+            your brand identity profile and AI perception audit are ready. now install the attribution pixel.
           </p>
         </div>
 
+        {/* Divider */}
+        <div className="mb-8" style={{ height: "1px", background: "rgba(255,255,255,0.08)" }} />
+
         {/* Embed code */}
         <div className="mb-6">
-          <p className="text-xs font-medium text-zinc-400 uppercase tracking-widest mb-2">
-            1. Add this to your store
-          </p>
-          <div className="bg-zinc-900/80 border border-zinc-800 rounded-xl p-4 font-mono text-xs text-zinc-300 break-all leading-relaxed">
+          <p className="section-tag mb-3">1. add this to your store</p>
+          <div
+            className="esina-code px-4 py-4 text-xs leading-relaxed break-all mb-2"
+            style={{ color: "rgba(255,255,255,0.7)", fontFamily: "'SF Mono', 'Fira Code', monospace" }}
+          >
             {embedCode}
           </div>
           <button
             onClick={handleCopy}
-            className="mt-2 w-full py-2.5 border border-zinc-700 hover:border-zinc-500 rounded-xl text-sm text-zinc-300 hover:text-white transition-colors"
+            className="btn-secondary w-full py-2.5 text-sm"
           >
-            {copied ? "✓ Copied!" : "Copy embed code"}
+            {copied ? "copied" : "copy embed code"}
           </button>
         </div>
 
         {/* Brand.md link */}
-        <div className="mb-8">
-          <p className="text-xs font-medium text-zinc-400 uppercase tracking-widest mb-2">
-            2. Your brand.md is live
-          </p>
+        <div className="mb-10">
+          <p className="section-tag mb-3">2. your brand.md is live</p>
           <a
             href={`https://esina-brand-identity.vercel.app/api/brand/${brandId}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-between bg-zinc-900/60 border border-zinc-800 rounded-xl px-4 py-3 hover:border-zinc-600 transition-colors"
+            className="flex items-center justify-between px-4 py-3 text-xs"
+            style={{
+              background: "rgba(0,0,0,0.12)",
+              borderRadius: "2px",
+              color: "rgba(255,255,255,0.55)",
+              fontFamily: "'SF Mono', 'Fira Code', monospace",
+              transition: "background 0.15s ease",
+            }}
           >
-            <span className="text-xs text-zinc-400 font-mono truncate">
-              /api/brand/{brandId}
-            </span>
-            <svg className="w-4 h-4 text-zinc-500 flex-shrink-0 ml-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
+            <span className="truncate">/api/brand/{brandId}</span>
+            <span className="ml-3 flex-shrink-0" style={{ color: "rgba(255,255,255,0.35)" }}>↗</span>
           </a>
         </div>
 
         {/* CTAs */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <a
-            href={`/audit/${brandId}`}
-            className="flex-1 text-center px-6 py-3 bg-violet-700 hover:bg-violet-600 text-white font-semibold rounded-xl transition-colors"
-          >
-            View AI Perception Audit →
+        <div className="flex flex-col gap-2">
+          <a href={`/audit/${brandId}`} className="btn-primary py-3 text-sm text-center">
+            view ai perception audit
           </a>
-          <a
-            href="/brands"
-            className="flex-1 text-center px-6 py-3 border border-zinc-700 hover:border-zinc-600 text-zinc-300 hover:text-white font-medium rounded-xl transition-colors"
-          >
-            Browse Brand Directory
+          <a href="/brands" className="btn-secondary py-3 text-sm text-center">
+            browse brand directory
           </a>
         </div>
       </div>
@@ -105,16 +106,21 @@ function ChatBubble({ message }: { message: ChatMessage }) {
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-4`}>
       {!isUser && (
-        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center flex-shrink-0 mr-3 mt-0.5">
-          <span className="text-white font-bold text-[10px]">E</span>
+        <div
+          className="w-6 h-6 flex items-center justify-center flex-shrink-0 mr-3 mt-1"
+          style={{ background: "rgba(0,0,0,0.2)", borderRadius: "2px" }}
+        >
+          <span className="font-goldman text-[10px] text-white">E</span>
         </div>
       )}
       <div
-        className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-line ${
-          isUser
-            ? "bg-violet-700/80 text-white rounded-br-sm"
-            : "bg-zinc-800/80 text-zinc-100 rounded-bl-sm border border-zinc-700/50"
-        }`}
+        className="max-w-[80%] px-4 py-3 text-sm leading-relaxed whitespace-pre-line"
+        style={{
+          background: isUser ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.15)",
+          borderRadius: "2px",
+          color: isUser ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.75)",
+          border: isUser ? "none" : "1px solid rgba(255,255,255,0.06)",
+        }}
       >
         {message.content}
       </div>
@@ -125,13 +131,19 @@ function ChatBubble({ message }: { message: ChatMessage }) {
 function TypingIndicator() {
   return (
     <div className="flex justify-start mb-4">
-      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center flex-shrink-0 mr-3 mt-0.5">
-        <span className="text-white font-bold text-[10px]">E</span>
+      <div
+        className="w-6 h-6 flex items-center justify-center flex-shrink-0 mr-3 mt-1"
+        style={{ background: "rgba(0,0,0,0.2)", borderRadius: "2px" }}
+      >
+        <span className="font-goldman text-[10px] text-white">E</span>
       </div>
-      <div className="bg-zinc-800/80 border border-zinc-700/50 px-4 py-3 rounded-2xl rounded-bl-sm flex items-center gap-1.5">
-        <span className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-        <span className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-        <span className="w-1.5 h-1.5 bg-zinc-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+      <div
+        className="px-4 py-3 flex items-center gap-1.5"
+        style={{ background: "rgba(0,0,0,0.15)", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.06)" }}
+      >
+        <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "rgba(255,255,255,0.4)", animationDelay: "0ms" }} />
+        <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "rgba(255,255,255,0.4)", animationDelay: "150ms" }} />
+        <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "rgba(255,255,255,0.4)", animationDelay: "300ms" }} />
       </div>
     </div>
   );
@@ -153,9 +165,8 @@ export default function OnboardPage() {
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const messageCount = useRef(0); // user message count
+  const messageCount = useRef(0);
 
-  // Scroll to bottom on new messages
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, aiTyping]);
@@ -181,23 +192,14 @@ export default function OnboardPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
 
-      const assistantMessage: ChatMessage = {
-        role: "assistant",
-        content: data.reply || "",
-      };
-
       if (data.reply) {
-        setMessages((prev) => [...prev, assistantMessage]);
+        setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
       }
-
-      if (data.done) {
-        setConversationDone(true);
-      }
+      if (data.done) setConversationDone(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Try again.");
     } finally {
       setAiTyping(false);
-      // Refocus input
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [messages, aiTyping]);
@@ -210,27 +212,17 @@ export default function OnboardPage() {
   };
 
   const handleGenerate = async () => {
-    if (!contactEmail.trim()) {
-      setShowEmailPrompt(true);
-      return;
-    }
-    await submitForExtraction();
-  };
-
-  const submitForExtraction = async () => {
+    if (!contactEmail.trim()) { setShowEmailPrompt(true); return; }
     setGenerating(true);
     setError(null);
-
     try {
       const res = await fetch("/api/onboard/extract", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages, contact_email: contactEmail.trim() }),
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Extraction failed");
-
       setCompletedBrandId(data.brandId);
       setCompletedBrandName(data.brandName || "Your brand");
     } catch (err) {
@@ -239,94 +231,83 @@ export default function OnboardPage() {
     }
   };
 
-  // ── Install screen ─────────────────────────────────────────────────
-
+  // Install screen
   if (completedBrandId) {
     return <InstallStep brandId={completedBrandId} brandName={completedBrandName} />;
   }
 
-  // ── Generating overlay ────────────────────────────────────────────
-
+  // Generating overlay
   if (generating) {
     return (
-      <div className="min-h-screen bg-[#09090b] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-2 border-violet-600 border-t-transparent rounded-full animate-spin mx-auto mb-5" />
-          <p className="text-white font-medium mb-2">Building your brand profile…</p>
-          <p className="text-zinc-500 text-sm">Extracting identity · Generating embedding · Running AI audit</p>
-          <p className="text-zinc-600 text-xs mt-2">This takes about 20-30 seconds</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center fade-up-1">
+          <div
+            className="w-10 h-10 border border-white/20 border-t-white/80 rounded-full animate-spin mx-auto mb-6"
+            style={{ borderRadius: "50%" }}
+          />
+          <p className="font-goldman text-white mb-2">building your brand profile</p>
+          <p className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
+            extracting identity · generating embedding · running ai audit
+          </p>
+          <p className="text-xs mt-2" style={{ color: "rgba(255,255,255,0.25)" }}>~20–30 seconds</p>
         </div>
       </div>
     );
   }
 
-  // ── Chat interface ────────────────────────────────────────────────
-
+  // Chat interface
   return (
-    <div className="min-h-screen bg-[#09090b] flex flex-col">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b border-zinc-800/60 bg-[#09090b]/95 backdrop-blur sticky top-0 z-10">
+      <header
+        className="sticky top-0 z-10 backdrop-blur-md"
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", background: "rgba(122,122,118,0.7)" }}
+      >
         <div className="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center">
-              <span className="text-white font-bold text-xs">E</span>
-            </div>
-            <span className="text-base font-semibold text-white tracking-tight">ESINA</span>
+          <Link href="/" className="font-goldman text-white tracking-[3px] text-sm uppercase">
+            ESINA
           </Link>
           <div className="flex items-center gap-4">
-            <Link
-              href="/questionnaire"
-              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
-            >
-              Prefer a form? →
-            </Link>
-            <span className="text-xs text-zinc-600 hidden sm:block">Conversational Onboarding</span>
+            <Link href="/questionnaire" className="nav-link">prefer a form →</Link>
+            <span className="section-tag hidden sm:block">brand identity interview</span>
           </div>
         </div>
       </header>
 
       {/* Chat area */}
       <main className="flex-1 overflow-y-auto">
-        <div className="max-w-2xl mx-auto px-6 py-8">
-          {/* Intro label */}
-          <div className="text-center mb-8">
-            <span className="text-xs text-zinc-600 uppercase tracking-widest">
-              Esina · Brand Identity Interview
-            </span>
-          </div>
+        <div className="max-w-2xl mx-auto px-6 py-10">
+          <p className="section-tag text-center mb-10">esina · brand identity interview</p>
 
-          {/* Messages */}
           <div className="space-y-0">
-            {messages.map((msg, i) => (
-              <ChatBubble key={i} message={msg} />
-            ))}
+            {messages.map((msg, i) => <ChatBubble key={i} message={msg} />)}
             {aiTyping && <TypingIndicator />}
           </div>
 
-          {/* "I'm done" + Generate button — shown when AI signals done OR after enough turns */}
+          {/* Generate / email prompt */}
           {(conversationDone || messageCount.current >= 5) && !aiTyping && (
-            <div className="mt-6 border-t border-zinc-800/60 pt-6">
+            <div className="mt-8 pt-6" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
               {!showEmailPrompt ? (
                 <div className="space-y-3">
-                  <p className="text-xs text-zinc-500 text-center">
-                    Ready to generate your brand profile?
+                  <p className="text-xs text-center" style={{ color: "rgba(255,255,255,0.35)" }}>
+                    ready to generate your brand profile?
                   </p>
                   <button
                     onClick={() => setShowEmailPrompt(true)}
-                    className="w-full py-3.5 bg-violet-700 hover:bg-violet-600 text-white font-semibold rounded-xl transition-colors text-sm"
+                    className="btn-primary w-full py-3.5 text-sm"
                   >
-                    Generate my brand.md →
+                    generate my brand.md
                   </button>
                   {!conversationDone && (
-                    <p className="text-xs text-zinc-600 text-center">
-                      Or keep talking — the more context, the richer the profile.
+                    <p className="text-xs text-center" style={{ color: "rgba(255,255,255,0.25)" }}>
+                      or keep talking — the more context, the richer the profile.
                     </p>
                   )}
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <p className="text-sm text-zinc-300 font-medium">Almost there. What&apos;s your email?</p>
-                  <p className="text-xs text-zinc-500">So we can send you your brand audit report.</p>
+                  <p className="text-sm text-white">almost there. what&apos;s your email?</p>
+                  <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>so we can send you your brand audit report.</p>
                   <input
                     type="email"
                     value={contactEmail}
@@ -334,20 +315,27 @@ export default function OnboardPage() {
                     onKeyDown={(e) => { if (e.key === "Enter") handleGenerate(); }}
                     placeholder="you@brand.com"
                     autoFocus
-                    className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-violet-600 transition-colors"
+                    className="w-full px-4 py-3 text-sm focus:outline-none"
+                    style={{
+                      background: "rgba(0,0,0,0.15)",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      borderRadius: "2px",
+                      color: "white",
+                    }}
                   />
                   <button
                     onClick={handleGenerate}
                     disabled={!contactEmail.trim()}
-                    className="w-full py-3.5 bg-violet-700 hover:bg-violet-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors text-sm"
+                    className="btn-primary w-full py-3.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
                   >
-                    Generate my brand.md →
+                    generate my brand.md
                   </button>
                   <button
                     onClick={() => setShowEmailPrompt(false)}
-                    className="w-full py-2 text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
+                    className="w-full py-2 text-xs"
+                    style={{ color: "rgba(255,255,255,0.35)", transition: "color 0.15s" }}
                   >
-                    ← Back to conversation
+                    ← back to conversation
                   </button>
                 </div>
               )}
@@ -355,8 +343,8 @@ export default function OnboardPage() {
           )}
 
           {error && (
-            <div className="mt-4 bg-red-950/30 border border-red-800/40 rounded-xl p-4">
-              <p className="text-red-400 text-sm">{error}</p>
+            <div className="mt-4 px-4 py-3 text-sm" style={{ background: "rgba(220,38,38,0.12)", border: "1px solid rgba(220,38,38,0.2)", borderRadius: "2px", color: "rgba(252,165,165,0.8)" }}>
+              {error}
             </div>
           )}
 
@@ -364,9 +352,12 @@ export default function OnboardPage() {
         </div>
       </main>
 
-      {/* Input bar — hidden once email prompt is shown */}
+      {/* Input bar */}
       {!showEmailPrompt && (
-        <div className="border-t border-zinc-800/60 bg-[#09090b]/95 backdrop-blur sticky bottom-0">
+        <div
+          className="sticky bottom-0 backdrop-blur-md"
+          style={{ borderTop: "1px solid rgba(255,255,255,0.08)", background: "rgba(122,122,118,0.8)" }}
+        >
           <div className="max-w-2xl mx-auto px-6 py-4">
             <div className="flex items-end gap-3">
               <textarea
@@ -374,11 +365,18 @@ export default function OnboardPage() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Tell us about your brand…"
+                placeholder="tell us about your brand…"
                 rows={1}
                 disabled={aiTyping}
-                className="flex-1 bg-zinc-900/80 border border-zinc-700/60 rounded-2xl px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-violet-600/60 transition-colors resize-none leading-relaxed disabled:opacity-50"
-                style={{ maxHeight: "140px", overflowY: "auto" }}
+                className="flex-1 px-4 py-3 text-sm focus:outline-none resize-none leading-relaxed disabled:opacity-50"
+                style={{
+                  background: "rgba(0,0,0,0.15)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  borderRadius: "2px",
+                  color: "white",
+                  maxHeight: "140px",
+                  overflowY: "auto",
+                }}
                 onInput={(e) => {
                   const el = e.currentTarget;
                   el.style.height = "auto";
@@ -388,15 +386,16 @@ export default function OnboardPage() {
               <button
                 onClick={() => sendMessage(input)}
                 disabled={!input.trim() || aiTyping}
-                className="w-10 h-10 rounded-xl bg-violet-700 hover:bg-violet-600 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors flex-shrink-0"
+                className="w-10 h-10 flex items-center justify-center flex-shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
+                style={{ background: "rgba(255,255,255,0.9)", borderRadius: "2px", transition: "opacity 0.15s" }}
               >
-                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="#4A4A46">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
               </button>
             </div>
-            <p className="text-xs text-zinc-700 mt-2 text-center">
-              Press Enter to send · Shift+Enter for new line
+            <p className="text-xs mt-2 text-center" style={{ color: "rgba(255,255,255,0.25)" }}>
+              enter to send · shift+enter for new line
             </p>
           </div>
         </div>

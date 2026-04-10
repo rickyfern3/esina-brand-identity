@@ -1,388 +1,296 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#09090b] text-white">
-      {/* ── Header ─────────────────────────────────────────────── */}
-      <header className="border-b border-zinc-800/60 sticky top-0 z-50 backdrop-blur-md bg-[#09090b]/80">
+    <div className="min-h-screen">
+
+      {/* ── Nav ──────────────────────────────────────────────────────── */}
+      <header className="sticky top-0 z-50" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(12px)", background: "rgba(122,122,118,0.7)" }}>
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-esina-500 to-esina-700 flex items-center justify-center shadow-lg shadow-esina-900/40">
-              <span className="text-white font-bold text-sm">E</span>
-            </div>
-            <span className="text-lg font-semibold tracking-tight">ESINA</span>
-          </div>
-          <nav className="flex items-center gap-6">
-            <Link href="/audits" className="text-sm text-zinc-400 hover:text-white transition-colors">
-              Audits
-            </Link>
-            <Link href="/match" className="text-sm text-zinc-400 hover:text-white transition-colors">
-              Match Demo
-            </Link>
-            <Link href="/translate" className="text-sm text-zinc-400 hover:text-white transition-colors">
-              Translate
-            </Link>
-            <Link
-              href="/questionnaire"
-              className="text-sm px-4 py-2 bg-esina-600 hover:bg-esina-500 text-white font-medium rounded-lg transition-colors"
-            >
-              Audit Your Brand
-            </Link>
+          <Link href="/" className="font-goldman text-white tracking-[3px] text-sm uppercase">
+            ESINA
+          </Link>
+          <nav className="flex items-center gap-8">
+            <Link href="/brands" className="nav-link">brands</Link>
+            <Link href="/match" className="nav-link">match</Link>
+            <Link href="/translate" className="nav-link">translate</Link>
+            <Link href="/audits" className="nav-link">audits</Link>
           </nav>
         </div>
       </header>
 
-      {/* ── Hero ───────────────────────────────────────────────── */}
-      <section className="relative pt-24 pb-20 px-6 overflow-hidden">
-        {/* Background glow */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-esina-600/5 rounded-full blur-3xl" />
+      {/* ── Hero ─────────────────────────────────────────────────────── */}
+      <section className="relative min-h-[88vh] flex items-center overflow-hidden px-6">
+        {/* Fingerprint background image */}
+        <div className="absolute inset-0 pointer-events-none select-none">
+          <div className="absolute right-0 top-0 h-full w-[55%] flex items-center justify-end pr-0">
+            <Image
+              src="/fingerprint.jpg"
+              alt=""
+              fill
+              priority
+              sizes="55vw"
+              className="object-cover object-left"
+              style={{ opacity: 0.32, maskImage: "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.9) 60%, rgba(0,0,0,0.9) 100%)" }}
+            />
+          </div>
         </div>
 
-        <div className="relative max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-esina-800/60 bg-esina-950/40 text-esina-300 text-xs font-medium mb-8 tracking-wide">
-            <span className="w-1.5 h-1.5 rounded-full bg-esina-400 animate-pulse" />
-            Brand Intelligence for the AI Era
-          </div>
+        <div className="relative max-w-6xl mx-auto w-full py-24">
+          <div className="max-w-2xl fade-up-1">
+            {/* Tag */}
+            <p className="section-tag mb-8">brand identity infrastructure</p>
 
-          <h1 className="text-5xl sm:text-6xl font-bold leading-tight tracking-tight mb-6">
-            AI agents recommend big brands{" "}
-            <span className="text-zinc-500">by default.</span>
-            <br />
-            <span className="bg-gradient-to-r from-esina-400 to-esina-300 bg-clip-text text-transparent">
-              Esina makes sure they recommend the right brand
-            </span>{" "}
-            —{" "}
-            <span className="text-zinc-400">even if that&apos;s you.</span>
-          </h1>
+            {/* Headline */}
+            <h1 className="text-5xl sm:text-6xl leading-[1.1] mb-7 font-goldman">
+              <span className="text-white">ai sees less than half</span>
+              <br />
+              <span style={{ color: "rgba(255,255,255,0.3)" }}>of who your brand is</span>
+            </h1>
 
-          <p className="text-xl text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            AI only sees half of who your brand is. Esina shows the rest.
-          </p>
+            {/* Subtitle */}
+            <p className="text-lg mb-10 max-w-xl leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
+              AI agents recommend based on popularity, not identity. Your brand becomes invisible. One line of code fixes that.
+            </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
-            <Link
-              href="/onboard"
-              className="btn-glow px-8 py-4 bg-esina-600 hover:bg-esina-500 text-white font-semibold rounded-xl transition-all text-base shadow-xl shadow-esina-900/30"
-            >
-              Tell us about your brand →
-            </Link>
-            <Link
-              href="/questionnaire"
-              className="px-8 py-4 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-medium rounded-xl transition-all text-base"
-            >
-              Fill out the brand form →
-            </Link>
-          </div>
-          <p className="text-xs text-zinc-600 text-center">
-            Two paths, same output — pick what feels right.{" "}
-            <Link href="/match" className="text-zinc-500 hover:text-zinc-300 underline underline-offset-2 transition-colors">
-              See the demo first →
-            </Link>
-          </p>
-        </div>
-      </section>
-
-      {/* ── Stat Bar ───────────────────────────────────────────── */}
-      <section className="px-6 pb-20">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-zinc-800/60 border border-zinc-800/60 rounded-2xl bg-zinc-900/30 overflow-hidden">
-            <div className="px-8 py-6 text-center">
-              <div className="text-3xl font-bold text-white mb-1">28</div>
-              <div className="text-sm text-zinc-500">brands audited</div>
-            </div>
-            <div className="px-8 py-6 text-center">
-              <div className="text-3xl font-bold text-amber-400 mb-1">43<span className="text-xl text-zinc-500">/100</span></div>
-              <div className="text-sm text-zinc-500">average AI identity alignment</div>
-            </div>
-            <div className="px-8 py-6 text-center">
-              <div className="text-3xl font-bold text-esina-400 mb-1">57%</div>
-              <div className="text-sm text-zinc-500">of brand identity invisible to AI</div>
+            {/* CTAs */}
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/onboard"
+                className="btn-primary px-7 py-3.5 text-sm font-medium inline-block"
+              >
+                build your brand.md
+              </Link>
+              <Link
+                href="/questionnaire"
+                className="btn-secondary px-7 py-3.5 text-sm inline-block"
+              >
+                tell us about your brand
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── The Problem ────────────────────────────────────────── */}
-      <section className="px-6 py-20 border-t border-zinc-800/40">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
+      {/* ── Stats bar ────────────────────────────────────────────────── */}
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-3 fade-up-2">
+            {[
+              { num: "43", label: "avg ai alignment / 100" },
+              { num: "57%", label: "identity invisible to ai" },
+              { num: "78", label: "brands profiled" },
+            ].map((s, i, arr) => (
+              <div
+                key={s.num}
+                className="py-8 px-6 text-center"
+                style={{ borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.08)" : "none" }}
+              >
+                <div className="font-goldman text-3xl text-white mb-1.5">{s.num}</div>
+                <div className="text-xs" style={{ color: "rgba(255,255,255,0.3)", letterSpacing: "0.06em" }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Problem ──────────────────────────────────────────────────── */}
+      <section className="px-6 py-24 fade-up-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+        <div className="max-w-6xl mx-auto">
+          <p className="section-tag mb-6">the problem</p>
+          <div className="grid md:grid-cols-2 gap-16 items-start">
             <div>
-              <div className="text-xs text-zinc-500 uppercase tracking-widest mb-4 font-medium">The Problem</div>
-              <h2 className="text-3xl font-bold mb-6 leading-tight">
-                AI flattens brand identity.
-                <br />
-                <span className="text-zinc-400">The biggest brand wins by default.</span>
+              <h2 className="text-3xl font-goldman text-white mb-6">
+                ai defaults to big brands. yours disappears.
               </h2>
-              <div className="space-y-5 text-zinc-400 leading-relaxed">
+              <div className="space-y-4 text-base leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
                 <p>
-                  AI knows what you sell. It doesn&apos;t know who you are. When a consumer asks an AI agent for a coffee brand that values craft and counterculture, it returns Starbucks. Ask for an independent skincare brand rooted in wellness, it returns Neutrogena. Ask for artisanal jewelry with a slow fashion ethos, it returns Tiffany.
+                  AI knows what you sell. It doesn&apos;t know who you are. When a consumer asks an AI agent for artisanal jewelry with a slow fashion ethos, it returns Tiffany. Ask for independent skincare rooted in wellness, it returns Neutrogena.
                 </p>
                 <p>
-                  This isn&apos;t a fashion problem. It&apos;s a brand identity problem. When products are functionally similar, AI defaults to the brand with the largest training signal — almost always the biggest brand, not the best match.
-                </p>
-                <p>
-                  Your identity — your archetypes, your values, your community, your aesthetic — works the same whether you&apos;re a coffee roaster, a skincare brand, a wellness studio, or a streetwear label. It just lives in your head and your captions. Not in any format AI can query.
+                  This isn&apos;t a size problem. It&apos;s a data problem. Your archetypes, values, community, aesthetic — everything that makes your brand yours — lives in your head and your captions. Not in any format AI can query.
                 </p>
               </div>
             </div>
 
-            {/* Problem visual */}
-            <div className="space-y-3">
-              <div className="text-xs text-zinc-600 uppercase tracking-widest mb-4 font-medium">What AI sees vs. what you actually are</div>
-
-              {[
-                { label: "Product category", ai: true, full: true },
-                { label: "Price tier", ai: true, full: true },
-                { label: "Website content", ai: true, full: true },
-                { label: "Brand archetypes", ai: false, full: true },
-                { label: "Core values", ai: false, full: true },
-                { label: "Community signals", ai: false, full: true },
-                { label: "Aesthetic identity", ai: false, full: true },
-                { label: "Cultural positioning", ai: false, full: true },
-              ].map((row) => (
-                <div key={row.label} className="flex items-center gap-4">
-                  <div className="w-36 text-sm text-zinc-500 flex-shrink-0">{row.label}</div>
-                  <div className="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${row.ai ? "bg-gradient-to-r from-esina-600 to-esina-400 w-full" : "bg-red-900/60 w-0"}`}
-                    />
+            {/* Visibility grid */}
+            <div style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px", padding: "24px" }}>
+              <p className="section-tag mb-5">what ai currently reads</p>
+              <div className="space-y-3">
+                {[
+                  { label: "product category", visible: true },
+                  { label: "price tier", visible: true },
+                  { label: "website content", visible: true },
+                  { label: "brand archetypes", visible: false },
+                  { label: "core values", visible: false },
+                  { label: "community signals", visible: false },
+                  { label: "aesthetic identity", visible: false },
+                  { label: "cultural positioning", visible: false },
+                ].map((row) => (
+                  <div key={row.label} className="flex items-center gap-4">
+                    <div className="w-40 text-sm flex-shrink-0" style={{ color: "rgba(255,255,255,0.45)" }}>
+                      {row.label}
+                    </div>
+                    <div className="flex-1 h-px" style={{ background: row.visible ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.12)" }} />
+                    <div className="text-xs w-16 text-right flex-shrink-0" style={{ color: row.visible ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.2)" }}>
+                      {row.visible ? "visible" : "invisible"}
+                    </div>
                   </div>
-                  <div className={`text-xs font-medium flex-shrink-0 w-16 text-right ${row.ai ? "text-esina-400" : "text-red-500"}`}>
-                    {row.ai ? "Visible" : "Invisible"}
-                  </div>
-                </div>
-              ))}
-
-              <div className="mt-5 pt-4 border-t border-zinc-800/60 flex justify-between text-xs text-zinc-600">
-                <span>What AI currently reads</span>
-                <span>What actually drives brand match</span>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── How Esina Works ────────────────────────────────────── */}
-      <section className="px-6 py-20 border-t border-zinc-800/40">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <div className="text-xs text-zinc-500 uppercase tracking-widest mb-4 font-medium">How Esina Works</div>
-            <h2 className="text-3xl font-bold">
-              From invisible to{" "}
-              <span className="bg-gradient-to-r from-esina-400 to-esina-300 bg-clip-text text-transparent">
-                AI-readable
-              </span>
-            </h2>
-          </div>
+      {/* ── How it works ─────────────────────────────────────────────── */}
+      <section className="px-6 py-24 fade-up-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+        <div className="max-w-6xl mx-auto">
+          <p className="section-tag mb-6">how it works</p>
+          <h2 className="text-3xl font-goldman text-white mb-14">three steps. one line of code.</h2>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-0" style={{ border: "1px solid rgba(255,255,255,0.06)", borderRadius: "2px" }}>
             {[
               {
-                step: "01",
-                title: "Brand fills out identity questionnaire",
-                description:
-                  "Archetypes, values, aesthetic style, community, voice, sustainability position. The identity dimensions that make your brand yours — structured for machines, regardless of what you sell.",
-                icon: (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
-                  </svg>
-                ),
+                num: "01",
+                title: "define your identity",
+                desc: "Archetypes, values, aesthetic style, community, voice. The identity dimensions that make your brand yours — structured for machines.",
               },
               {
-                step: "02",
-                title: "AI Perception Audit reveals gaps",
-                description:
-                  "Three independent AI queries assess how the brand is actually perceived — archetypes, competitive positioning, consumer simulation. We score the gap between self-reported and AI-perceived identity.",
-                icon: (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
-                  </svg>
-                ),
+                num: "02",
+                title: "get your brand.md",
+                desc: "AI perception audit runs automatically. We score the gap between your self-reported identity and how AI actually perceives you.",
               },
               {
-                step: "03",
-                title: "Normalized identity data powers smarter matching",
-                description:
-                  "Brand identity becomes a vector embedding. Consumer preferences match against it semantically — not by keyword, not by popularity. The right brand surfaces first.",
-                icon: (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-                  </svg>
-                ),
+                num: "03",
+                title: "add one line",
+                desc: "Drop one script tag in your store header. AI agents now have a machine-readable identity profile to match against.",
               },
-            ].map((item) => (
+            ].map((step, i, arr) => (
               <div
-                key={item.step}
-                className="relative bg-zinc-900/40 border border-zinc-800/60 rounded-2xl p-7 hover:border-zinc-700 transition-colors"
+                key={step.num}
+                className="p-8"
+                style={{
+                  background: "rgba(0,0,0,0.12)",
+                  borderRight: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none",
+                }}
               >
-                <div className="flex items-start gap-4 mb-5">
-                  <div className="w-9 h-9 rounded-lg bg-esina-950/60 border border-esina-800/40 flex items-center justify-center text-esina-400 flex-shrink-0">
-                    {item.icon}
-                  </div>
-                  <span className="text-xs text-zinc-600 font-mono mt-2">{item.step}</span>
-                </div>
-                <h3 className="font-semibold text-white mb-3 leading-snug">{item.title}</h3>
-                <p className="text-sm text-zinc-500 leading-relaxed">{item.description}</p>
-
-                {/* Connector arrow (not on last) */}
-                {item.step !== "03" && (
-                  <div className="hidden md:block absolute -right-3.5 top-1/2 -translate-y-1/2 text-zinc-700 text-xl z-10">
-                    →
-                  </div>
-                )}
+                <div className="font-goldman text-4xl mb-6" style={{ color: "rgba(255,255,255,0.2)" }}>{step.num}</div>
+                <h3 className="font-goldman text-white text-lg mb-3">{step.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>{step.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Mock Demo Comparison ───────────────────────────────── */}
-      <section className="px-6 py-20 border-t border-zinc-800/40">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <div className="text-xs text-zinc-500 uppercase tracking-widest mb-4 font-medium">The Difference</div>
-            <h2 className="text-3xl font-bold mb-4">Same brief. Very different results.</h2>
-            <p className="text-zinc-500 max-w-xl mx-auto text-sm leading-relaxed">
-              Consumer brief:{" "}
-              <span className="text-zinc-300 italic">
-                &quot;Artisanal jewelry that feels like wearable art. No logo, slow fashion, quiet luxury aesthetic.&quot;
-              </span>
-            </p>
-            <p className="text-xs text-zinc-600 mt-3 max-w-md mx-auto">
-              Same dynamic applies across any category — coffee, skincare, wellness, hospitality, food, tech accessories, and more.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Esina result */}
-            <div className="border border-esina-800/50 bg-esina-950/20 rounded-2xl overflow-hidden">
-              <div className="px-6 py-4 border-b border-esina-800/40 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-md bg-gradient-to-br from-esina-500 to-esina-700 flex items-center justify-center">
-                    <span className="text-white font-bold text-[10px]">E</span>
-                  </div>
-                  <span className="text-sm font-medium text-esina-300">Esina Match</span>
-                </div>
-                <span className="text-xs text-esina-400 bg-esina-900/40 px-2 py-1 rounded-md border border-esina-800/40">Identity-aware</span>
-              </div>
-              <div className="p-4 space-y-3">
-                {[
-                  { rank: 1, name: "Alighieri", detail: "Sage archetype · quiet luxury · no logo · literary craft", score: 94 },
-                  { rank: 2, name: "Completedworks", detail: "Creator archetype · sculptural jewelry · artisanal", score: 91 },
-                  { rank: 3, name: "Lizzie Fortunato", detail: "Explorer archetype · found materials · heritage craft", score: 87 },
-                ].map((match) => (
-                  <div key={match.rank} className="flex items-start gap-3 p-3 bg-zinc-900/50 rounded-xl border border-zinc-800/40">
-                    <div className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 ${match.rank === 1 ? "bg-esina-600 text-white" : "bg-zinc-800 text-zinc-400"}`}>
-                      {match.rank}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-white">{match.name}</span>
-                        <span className="text-xs text-esina-400 font-mono">{match.score}%</span>
-                      </div>
-                      <p className="text-xs text-zinc-500 leading-relaxed">{match.detail}</p>
-                    </div>
-                  </div>
-                ))}
-                <p className="text-xs text-esina-400/70 text-center pt-1">✓ Identity-matched — not popularity-ranked</p>
-              </div>
-            </div>
-
-            {/* Generic AI result */}
-            <div className="border border-zinc-800/60 bg-zinc-900/20 rounded-2xl overflow-hidden">
-              <div className="px-6 py-4 border-b border-zinc-800/40 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-md bg-zinc-700 flex items-center justify-center">
-                    <span className="text-zinc-300 font-bold text-[10px]">AI</span>
-                  </div>
-                  <span className="text-sm font-medium text-zinc-400">Generic AI</span>
-                </div>
-                <span className="text-xs text-zinc-500 bg-zinc-800/60 px-2 py-1 rounded-md border border-zinc-700/40">Popularity-based</span>
-              </div>
-              <div className="p-4 space-y-3">
-                {[
-                  { rank: 1, name: "Tiffany & Co.", detail: "Recommended because it dominates jewelry search volume", score: null },
-                  { rank: 2, name: "Pandora", detail: "High brand recognition, strong retail presence", score: null },
-                  { rank: 3, name: "Kay Jewelers", detail: "Top-3 jewelry retailer by market share", score: null },
-                ].map((match) => (
-                  <div key={match.rank} className="flex items-start gap-3 p-3 bg-zinc-900/40 rounded-xl border border-zinc-800/30 opacity-80">
-                    <div className="w-6 h-6 rounded-md bg-zinc-800 text-zinc-500 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
-                      {match.rank}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-zinc-300">{match.name}</span>
-                        <span className="text-xs text-zinc-600 font-mono">?</span>
-                      </div>
-                      <p className="text-xs text-zinc-600 leading-relaxed">{match.detail}</p>
-                    </div>
-                  </div>
-                ))}
-                <p className="text-xs text-red-500/60 text-center pt-1">✗ Functionally similar → default to biggest brand</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA ────────────────────────────────────────────────── */}
-      <section className="px-6 py-24 border-t border-zinc-800/40">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-esina-800/60 bg-esina-950/40 text-esina-300 text-xs font-medium mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-esina-400 animate-pulse" />
-            Free for the first 100 brands
-          </div>
-          <h2 className="text-4xl font-bold mb-5 leading-tight">
-            Find out where AI sees gaps{" "}
-            <span className="text-zinc-500">in your brand.</span>
-          </h2>
-          <p className="text-zinc-400 mb-10 max-w-xl mx-auto leading-relaxed">
-            We run three independent AI queries against your brand, score the gaps, and show you exactly where your identity isn&apos;t landing.
+      {/* ── Integration ───────────────────────────────────────────────── */}
+      <section className="px-6 py-24 fade-up-5" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+        <div className="max-w-6xl mx-auto">
+          <p className="section-tag mb-6">the integration</p>
+          <h2 className="text-3xl font-goldman text-white mb-3">this is all you add.</h2>
+          <p className="text-sm mb-10" style={{ color: "rgba(255,255,255,0.35)" }}>
+            paste it in your store&apos;s &lt;head&gt;. nothing else.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
-            <Link
-              href="/onboard"
-              className="btn-glow px-10 py-5 bg-esina-600 hover:bg-esina-500 text-white font-semibold rounded-xl transition-all text-base shadow-2xl shadow-esina-900/40"
-            >
-              Tell us about your brand →
-            </Link>
-            <Link
-              href="/questionnaire"
-              className="px-10 py-5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-medium rounded-xl transition-all text-base"
-            >
-              Fill out the brand form →
-            </Link>
+          <div
+            className="esina-code px-6 py-5 text-sm leading-relaxed overflow-x-auto"
+            style={{ maxWidth: "640px", color: "rgba(255,255,255,0.8)", fontFamily: "'SF Mono', 'Fira Code', monospace" }}
+          >
+            {'<script src="https://esina-brand-identity.vercel.app/esina.js?brand=YOUR_BRAND_ID"></script>'}
           </div>
-          <p className="text-xs text-zinc-600">Two paths, same output — pick what feels right.</p>
+          <p className="text-xs mt-4" style={{ color: "rgba(255,255,255,0.25)" }}>
+            your brand id is generated when you complete onboarding. free forever.
+          </p>
         </div>
       </section>
 
-      {/* ── Footer ─────────────────────────────────────────────── */}
-      <footer className="border-t border-zinc-800/40 px-6 py-10">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-esina-500 to-esina-700 flex items-center justify-center">
-              <span className="text-white font-bold text-[10px]">E</span>
+      {/* ── Proof ────────────────────────────────────────────────────── */}
+      <section className="px-6 py-24 fade-up-6" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+        <div className="max-w-6xl mx-auto">
+          <p className="section-tag mb-6">the proof</p>
+          <h2 className="text-3xl font-goldman text-white mb-4">same query. different intelligence.</h2>
+
+          {/* Consumer query */}
+          <div className="mb-10 px-5 py-4" style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px", maxWidth: "560px" }}>
+            <p className="section-tag mb-2">consumer query</p>
+            <p className="text-sm" style={{ color: "rgba(255,255,255,0.7)" }}>
+              &ldquo;Artisanal jewelry that feels like wearable art. No logo, slow fashion, quiet luxury aesthetic.&rdquo;
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4" style={{ maxWidth: "880px" }}>
+            {/* ESINA column */}
+            <div style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px" }}>
+              <div className="px-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                <p className="text-xs font-goldman tracking-widest text-white">ESINA identity match</p>
+              </div>
+              <div className="p-4 space-y-2">
+                {[
+                  { name: "éliou", score: "53%" },
+                  { name: "Completedworks", score: "49%" },
+                  { name: "Lizzie Fortunato", score: "47%" },
+                ].map((b) => (
+                  <div key={b.name} className="flex items-center justify-between px-4 py-3" style={{ background: "rgba(0,0,0,0.08)", borderRadius: "2px" }}>
+                    <span className="text-sm text-white">{b.name}</span>
+                    <span className="font-goldman text-sm text-white">{b.score}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <span className="text-sm font-medium text-zinc-400">ESINA</span>
-            <span className="text-zinc-700 text-sm">·</span>
-            <span className="text-sm text-zinc-600">Built for the AI era</span>
+
+            {/* Generic AI column */}
+            <div style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px" }}>
+              <div className="px-6 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                <p className="text-xs font-goldman tracking-widest" style={{ color: "rgba(255,255,255,0.45)" }}>generic ai</p>
+              </div>
+              <div className="p-4 space-y-2">
+                {[
+                  { name: "Pandora", label: "popular" },
+                  { name: "Tiffany & Co.", label: "popular" },
+                  { name: "Mejuri", label: "popular" },
+                ].map((b) => (
+                  <div key={b.name} className="flex items-center justify-between px-4 py-3" style={{ background: "rgba(0,0,0,0.08)", borderRadius: "2px" }}>
+                    <span className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>{b.name}</span>
+                    <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{b.label}</span>
+                  </div>
+                ))}
+                <div className="px-4 py-3" style={{ background: "rgba(0,0,0,0.08)", borderRadius: "2px" }}>
+                  <span className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>éliou not mentioned</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-6">
-            <Link href="/audits" className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors">
-              Audit Reports
+        </div>
+      </section>
+
+      {/* ── CTA ──────────────────────────────────────────────────────── */}
+      <section className="px-6 py-28 text-center">
+        <div className="max-w-xl mx-auto">
+          <h2 className="text-3xl font-goldman text-white mb-3">free forever.</h2>
+          <p className="text-lg mb-2" style={{ color: "rgba(255,255,255,0.45)" }}>pay when ai sends you customers.</p>
+          <p className="text-sm mb-12" style={{ color: "rgba(255,255,255,0.35)" }}>no subscriptions. no setup. one line of code.</p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link href="/onboard" className="btn-primary px-8 py-4 text-sm font-medium inline-block">
+              get your brand.md
             </Link>
-            <Link href="/match" className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors">
-              Match Demo
-            </Link>
-            <Link href="/translate" className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors">
-              Identity Translator
-            </Link>
-            <Link href="/questionnaire" className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors">
-              Get Audited
+            <Link href="/match" className="btn-secondary px-8 py-4 text-sm inline-block">
+              see the demo
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* ── Footer ───────────────────────────────────────────────────── */}
+      <footer className="px-6 py-8" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>© 2026 ESINA</span>
+          <nav className="flex items-center gap-6">
+            <Link href="/brands" className="nav-link">brands</Link>
+            <Link href="/match" className="nav-link">match</Link>
+            <Link href="/translate" className="nav-link">translate</Link>
+            <Link href="/audits" className="nav-link">audits</Link>
+          </nav>
         </div>
       </footer>
     </div>

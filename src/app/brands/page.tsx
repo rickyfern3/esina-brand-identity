@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic";
-export const revalidate = 60; // re-fetch from Supabase at most once per minute
+export const revalidate = 60;
 
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
@@ -9,50 +9,12 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// ── Helpers ─────────────────────────────────────────────────────────────
-
-function scoreColor(score: number): string {
-  if (score >= 70) return "text-emerald-400";
-  if (score >= 45) return "text-amber-400";
-  return "text-rose-400";
-}
-
-function scoreDot(score: number): string {
-  if (score >= 70) return "bg-emerald-400";
-  if (score >= 45) return "bg-amber-400";
-  return "bg-rose-400";
-}
-
-function categoryIcon(category: string): string {
-  const map: Record<string, string> = {
-    "Fashion": "👗",
-    "vintage": "🧥",
-    "jewelry": "💍",
-    "accessories": "👜",
-    "Food & Beverage": "🍶",
-    "Beauty & Personal Care": "✨",
-    "Health & Wellness": "🌿",
-    "Home & Lifestyle": "🏡",
-    "Tech & Accessories": "⚡",
-  };
-  for (const [key, icon] of Object.entries(map)) {
-    if (category?.toLowerCase().includes(key.toLowerCase())) return icon;
-  }
-  return "◆";
-}
-
-// ── Page ────────────────────────────────────────────────────────────────
-
 export default async function BrandsDirectoryPage() {
-  // Fetch all brand profiles
   const { data: brands } = await supabase
     .from("brand_profiles")
-    .select(
-      "id, brand_name, category, price_tier, archetypes, style_tags, status_signal_type, origin_location"
-    )
+    .select("id, brand_name, category, price_tier, archetypes, style_tags, status_signal_type, origin_location")
     .order("brand_name");
 
-  // Fetch latest audit score per brand
   const { data: audits } = await supabase
     .from("perception_audits")
     .select("brand_profile_id, identity_alignment_score")
@@ -66,11 +28,8 @@ export default async function BrandsDirectoryPage() {
   }
 
   const totalBrands = (brands || []).length;
-  const depopBrands = (brands || []).filter(
-    (b) => b.origin_location?.startsWith("depop:")
-  ).length;
+  const depopBrands = (brands || []).filter((b) => b.origin_location?.startsWith("depop:")).length;
 
-  // Group by category
   const byCategory = new Map<string, typeof brands>();
   for (const brand of brands || []) {
     const cat = brand.category || "Other";
@@ -79,187 +38,187 @@ export default async function BrandsDirectoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b]">
+    <div className="min-h-screen">
       {/* Header */}
-      <header className="border-b border-zinc-800/60">
-        <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">E</span>
-            </div>
-            <span className="text-lg font-semibold text-white tracking-tight">ESINA</span>
+      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(12px)", background: "rgba(122,122,118,0.7)" }}>
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="font-goldman text-white tracking-[3px] text-sm uppercase">
+            ESINA
           </Link>
-          <nav className="flex items-center gap-6 text-sm text-zinc-400">
-            <Link href="/match" className="hover:text-white transition-colors">Match</Link>
-            <Link href="/audits" className="hover:text-white transition-colors">Audits</Link>
-            <Link href="/translate" className="hover:text-white transition-colors">Translate</Link>
-            <Link
-              href="/questionnaire"
-              className="px-3 py-1.5 bg-violet-700 hover:bg-violet-600 text-white rounded-lg transition-colors"
-            >
-              Add Brand
-            </Link>
+          <nav className="flex items-center gap-6">
+            <Link href="/match" className="nav-link">match</Link>
+            <Link href="/audits" className="nav-link">audits</Link>
+            <Link href="/translate" className="nav-link">translate</Link>
+            <Link href="/questionnaire" className="btn-primary px-4 py-2 text-xs inline-block">add brand</Link>
           </nav>
         </div>
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-12">
         {/* Hero */}
-        <div className="mb-12">
-          <p className="text-xs text-violet-400 uppercase tracking-widest mb-3 font-medium">
-            Brand Identity Directory
-          </p>
-          <h1 className="text-4xl font-bold text-white mb-4 tracking-tight">
-            Every brand. Machine-readable.
+        <div className="mb-14 fade-up-1">
+          <p className="section-tag mb-5">brand identity directory</p>
+          <h1 className="font-goldman text-4xl text-white mb-4">
+            every brand. machine-readable.
           </h1>
-          <p className="text-zinc-400 text-lg max-w-2xl leading-relaxed">
-            AI agents can discover any brand&apos;s full identity profile by fetching its{" "}
-            <code className="text-violet-300 bg-violet-950/40 px-1.5 py-0.5 rounded text-sm">brand.md</code>{" "}
-            endpoint. {totalBrands} brands indexed. {depopBrands} from Depop.
+          <p className="text-base max-w-2xl leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
+            AI agents discover any brand&apos;s full identity profile by fetching its{" "}
+            <code
+              className="text-xs px-1.5 py-0.5"
+              style={{ background: "rgba(0,0,0,0.25)", borderRadius: "2px", color: "rgba(255,255,255,0.7)", fontFamily: "'SF Mono', monospace" }}
+            >
+              brand.md
+            </code>{" "}
+            endpoint. {totalBrands} brands indexed.
           </p>
 
           {/* Stats */}
-          <div className="flex gap-6 mt-8">
+          <div className="flex gap-4 mt-8">
             {[
-              { label: "Brands indexed", value: totalBrands },
-              { label: "Depop sellers", value: depopBrands },
-              { label: "Categories", value: byCategory.size },
+              { label: "brands indexed", value: totalBrands },
+              { label: "depop sellers", value: depopBrands },
+              { label: "categories", value: byCategory.size },
             ].map((s) => (
-              <div key={s.label} className="border border-zinc-800 rounded-xl px-5 py-4">
-                <p className="text-2xl font-bold text-white">{s.value}</p>
-                <p className="text-xs text-zinc-500 mt-0.5">{s.label}</p>
+              <div
+                key={s.label}
+                className="px-5 py-4"
+                style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px" }}
+              >
+                <p className="font-goldman text-2xl text-white">{s.value}</p>
+                <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>{s.label}</p>
               </div>
             ))}
           </div>
 
-          {/* AI agent instruction box */}
-          <div className="mt-8 border border-violet-800/30 bg-violet-950/20 rounded-xl p-5">
-            <p className="text-xs text-violet-400 uppercase tracking-widest mb-2 font-medium">
-              For AI Agents
+          {/* AI agent instruction */}
+          <div
+            className="mt-8 p-5"
+            style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.06)" }}
+          >
+            <p className="section-tag mb-3">for ai agents</p>
+            <p className="text-sm mb-3" style={{ color: "rgba(255,255,255,0.55)" }}>
+              each brand has a machine-readable identity profile at:
             </p>
-            <p className="text-sm text-zinc-300 mb-3">
-              Each brand has a machine-readable identity profile at:
-            </p>
-            <code className="block text-sm text-violet-200 bg-zinc-900 rounded-lg px-4 py-3 border border-zinc-800">
+            <div
+              className="px-4 py-3 text-sm"
+              style={{
+                background: "rgba(0,0,0,0.25)",
+                borderRadius: "2px",
+                color: "rgba(255,255,255,0.7)",
+                fontFamily: "'SF Mono', 'Fira Code', monospace",
+              }}
+            >
               GET https://esina-brand-identity.vercel.app/api/brand/{"{"}brandId{"}"}
-            </code>
-            <p className="text-xs text-zinc-500 mt-3">
-              The response is <code className="text-zinc-400">text/markdown</code> with structured archetypes,
-              values, style tags, communities, and explicit matching instructions. Every response
-              embeds a unique <code className="text-zinc-400">esina_token</code> for attribution tracking.
-            </p>
+            </div>
           </div>
         </div>
 
-        {/* Brand grid — all brands */}
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-white">All Brands</h2>
-          <p className="text-sm text-zinc-500">{totalBrands} profiles</p>
+        {/* Brand grid */}
+        <div className="mb-6 flex items-center justify-between fade-up-2">
+          <h2 className="font-goldman text-lg text-white">all brands</h2>
+          <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>{totalBrands} profiles</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 fade-up-3">
           {(brands || []).map((brand) => {
             const score = auditMap.get(brand.id);
-            const archetypes = (
-              brand.archetypes as { archetype: string; primary: boolean }[] | null
-            ) || [];
-            const primaryArchetype = archetypes.find((a) => a.primary)?.archetype
-              || archetypes[0]?.archetype;
+            const archetypes = (brand.archetypes as { archetype: string; primary: boolean }[] | null) || [];
+            const primaryArchetype = archetypes.find((a) => a.primary)?.archetype || archetypes[0]?.archetype;
             const styleTags = (brand.style_tags as string[] | null) || [];
             const isDepop = brand.origin_location?.startsWith("depop:");
-            const depopUsername = isDepop
-              ? brand.origin_location!.replace("depop:", "")
-              : null;
+            const depopUsername = isDepop ? brand.origin_location!.replace("depop:", "") : null;
 
             return (
               <div
                 key={brand.id}
-                className="group border border-zinc-800 hover:border-zinc-700 bg-zinc-900/30 hover:bg-zinc-900/60 rounded-xl p-5 transition-all"
+                className="p-5 group"
+                style={{
+                  background: "rgba(0,0,0,0.12)",
+                  borderRadius: "2px",
+                  border: "1px solid rgba(255,255,255,0.04)",
+                  transition: "border-color 0.15s ease",
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.12)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.04)"; }}
               >
                 {/* Brand header */}
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-base">{categoryIcon(brand.category)}</span>
-                      <h3 className="text-white font-semibold text-sm truncate">
-                        {brand.brand_name}
-                      </h3>
-                    </div>
+                    <h3 className="text-sm text-white mb-1 truncate">{brand.brand_name}</h3>
                     <div className="flex items-center gap-2">
-                      <p className="text-xs text-zinc-500 capitalize">
+                      <p className="text-xs capitalize" style={{ color: "rgba(255,255,255,0.35)" }}>
                         {brand.category}
                       </p>
                       {brand.price_tier && (
                         <>
-                          <span className="text-zinc-700">·</span>
-                          <p className="text-xs text-zinc-600 capitalize">
+                          <span style={{ color: "rgba(255,255,255,0.2)" }}>·</span>
+                          <p className="text-xs capitalize" style={{ color: "rgba(255,255,255,0.25)" }}>
                             {brand.price_tier}
                           </p>
                         </>
                       )}
                       {isDepop && (
                         <>
-                          <span className="text-zinc-700">·</span>
-                          <span className="text-xs text-violet-400">Depop</span>
+                          <span style={{ color: "rgba(255,255,255,0.2)" }}>·</span>
+                          <span className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>depop</span>
                         </>
                       )}
                     </div>
                   </div>
-
-                  {/* Alignment score */}
                   {score !== undefined ? (
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <div className={`w-1.5 h-1.5 rounded-full ${scoreDot(score)}`} />
-                      <span className={`text-sm font-bold ${scoreColor(score)}`}>
-                        {Math.round(score)}
-                      </span>
-                    </div>
+                    <span className="font-goldman text-sm text-white flex-shrink-0 ml-2">
+                      {Math.round(score)}
+                    </span>
                   ) : (
-                    <span className="text-xs text-zinc-700">—</span>
+                    <span className="text-xs flex-shrink-0" style={{ color: "rgba(255,255,255,0.2)" }}>—</span>
                   )}
                 </div>
 
-                {/* Archetype + style tags */}
+                {/* Tags */}
                 <div className="flex flex-wrap gap-1.5 mb-4">
                   {primaryArchetype && (
-                    <span className="text-[11px] px-2 py-0.5 rounded-full border border-violet-800/50 text-violet-300 bg-violet-950/30 capitalize">
+                    <span
+                      className="text-[11px] px-2 py-0.5"
+                      style={{ background: "rgba(255,255,255,0.1)", borderRadius: "2px", color: "rgba(255,255,255,0.7)", textTransform: "capitalize" }}
+                    >
                       {primaryArchetype}
                     </span>
                   )}
                   {styleTags.slice(0, 3).map((tag) => (
                     <span
                       key={tag}
-                      className="text-[11px] px-2 py-0.5 rounded-full border border-zinc-700/50 text-zinc-400 bg-zinc-800/30"
+                      className="text-[11px] px-2 py-0.5"
+                      style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px", color: "rgba(255,255,255,0.45)" }}
                     >
                       {tag.replace(/_/g, " ")}
                     </span>
                   ))}
                 </div>
 
-                {/* Action links */}
-                <div className="flex items-center gap-3 pt-3 border-t border-zinc-800/60">
+                {/* Actions */}
+                <div className="flex items-center gap-4 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
                   <a
                     href={`/api/brand/${brand.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-violet-400 hover:text-violet-300 transition-colors font-medium"
+                    className="text-xs"
+                    style={{ color: "rgba(255,255,255,0.55)", transition: "color 0.15s" }}
+                    onMouseEnter={(e) => { (e.target as HTMLElement).style.color = "white"; }}
+                    onMouseLeave={(e) => { (e.target as HTMLElement).style.color = "rgba(255,255,255,0.55)"; }}
                   >
                     brand.md ↗
                   </a>
-                  <Link
-                    href={`/audit/${brand.id}`}
-                    className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
-                  >
-                    Audit report
+                  <Link href={`/audit/${brand.id}`} className="nav-link">
+                    audit report
                   </Link>
                   {depopUsername && (
                     <a
                       href={`https://www.depop.com/${depopUsername}/`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors ml-auto"
+                      className="nav-link ml-auto"
                     >
-                      Depop ↗
+                      depop ↗
                     </a>
                   )}
                 </div>
@@ -269,26 +228,25 @@ export default async function BrandsDirectoryPage() {
         </div>
 
         {/* Footer CTA */}
-        <div className="mt-16 border border-zinc-800 rounded-2xl p-8 text-center">
-          <h3 className="text-xl font-bold text-white mb-2">Add your brand</h3>
-          <p className="text-zinc-400 text-sm mb-6 max-w-md mx-auto">
-            Complete our 7-step identity questionnaire. We generate your AI perception audit,
-            identity embedding, and a machine-readable brand.md profile — all automatically.
+        <div
+          className="mt-14 p-10 text-center fade-up-4"
+          style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px" }}
+        >
+          <h3 className="font-goldman text-xl text-white mb-2">add your brand</h3>
+          <p className="text-sm mb-8 max-w-md mx-auto" style={{ color: "rgba(255,255,255,0.45)" }}>
+            complete our identity questionnaire. we generate your ai perception audit, identity embedding, and a machine-readable brand.md — all automatically.
           </p>
-          <Link
-            href="/questionnaire"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-violet-700 hover:bg-violet-600 text-white font-medium rounded-xl transition-colors"
-          >
-            Run Your AI Audit →
+          <Link href="/questionnaire" className="btn-primary px-6 py-3 text-sm inline-block">
+            run your ai audit
           </Link>
         </div>
       </main>
 
-      <footer className="border-t border-zinc-800/60 mt-12 py-8">
-        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between text-xs text-zinc-600">
-          <span>ESINA Identity Matching Engine</span>
+      <footer className="py-8 mt-12" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
+          <span>ESINA identity matching engine</span>
           <span>
-            <code>GET /api/brand/:id</code> · <code>text/markdown</code> · AI-crawlable
+            <code style={{ fontFamily: "monospace" }}>GET /api/brand/:id</code> · text/markdown · ai-crawlable
           </span>
         </div>
       </footer>

@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ESINA — Identity Matching Engine",
+  title: "ESINA — Brand Identity Infrastructure",
   description:
-    "Normalized identity matching for agentic commerce. See how brand identity data produces better matches than generic AI.",
+    "AI agents recommend based on popularity, not identity. Your brand becomes invisible. One line of code fixes that.",
+  icons: {
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◆</text></svg>",
+  },
 };
 
 export default function RootLayout({
@@ -13,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <body className="min-h-screen antialiased">{children}</body>
     </html>
   );

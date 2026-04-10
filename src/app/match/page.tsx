@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 interface EsinaMatch {
   brandId: string;
@@ -29,14 +30,12 @@ export default function MatchPage() {
   async function handleRunMatch() {
     const text = preferenceText.trim();
     if (!text) return;
-
     setLoading(true);
     setError(null);
     setEsinaMatches([]);
     setGenericRecs([]);
 
     try {
-      // Run both requests in parallel
       const [esinaRes, genericRes] = await Promise.all([
         fetch("/api/run-match", {
           method: "POST",
@@ -52,15 +51,12 @@ export default function MatchPage() {
 
       const esinaData = await esinaRes.json();
       const genericData = await genericRes.json();
-
       if (esinaData.error) throw new Error(esinaData.error);
       if (genericData.error) throw new Error(genericData.error);
-
       setEsinaMatches(esinaData.matches || []);
       setGenericRecs(genericData.recommendations || []);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Something went wrong";
-      setError(message);
+      setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -69,52 +65,38 @@ export default function MatchPage() {
   const hasResults = esinaMatches.length > 0 || genericRecs.length > 0;
 
   return (
-    <div className="min-h-screen bg-[#09090b]">
+    <div className="min-h-screen">
       {/* Header */}
-      <header className="border-b border-zinc-800/60">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-esina-500 to-esina-700 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">E</span>
-            </div>
-            <span className="text-lg font-semibold text-white tracking-tight">
-              ESINA
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            <a
-              href="/audits"
-              className="text-xs text-zinc-400 hover:text-esina-400 transition-colors"
-            >
-              View Audits
-            </a>
-            <span className="text-xs text-zinc-500 uppercase tracking-widest">
-              Identity Matching Engine
-            </span>
-          </div>
+      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(12px)", background: "rgba(122,122,118,0.7)" }}>
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="font-goldman text-white tracking-[3px] text-sm uppercase">
+            ESINA
+          </Link>
+          <nav className="flex items-center gap-6">
+            <Link href="/brands" className="nav-link">brands</Link>
+            <Link href="/translate" className="nav-link">translate</Link>
+            <Link href="/audits" className="nav-link">audits</Link>
+          </nav>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-10">
+      <main className="max-w-6xl mx-auto px-6 py-12">
         {/* Hero */}
-        <div className="mb-10">
-          <h1 className="text-3xl font-bold text-white mb-2">
-            Brand Identity Match
-          </h1>
-          <p className="text-zinc-400 max-w-2xl">
-            Describe what you look for in brands. ESINA matches you against
-            normalized identity profiles using vector similarity — then compares
-            against what generic AI would recommend without that data.
+        <div className="mb-10 fade-up-1">
+          <p className="section-tag mb-5">identity matching engine</p>
+          <h1 className="font-goldman text-4xl text-white mb-3">brand identity match</h1>
+          <p className="text-base max-w-2xl leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
+            describe what you look for in brands. esina matches you against normalized identity profiles using vector similarity — then compares against what generic ai would recommend without that data.
           </p>
         </div>
 
-        {/* Input Section */}
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 mb-10">
-          <label
-            htmlFor="preferences"
-            className="block text-sm font-medium text-zinc-300 mb-3"
-          >
-            Your brand preferences
+        {/* Input */}
+        <div
+          className="p-6 mb-10 fade-up-2"
+          style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px" }}
+        >
+          <label htmlFor="preferences" className="block text-sm text-white mb-3">
+            your brand preferences
           </label>
           <textarea
             id="preferences"
@@ -122,117 +104,101 @@ export default function MatchPage() {
             value={preferenceText}
             onChange={(e) => setPreferenceText(e.target.value)}
             placeholder={PLACEHOLDER}
-            className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-esina-600 focus:ring-1 focus:ring-esina-600/30 transition-colors resize-none text-[15px] leading-relaxed"
+            className="w-full focus:outline-none resize-none text-sm leading-relaxed"
+            style={{
+              background: "rgba(0,0,0,0.15)",
+              border: "1px solid rgba(255,255,255,0.12)",
+              borderRadius: "2px",
+              color: "white",
+              padding: "12px 16px",
+            }}
           />
           <div className="flex items-center justify-between mt-4">
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
               {preferenceText.length > 0
                 ? `${preferenceText.length} characters`
-                : "Describe your values, aesthetics, communities, price range..."}
+                : "describe your values, aesthetics, communities, price range…"}
             </span>
             <button
               onClick={handleRunMatch}
               disabled={!preferenceText.trim() || loading}
-              className="btn-glow px-6 py-2.5 bg-esina-600 hover:bg-esina-500 disabled:bg-zinc-700 disabled:cursor-not-allowed text-white font-medium rounded-xl transition-all text-sm"
+              className="btn-primary px-6 py-2.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="flex items-center gap-2">
-                  <svg
-                    className="animate-spin h-4 w-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  Matching...
+                  <span
+                    className="w-3.5 h-3.5 border border-[#4A4A46]/30 border-t-[#4A4A46] animate-spin"
+                    style={{ borderRadius: "50%" }}
+                  />
+                  matching…
                 </span>
-              ) : (
-                "Run Match"
-              )}
+              ) : "run match"}
             </button>
           </div>
         </div>
 
         {/* Error */}
         {error && (
-          <div className="bg-red-950/30 border border-red-800/50 rounded-xl p-4 mb-8">
-            <p className="text-red-400 text-sm">{error}</p>
+          <div
+            className="p-4 mb-8 text-sm"
+            style={{ background: "rgba(220,38,38,0.12)", border: "1px solid rgba(220,38,38,0.2)", borderRadius: "2px", color: "rgba(252,165,165,0.8)" }}
+          >
+            {error}
           </div>
         )}
 
         {/* Results */}
         {hasResults && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 fade-up-3">
             {/* ESINA Results */}
             <div>
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-6 h-6 rounded-md bg-esina-600/20 flex items-center justify-center">
-                  <span className="text-esina-400 text-xs font-bold">E</span>
-                </div>
-                <h2 className="text-lg font-semibold text-white">
-                  ESINA Identity Match
-                </h2>
-                <span className="text-[11px] text-esina-400 bg-esina-950/50 border border-esina-800/30 px-2 py-0.5 rounded-full">
-                  Normalized data
+                <h2 className="font-goldman text-base text-white">ESINA identity match</h2>
+                <span
+                  className="text-[10px] px-2 py-0.5"
+                  style={{ background: "rgba(255,255,255,0.12)", borderRadius: "2px", color: "rgba(255,255,255,0.7)", letterSpacing: "0.06em" }}
+                >
+                  normalized data
                 </span>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {esinaMatches.map((match, i) => (
                   <div
                     key={match.brandId}
-                    className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4 hover:border-zinc-700 transition-colors"
+                    className="p-4"
+                    style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.04)" }}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-3">
-                        <span className="text-zinc-500 text-xs font-mono w-5 text-right">
-                          {i + 1}
+                        <span className="font-goldman text-xs w-5 text-right" style={{ color: "rgba(255,255,255,0.3)" }}>
+                          {String(i + 1).padStart(2, "0")}
                         </span>
                         <a
                           href={`/audit/${match.brandId}`}
-                          className="text-white font-medium hover:text-esina-400 transition-colors"
+                          className="text-sm text-white"
+                          style={{ transition: "opacity 0.15s" }}
                         >
                           {match.brandName}
                         </a>
                       </div>
-                      <span className="text-esina-400 font-semibold text-lg tabular-nums">
+                      <span className="font-goldman text-base text-white tabular-nums">
                         {match.score}%
                       </span>
                     </div>
 
                     {/* Score bar */}
                     <div className="ml-8 mb-2">
-                      <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                      <div className="h-px overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
                         <div
-                          className="h-full rounded-full score-bar-animate"
-                          style={{
-                            width: `${match.score}%`,
-                            background:
-                              match.score >= 60
-                                ? "linear-gradient(90deg, #1b87f5, #33a6ff)"
-                                : match.score >= 45
-                                ? "linear-gradient(90deg, #1b87f5, #59c4ff)"
-                                : "linear-gradient(90deg, #3f3f46, #52525b)",
-                          }}
+                          className="h-full score-bar-animate"
+                          style={{ width: `${match.score}%`, background: "rgba(255,255,255,0.7)" }}
                         />
                       </div>
                     </div>
 
-                    {/* Snippet */}
                     {match.snippet && (
-                      <p className="ml-8 text-xs text-zinc-500 leading-relaxed line-clamp-2">
+                      <p className="ml-8 text-xs leading-relaxed line-clamp-2" style={{ color: "rgba(255,255,255,0.4)" }}>
                         {match.snippet}
                       </p>
                     )}
@@ -241,35 +207,32 @@ export default function MatchPage() {
               </div>
             </div>
 
-            {/* Generic AI Results */}
+            {/* Generic AI */}
             <div>
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-6 h-6 rounded-md bg-zinc-700/30 flex items-center justify-center">
-                  <span className="text-zinc-400 text-xs font-bold">AI</span>
-                </div>
-                <h2 className="text-lg font-semibold text-white">
-                  Generic AI Recommendation
-                </h2>
-                <span className="text-[11px] text-zinc-400 bg-zinc-800/50 border border-zinc-700/30 px-2 py-0.5 rounded-full">
-                  No identity data
+                <h2 className="font-goldman text-base" style={{ color: "rgba(255,255,255,0.45)" }}>generic ai</h2>
+                <span
+                  className="text-[10px] px-2 py-0.5"
+                  style={{ background: "rgba(0,0,0,0.15)", borderRadius: "2px", color: "rgba(255,255,255,0.4)", letterSpacing: "0.06em" }}
+                >
+                  no identity data
                 </span>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {genericRecs.map((rec, i) => (
                   <div
                     key={`${rec.brand}-${i}`}
-                    className="bg-zinc-900/30 border border-zinc-800/60 rounded-xl p-4"
+                    className="p-4"
+                    style={{ background: "rgba(0,0,0,0.08)", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.04)" }}
                   >
                     <div className="flex items-start gap-3">
-                      <span className="text-zinc-500 text-xs font-mono w-5 text-right mt-0.5">
-                        {i + 1}
+                      <span className="font-goldman text-xs w-5 text-right mt-0.5" style={{ color: "rgba(255,255,255,0.2)" }}>
+                        {String(i + 1).padStart(2, "0")}
                       </span>
                       <div>
-                        <h3 className="text-zinc-200 font-medium">
-                          {rec.brand}
-                        </h3>
-                        <p className="text-xs text-zinc-500 mt-1 leading-relaxed">
+                        <h3 className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>{rec.brand}</h3>
+                        <p className="text-xs mt-1 leading-relaxed" style={{ color: "rgba(255,255,255,0.3)" }}>
                           {rec.reason}
                         </p>
                       </div>
@@ -278,17 +241,12 @@ export default function MatchPage() {
                 ))}
               </div>
 
-              {/* Comparison note */}
-              <div className="mt-6 bg-zinc-900/30 border border-zinc-800/40 rounded-xl p-4">
-                <p className="text-xs text-zinc-500 leading-relaxed">
-                  <span className="text-zinc-400 font-medium">
-                    What&apos;s the difference?
-                  </span>{" "}
-                  ESINA matches against structured, normalized brand identity
-                  profiles — actual data about how brands define themselves.
-                  Generic AI relies on training data, popular perception, and
-                  surface-level associations. The gap between these two results
-                  is what ESINA solves.
+              <div
+                className="mt-4 p-4"
+                style={{ background: "rgba(0,0,0,0.1)", borderRadius: "2px" }}
+              >
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.35)" }}>
+                  esina matches against structured identity profiles — actual data about how brands define themselves. generic ai relies on training data and popular perception. the gap between these results is what esina solves.
                 </p>
               </div>
             </div>
@@ -297,40 +255,26 @@ export default function MatchPage() {
 
         {/* Empty state */}
         {!hasResults && !loading && !error && (
-          <div className="text-center py-16">
-            <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-7 h-7 text-zinc-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
+          <div className="text-center py-20 fade-up-3">
+            <div
+              className="w-12 h-12 flex items-center justify-center mx-auto mb-4"
+              style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px" }}
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.2} stroke="rgba(255,255,255,0.4)">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
             </div>
-            <p className="text-zinc-500 text-sm">
-              Describe your preferences above and hit{" "}
-              <span className="text-esina-400">Run Match</span> to see ranked
-              brand results.
+            <p className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
+              describe your preferences above and run match to see ranked brand results.
             </p>
           </div>
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-zinc-800/40 mt-16">
-        <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-          <span className="text-xs text-zinc-600">
-            ESINA MVP — Identity Matching Demo
-          </span>
-          <span className="text-xs text-zinc-600">
-            12 brands &middot; cosine similarity &middot; pgvector
-          </span>
+      <footer className="mt-16 py-6" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
+          <span>esina · identity matching demo</span>
+          <span>cosine similarity · pgvector</span>
         </div>
       </footer>
     </div>
