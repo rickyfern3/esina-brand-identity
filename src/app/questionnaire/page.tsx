@@ -1079,6 +1079,23 @@ export default function QuestionnairePage() {
 
       {/* Content */}
       <main className="max-w-2xl mx-auto px-6 py-10">
+
+        {/* Conversational onboarding banner — shown on step 1 only */}
+        {step === 1 && (
+          <div className="mb-8 flex items-center justify-between gap-4 bg-violet-950/30 border border-violet-800/40 rounded-2xl px-5 py-4">
+            <div>
+              <p className="text-sm font-medium text-violet-200 mb-0.5">Prefer to just talk about your brand?</p>
+              <p className="text-xs text-zinc-500">Try our conversational onboarding — it takes 3 minutes.</p>
+            </div>
+            <Link
+              href="/onboard"
+              className="flex-shrink-0 text-xs px-4 py-2 bg-violet-800/60 hover:bg-violet-700/60 border border-violet-700/60 text-violet-200 rounded-lg transition-colors whitespace-nowrap"
+            >
+              Try it →
+            </Link>
+          </div>
+        )}
+
         {step === 1 && <StepBasics data={form} update={update} />}
         {step === 2 && <StepIdentity data={form} update={update} />}
         {step === 3 && <StepValues data={form} update={update} />}

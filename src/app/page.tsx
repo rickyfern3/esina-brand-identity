@@ -60,20 +60,26 @@ export default function LandingPage() {
             AI only sees half of who your brand is. Esina shows the rest.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
             <Link
-              href="/questionnaire"
+              href="/onboard"
               className="btn-glow px-8 py-4 bg-esina-600 hover:bg-esina-500 text-white font-semibold rounded-xl transition-all text-base shadow-xl shadow-esina-900/30"
             >
-              Audit Your Brand — Free for the first 100
+              Tell us about your brand →
             </Link>
             <Link
-              href="/match"
+              href="/questionnaire"
               className="px-8 py-4 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-medium rounded-xl transition-all text-base"
             >
-              See the Demo →
+              Fill out the brand form →
             </Link>
           </div>
+          <p className="text-xs text-zinc-600 text-center">
+            Two paths, same output — pick what feels right.{" "}
+            <Link href="/match" className="text-zinc-500 hover:text-zinc-300 underline underline-offset-2 transition-colors">
+              See the demo first →
+            </Link>
+          </p>
         </div>
       </section>
 
@@ -332,14 +338,23 @@ export default function LandingPage() {
             <span className="text-zinc-500">in your brand.</span>
           </h2>
           <p className="text-zinc-400 mb-10 max-w-xl mx-auto leading-relaxed">
-            Fill out the identity questionnaire. We run three independent AI queries against your brand, score the gaps, and show you exactly where your identity isn&apos;t landing.
+            We run three independent AI queries against your brand, score the gaps, and show you exactly where your identity isn&apos;t landing.
           </p>
-          <Link
-            href="/questionnaire"
-            className="btn-glow inline-block px-10 py-5 bg-esina-600 hover:bg-esina-500 text-white font-semibold rounded-xl transition-all text-base shadow-2xl shadow-esina-900/40"
-          >
-            Audit Your Brand — Free for the first 100
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
+            <Link
+              href="/onboard"
+              className="btn-glow px-10 py-5 bg-esina-600 hover:bg-esina-500 text-white font-semibold rounded-xl transition-all text-base shadow-2xl shadow-esina-900/40"
+            >
+              Tell us about your brand →
+            </Link>
+            <Link
+              href="/questionnaire"
+              className="px-10 py-5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-medium rounded-xl transition-all text-base"
+            >
+              Fill out the brand form →
+            </Link>
+          </div>
+          <p className="text-xs text-zinc-600">Two paths, same output — pick what feels right.</p>
         </div>
       </section>
 
