@@ -184,6 +184,32 @@ export async function POST(req: NextRequest) {
     // ── Step 5: Calculate completeness ────────────────────────────────
     const completeness = calculateCompleteness(extracted);
 
+    // ── Step 5b: Sanitize all controlled-vocab fields ─────────────────
+    // GPT may generate values outside the Supabase CHECK constraint lists.
+    // Filter each array/enum field to only include allowed values.
+    const VALID_VALUES = new Set(["sustainability","transparency","craftsmanship","community","innovation","inclusivity","heritage","irreverence","minimalism","wellness","independence","authenticity","luxury","affordability","boldness","rebellion","simplicity","creativity","performance","tradition"]);
+    const VALID_ANTI_VALUES = new Set(["corporate","mass_market","disposable","pretentious","basic","generic","exclusive","cheap","boring","conformist","wasteful","elitist"]);
+    const VALID_STYLE_TAGS = new Set(["minimalist","maximalist","brutalist","cottagecore","gorpcore","streetwear","vintage","futuristic","bohemian","preppy","industrial","organic","techwear","avant_garde","classic","heritage","artisanal","raw","elevated_basics","athleisure"]);
+    const VALID_PRICE_TIERS = new Set(["budget","value","mid","premium","luxury"]);
+    const VALID_STATUS_SIGNALS = new Set(["conspicuous","quiet_luxury","counterculture","accessible_premium","anti_status"]);
+    const VALID_EMOTIONAL = new Set(["serenity","empowerment","belonging","excitement","rebellion","nostalgia","joy","confidence","comfort"]);
+    const VALID_VOICE_TONE = new Set(["formal","casual","irreverent","authoritative","warm","edgy"]);
+    const VALID_HUMOR = new Set(["none","subtle","moderate","central_to_brand"]);
+    const VALID_DESIGN = new Set(["clean","ornate","raw","polished","eclectic","industrial"]);
+    const VALID_VISUAL = new Set(["Serious","Playful","Ironic","Aspirational","Authentic","Provocative"]);
+    const VALID_SUSTAINABILITY = new Set(["none","basic","committed","leader","regenerative"]);
+    const VALID_ARCHETYPES = new Set(["creator","sage","explorer","rebel","lover","caregiver","jester","everyperson","hero","ruler","magician","innocent"]);
+
+    const sanitizeArr = (arr: unknown, validSet: Set<string>): string[] =>
+      Array.isArray(arr) ? (arr as string[]).filter(v => validSet.has(v)) : [];
+    const sanitizeEnum = (val: unknown, validSet: Set<string>, fallback: string | null = null): string | null => {
+      if (typeof val === "string" && validSet.has(val)) return val;
+      return fallback;
+    };
+    // Sanitize archetypes — keep valid archetype strings, drop unknown ones
+    const rawArchetypes = Array.isArray(extracted.archetypes) ? extracted.archetypes as Array<{archetype?: string; weight?: number; primary?: boolean}> : [];
+    const sanitizedArchetypes = rawArchetypes.filter(a => a.archetype && VALID_ARCHETYPES.has(a.archetype));
+
     // ── Step 6: Insert brand profile ──────────────────────────────────
     const { data: brand, error: insertErr } = await supabase
       .from("brand_profiles")
@@ -195,21 +221,21 @@ export async function POST(req: NextRequest) {
         category: extracted.category || "Other",
         subcategories: [],
         platforms: [],
-        price_tier: extracted.price_tier || null,
+        price_tier: sanitizeEnum(extracted.price_tier, VALID_PRICE_TIERS),
         founded_year: null,
         origin_location: null,
         identity_statements: (extracted.identity_statements as string[]) || [],
-        archetypes: (extracted.archetypes as object[]) || [],
-        values: (extracted.values as string[]) || [],
-        anti_values: (extracted.anti_values as string[]) || [],
-        style_tags: (extracted.style_tags as string[]) || [],
-        design_language: (extracted.design_language as string) || null,
-        visual_tone: (extracted.visual_tone as string) || null,
-        voice_tone: (extracted.voice_tone as string) || null,
-        humor_level: (extracted.humor_level as string) || null,
-        emotional_resonance: (extracted.emotional_resonance as string) || null,
-        sustainability_level: (extracted.sustainability_level as string) || null,
-        status_signal_type: (extracted.status_signal_type as string) || null,
+        archetypes: sanitizedArchetypes,
+        values: sanitizeArr(extracted.values, VALID_VALUES),
+        anti_values: sanitizeArr(extracted.anti_values, VALID_ANTI_VALUES),
+        style_tags: sanitizeArr(extracted.style_tags, VALID_STYLE_TAGS),
+        design_language: sanitizeEnum(extracted.design_language, VALID_DESIGN),
+        visual_tone: sanitizeEnum(extracted.visual_tone, VALID_VISUAL),
+        voice_tone: sanitizeEnum(extracted.voice_tone, VALID_VOICE_TONE),
+        humor_level: sanitizeEnum(extracted.humor_level, VALID_HUMOR),
+        emotional_resonance: sanitizeEnum(extracted.emotional_resonance, VALID_EMOTIONAL),
+        sustainability_level: sanitizeEnum(extracted.sustainability_level, VALID_SUSTAINABILITY),
+        status_signal_type: sanitizeEnum(extracted.status_signal_type, VALID_STATUS_SIGNALS),
         logo_visibility: null,
         exclusivity_level: null,
         communities: (extracted.communities as string[]) || [],
@@ -237,19 +263,19 @@ export async function POST(req: NextRequest) {
           brand_name: extracted.brand_name || "Unknown Brand",
           contact_email: contact_email || null,
           category: extracted.category || "Other",
-          price_tier: extracted.price_tier || null,
+          price_tier: sanitizeEnum(extracted.price_tier, VALID_PRICE_TIERS),
           identity_statements: (extracted.identity_statements as string[]) || [],
-          archetypes: (extracted.archetypes as object[]) || [],
-          values: (extracted.values as string[]) || [],
-          anti_values: (extracted.anti_values as string[]) || [],
-          style_tags: (extracted.style_tags as string[]) || [],
-          design_language: (extracted.design_language as string) || null,
-          visual_tone: (extracted.visual_tone as string) || null,
-          voice_tone: (extracted.voice_tone as string) || null,
-          humor_level: (extracted.humor_level as string) || null,
-          emotional_resonance: (extracted.emotional_resonance as string) || null,
-          sustainability_level: (extracted.sustainability_level as string) || null,
-          status_signal_type: (extracted.status_signal_type as string) || null,
+          archetypes: sanitizedArchetypes,
+          values: sanitizeArr(extracted.values, VALID_VALUES),
+          anti_values: sanitizeArr(extracted.anti_values, VALID_ANTI_VALUES),
+          style_tags: sanitizeArr(extracted.style_tags, VALID_STYLE_TAGS),
+          design_language: sanitizeEnum(extracted.design_language, VALID_DESIGN),
+          visual_tone: sanitizeEnum(extracted.visual_tone, VALID_VISUAL),
+          voice_tone: sanitizeEnum(extracted.voice_tone, VALID_VOICE_TONE),
+          humor_level: sanitizeEnum(extracted.humor_level, VALID_HUMOR),
+          emotional_resonance: sanitizeEnum(extracted.emotional_resonance, VALID_EMOTIONAL),
+          sustainability_level: sanitizeEnum(extracted.sustainability_level, VALID_SUSTAINABILITY),
+          status_signal_type: sanitizeEnum(extracted.status_signal_type, VALID_STATUS_SIGNALS),
           communities: (extracted.communities as string[]) || [],
           brand_adjacencies: (extracted.brand_adjacencies as string[]) || [],
           trend_alignment: [],
