@@ -262,10 +262,7 @@ export default function OnboardPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header
-        className="sticky top-0 z-10 backdrop-blur-md"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", background: "rgba(122,122,118,0.75)", backdropFilter: "blur(12px)" }}
-      >
+      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
         <div className="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="font-goldman text-white tracking-[3px] text-base uppercase">
             ESINA

@@ -125,7 +125,7 @@ export default async function AuditReportPage({
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(12px)", background: "rgba(122,122,118,0.75)" }}>
+      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="font-goldman text-white tracking-[3px] text-base uppercase">
             ESINA

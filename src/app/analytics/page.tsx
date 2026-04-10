@@ -312,9 +312,9 @@ export default function AnalyticsDashboard() {
   // ── Dashboard ─────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen" style={{ background: "linear-gradient(180deg, #7A7A76 0%, #E8E4E0 100%)" }}>
+    <div className="min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-10" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(12px)", background: "rgba(122,122,118,0.75)" }}>
+      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5">
