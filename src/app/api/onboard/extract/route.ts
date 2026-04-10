@@ -27,7 +27,7 @@ The JSON must match this exact schema:
   "voice_tone": string,         // one of: formal | casual | irreverent | authoritative | warm | edgy
   "humor_level": string,        // one of: none | subtle | moderate | central_to_brand
   "design_language": string,    // one of: clean | ornate | raw | polished | eclectic | industrial
-  "visual_tone": string,        // one of: Serious | Playful | Ironic | Aspirational | Authentic | Provocative
+  "visual_tone": string,        // one of: serious | playful | ironic | aspirational | authentic | provocative
   "sustainability_level": string,// one of: none | basic | committed | leader | regenerative
   "brand_adjacencies": [string],// brands the founder mentioned that customers also love
   "origin_story": string,       // 1-3 sentences from what the founder shared
@@ -196,7 +196,7 @@ export async function POST(req: NextRequest) {
     const VALID_VOICE_TONE = new Set(["formal","casual","irreverent","authoritative","warm","edgy"]);
     const VALID_HUMOR = new Set(["none","subtle","moderate","central_to_brand"]);
     const VALID_DESIGN = new Set(["clean","ornate","raw","polished","eclectic","industrial"]);
-    const VALID_VISUAL = new Set(["Serious","Playful","Ironic","Aspirational","Authentic","Provocative"]);
+    const VALID_VISUAL = new Set(["serious","playful","ironic","aspirational","authentic","provocative"]);
     const VALID_SUSTAINABILITY = new Set(["none","basic","committed","leader","regenerative"]);
     const VALID_ARCHETYPES = new Set(["creator","sage","explorer","rebel","lover","caregiver","jester","everyperson","hero","ruler","magician","innocent"]);
 
@@ -226,11 +226,11 @@ export async function POST(req: NextRequest) {
         origin_location: null,
         identity_statements: (extracted.identity_statements as string[]) || [],
         archetypes: sanitizedArchetypes,
-        values: sanitizeArr(extracted.values, VALID_VALUES).slice(0, 6),
+        values: sanitizeArr(extracted.values, VALID_VALUES).slice(0, 5),
         anti_values: sanitizeArr(extracted.anti_values, VALID_ANTI_VALUES).slice(0, 3),
         style_tags: sanitizeArr(extracted.style_tags, VALID_STYLE_TAGS).slice(0, 5),
         design_language: sanitizeEnum(extracted.design_language, VALID_DESIGN),
-        visual_tone: sanitizeEnum(extracted.visual_tone, VALID_VISUAL),
+        visual_tone: sanitizeEnum((extracted.visual_tone as string)?.toLowerCase(), VALID_VISUAL),
         voice_tone: sanitizeEnum(extracted.voice_tone, VALID_VOICE_TONE),
         humor_level: sanitizeEnum(extracted.humor_level, VALID_HUMOR),
         emotional_resonance: sanitizeEnum(extracted.emotional_resonance, VALID_EMOTIONAL),
@@ -266,11 +266,11 @@ export async function POST(req: NextRequest) {
           price_tier: sanitizeEnum(extracted.price_tier, VALID_PRICE_TIERS),
           identity_statements: (extracted.identity_statements as string[]) || [],
           archetypes: sanitizedArchetypes,
-          values: sanitizeArr(extracted.values, VALID_VALUES).slice(0, 6),
+          values: sanitizeArr(extracted.values, VALID_VALUES).slice(0, 5),
           anti_values: sanitizeArr(extracted.anti_values, VALID_ANTI_VALUES).slice(0, 3),
           style_tags: sanitizeArr(extracted.style_tags, VALID_STYLE_TAGS).slice(0, 5),
           design_language: sanitizeEnum(extracted.design_language, VALID_DESIGN),
-          visual_tone: sanitizeEnum(extracted.visual_tone, VALID_VISUAL),
+          visual_tone: sanitizeEnum((extracted.visual_tone as string)?.toLowerCase(), VALID_VISUAL),
           voice_tone: sanitizeEnum(extracted.voice_tone, VALID_VOICE_TONE),
           humor_level: sanitizeEnum(extracted.humor_level, VALID_HUMOR),
           emotional_resonance: sanitizeEnum(extracted.emotional_resonance, VALID_EMOTIONAL),
