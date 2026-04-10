@@ -114,13 +114,8 @@ export default async function AuditsListPage() {
               <Link
                 key={brand.id}
                 href={`/audit/${brand.id}`}
-                className="p-5 block group card-mid"
-                style={{
-                  transition: "border-color 0.15s ease",
-                  border: "1px solid rgba(0,0,0,0.08)",
-                }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,0,0,0.2)"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,0,0,0.08)"; }}
+                className="p-5 block card-mid esina-audit-card"
+                style={{ border: "1px solid rgba(0,0,0,0.08)" }}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1 min-w-0 pr-3">
