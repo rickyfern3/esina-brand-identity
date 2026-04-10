@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
 
     // ── Step 3: Generate identity text ────────────────────────────────
     // Use the extracted identity_text if rich, otherwise fall back to generateIdentityText
-    const generatedText = generateIdentityText(extracted as Parameters<typeof generateIdentityText>[0]);
+    const generatedText = generateIdentityText(extracted as unknown as Parameters<typeof generateIdentityText>[0]);
     const identityText = (extracted.identity_text as string)?.length > generatedText.length
       ? extracted.identity_text as string
       : generatedText;
