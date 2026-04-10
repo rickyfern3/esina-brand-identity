@@ -33,12 +33,12 @@ export default async function AuditsListPage() {
     }
   }
 
-  const auditedCount = [...auditMap.keys()].length;
+  const auditedCount = Array.from(auditMap.keys()).length;
   const totalBrands = (brands || []).length;
   const avgScore =
     auditedCount > 0
       ? Math.round(
-          [...auditMap.values()].reduce(
+          Array.from(auditMap.values()).reduce(
             (sum, a) => sum + (a.identity_alignment_score || 0),
             0
           ) / auditedCount
@@ -122,8 +122,6 @@ export default async function AuditsListPage() {
                   border: "1px solid rgba(255,255,255,0.04)",
                   transition: "border-color 0.15s ease",
                 }}
-                onMouseEnter={undefined}
-                onMouseLeave={undefined}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1 min-w-0 pr-3">
