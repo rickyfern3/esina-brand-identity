@@ -1,43 +1,35 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* ── Fonts ──────────────────────────────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap');
 @import url('https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap');
 
-/* ── Design tokens ───────────────────────────────────────────────────── */
-:root {
-  --bg-gradient-top: #7A7A76;
-  --bg-gradient-bottom: #B0B0AC;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  --text-100: rgba(255, 255, 255, 1);
-  --text-45: rgba(255, 255, 255, 0.45);
-  --text-35: rgba(255, 255, 255, 0.35);
-  --text-25: rgba(255, 255, 255, 0.25);
-
-  --btn-primary-bg: #ffffff;
-  --btn-primary-text: #4A4A46;
-  --btn-secondary-border: rgba(255, 255, 255, 0.2);
-
-  --divider: rgba(255, 255, 255, 0.08);
-  --card-bg: rgba(0, 0, 0, 0.12);
-  --code-bg: rgba(0, 0, 0, 0.25);
-
-  --radius-card: 2px;
-  --radius-btn: 2px;
-}
-
-/* ── Base ────────────────────────────────────────────────────────────── */
+/* ── Gradient spans full document height ─────────────────────────────
+   As you scroll, the page goes from dark gray (#7A7A76) to near-white
+   (#E8E4E0). Text colors must adapt per zone. Body is transparent so
+   the html gradient shows through.
+   ──────────────────────────────────────────────────────────────────── */
 html {
+  min-height: 100%;
+  background: linear-gradient(180deg,
+    #7A7A76  0%,
+    #8A8A86  15%,
+    #9A9A96  30%,
+    #AAAAAA  50%,
+    #BBBAB6  65%,
+    #CCC9C4  78%,
+    #DBD8D2  88%,
+    #E8E4E0  100%
+  );
   scroll-behavior: smooth;
 }
 
 body {
-  background: linear-gradient(180deg, var(--bg-gradient-top) 0%, var(--bg-gradient-bottom) 100%);
-  background-attachment: fixed;
+  background: transparent;
   min-height: 100vh;
-  color: var(--text-100);
+  color: #ffffff;
   font-family: 'General Sans', system-ui, sans-serif;
   font-size: 16px;
   line-height: 1.6;
@@ -60,27 +52,38 @@ h1, h2, h3, h4 {
 /* ── Scrollbar ───────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
 
-/* ── Utility classes ─────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════
+   TOP ZONE — nav, hero, stats (dark gray background)
+   Text: white. Use these classes in the top ~30% of the page.
+   ══════════════════════════════════════════════════════════════════════ */
 
-/* Dividers */
-.esina-divider {
-  border-color: var(--divider);
+/* Nav link — dark zone */
+.nav-link {
+  color: rgba(255,255,255,0.55);
+  transition: color 0.15s ease;
+  font-size: 0.8125rem;
+  font-family: 'General Sans', system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+.nav-link:hover { color: rgba(255,255,255,1); }
+
+/* Section tag — dark zone */
+.section-tag {
+  font-family: 'General Sans', system-ui, sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: lowercase;
+  color: rgba(255,255,255,0.35);
 }
 
-/* Cards */
-.esina-card {
-  background: var(--card-bg);
-  border-radius: var(--radius-card);
-}
-
-/* Buttons */
+/* Primary button — dark zone */
 .btn-primary {
-  background: var(--btn-primary-bg);
-  color: var(--btn-primary-text);
-  border-radius: var(--radius-btn);
+  background: #ffffff;
+  color: #4A4A46;
+  border-radius: 2px;
   font-family: 'General Sans', system-ui, sans-serif;
   font-weight: 500;
   transition: opacity 0.15s ease;
@@ -88,11 +91,12 @@ h1, h2, h3, h4 {
 }
 .btn-primary:hover { opacity: 0.88; }
 
+/* Secondary button — dark zone */
 .btn-secondary {
   background: transparent;
-  border: 1px solid var(--btn-secondary-border);
+  border: 1px solid rgba(255,255,255,0.2);
   color: rgba(255,255,255,0.8);
-  border-radius: var(--radius-btn);
+  border-radius: 2px;
   font-family: 'General Sans', system-ui, sans-serif;
   font-weight: 400;
   transition: border-color 0.15s ease, color 0.15s ease;
@@ -103,32 +107,100 @@ h1, h2, h3, h4 {
   color: rgba(255,255,255,1);
 }
 
-/* Code blocks */
+/* Divider — dark zone */
+.divider-dark {
+  border-color: rgba(255,255,255,0.08);
+}
+
+/* Card — dark zone */
+.card-dark {
+  background: rgba(0,0,0,0.12);
+  border-radius: 2px;
+}
+
+/* Code block — dark zone */
 .esina-code {
-  background: var(--code-bg);
+  background: rgba(0,0,0,0.25);
   font-family: 'SF Mono', 'Fira Code', monospace;
   border-radius: 2px;
 }
 
-/* Nav links */
-.nav-link {
-  color: rgba(255,255,255,0.55);
-  transition: color 0.15s ease;
-  font-size: 0.8125rem;
-  letter-spacing: 0.01em;
-}
-.nav-link:hover { color: rgba(255,255,255,1); }
+/* ══════════════════════════════════════════════════════════════════════
+   MID ZONE — problem, how it works, integration (medium gray, ~30–65%)
+   Text: dark. Headings rgba(0,0,0,0.7), body rgba(0,0,0,0.4).
+   ══════════════════════════════════════════════════════════════════════ */
 
-/* Section tags */
-.section-tag {
+.section-tag-mid {
   font-family: 'General Sans', system-ui, sans-serif;
   font-size: 0.6875rem;
   letter-spacing: 0.12em;
   text-transform: lowercase;
-  color: var(--text-35);
+  color: rgba(0,0,0,0.25);
 }
 
-/* Score bar animation */
+.card-mid {
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+}
+
+.code-mid {
+  background: rgba(0,0,0,0.08);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  border-radius: 2px;
+}
+
+.divider-mid {
+  border-color: rgba(0,0,0,0.08);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   BOTTOM ZONE — proof, CTA, footer (near-white, ~65–100%)
+   Text: dark. Headings rgba(0,0,0,0.75), body rgba(0,0,0,0.35).
+   ══════════════════════════════════════════════════════════════════════ */
+
+.section-tag-light {
+  font-family: 'General Sans', system-ui, sans-serif;
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: lowercase;
+  color: rgba(0,0,0,0.25);
+}
+
+/* CTA button — bottom zone */
+.btn-cta-dark {
+  background: #2A2A28;
+  color: #E8E4E0;
+  border-radius: 2px;
+  font-family: 'General Sans', system-ui, sans-serif;
+  font-weight: 500;
+  transition: opacity 0.15s ease;
+  cursor: pointer;
+}
+.btn-cta-dark:hover { opacity: 0.88; }
+
+.card-light {
+  background: rgba(255,255,255,0.2);
+  border-radius: 2px;
+}
+
+.divider-light {
+  border-color: rgba(0,0,0,0.1);
+}
+
+/* Nav link — light zone (for footers, mid/light nav) */
+.nav-link-light {
+  color: rgba(0,0,0,0.25);
+  transition: color 0.15s ease;
+  font-size: 0.8125rem;
+  font-family: 'General Sans', system-ui, sans-serif;
+}
+.nav-link-light:hover { color: rgba(0,0,0,0.55); }
+
+/* ══════════════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Score bar */
 @keyframes fillBar {
   from { width: 0%; }
 }
@@ -136,20 +208,18 @@ h1, h2, h3, h4 {
   animation: fillBar 0.8s ease-out forwards;
 }
 
-/* Page fade-in */
+/* Page fade-in — staggered */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-.fade-up {
-  animation: fadeUp 0.5s ease-out forwards;
-}
+.fade-up   { animation: fadeUp 0.5s ease-out forwards; }
 .fade-up-1 { animation: fadeUp 0.5s 0.05s ease-out both; }
-.fade-up-2 { animation: fadeUp 0.5s 0.1s ease-out both; }
+.fade-up-2 { animation: fadeUp 0.5s 0.10s ease-out both; }
 .fade-up-3 { animation: fadeUp 0.5s 0.15s ease-out both; }
-.fade-up-4 { animation: fadeUp 0.5s 0.2s ease-out both; }
+.fade-up-4 { animation: fadeUp 0.5s 0.20s ease-out both; }
 .fade-up-5 { animation: fadeUp 0.5s 0.25s ease-out both; }
-.fade-up-6 { animation: fadeUp 0.5s 0.3s ease-out both; }
+.fade-up-6 { animation: fadeUp 0.5s 0.30s ease-out both; }
 
 @media (prefers-reduced-motion: reduce) {
   .fade-up, .fade-up-1, .fade-up-2, .fade-up-3,

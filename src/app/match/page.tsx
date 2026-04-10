@@ -67,9 +67,9 @@ export default function MatchPage() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(12px)", background: "rgba(122,122,118,0.7)" }}>
+      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(12px)", background: "rgba(122,122,118,0.75)" }}>
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="font-goldman text-white tracking-[3px] text-sm uppercase">
+          <Link href="/" className="font-goldman text-white tracking-[3px] text-[28px] font-bold uppercase">
             ESINA
           </Link>
           <nav className="flex items-center gap-6">
@@ -83,19 +83,16 @@ export default function MatchPage() {
       <main className="max-w-6xl mx-auto px-6 py-12">
         {/* Hero */}
         <div className="mb-10 fade-up-1">
-          <p className="section-tag mb-5">identity matching engine</p>
-          <h1 className="font-goldman text-4xl text-white mb-3">brand identity match</h1>
+          <p className="section-tag mb-5">matching demo</p>
+          <h1 className="font-goldman text-4xl font-bold text-white mb-3">identity match vs generic ai</h1>
           <p className="text-base max-w-2xl leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
             describe what you look for in brands. esina matches you against normalized identity profiles using vector similarity — then compares against what generic ai would recommend without that data.
           </p>
         </div>
 
         {/* Input */}
-        <div
-          className="p-6 mb-10 fade-up-2"
-          style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px" }}
-        >
-          <label htmlFor="preferences" className="block text-sm text-white mb-3">
+        <div className="p-6 mb-10 fade-up-2" style={{ borderRadius: "2px" }}>
+          <label htmlFor="preferences" className="block text-sm mb-3" style={{ color: "rgba(255,255,255,0.45)" }}>
             your brand preferences
           </label>
           <textarea
@@ -104,15 +101,20 @@ export default function MatchPage() {
             value={preferenceText}
             onChange={(e) => setPreferenceText(e.target.value)}
             placeholder={PLACEHOLDER}
-            className="w-full focus:outline-none resize-none text-sm leading-relaxed"
+            className="w-full focus:outline-none resize-none text-sm leading-relaxed card-dark"
             style={{
-              background: "rgba(0,0,0,0.15)",
-              border: "1px solid rgba(255,255,255,0.12)",
+              background: "rgba(0,0,0,0.12)",
+              border: "2px solid rgba(255,255,255,0.12)",
               borderRadius: "2px",
-              color: "white",
+              color: "rgba(255,255,255,0.6)",
               padding: "12px 16px",
             }}
           />
+          <style>{`
+            textarea::placeholder {
+              color: rgba(255,255,255,0.3);
+            }
+          `}</style>
           <div className="flex items-center justify-between mt-4">
             <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
               {preferenceText.length > 0
@@ -147,58 +149,59 @@ export default function MatchPage() {
           </div>
         )}
 
+        {/* Loading State */}
+        {loading && !hasResults && (
+          <div className="text-center py-20 fade-up-3">
+            <p style={{ color: "rgba(255,255,255,0.45)" }}>running match…</p>
+          </div>
+        )}
+
         {/* Results */}
         {hasResults && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 fade-up-3">
             {/* ESINA Results */}
             <div>
-              <div className="flex items-center gap-3 mb-5">
-                <h2 className="font-goldman text-base text-white">ESINA identity match</h2>
-                <span
-                  className="text-[10px] px-2 py-0.5"
-                  style={{ background: "rgba(255,255,255,0.12)", borderRadius: "2px", color: "rgba(255,255,255,0.7)", letterSpacing: "0.06em" }}
-                >
-                  normalized data
-                </span>
+              <div className="flex items-center gap-3 mb-5 card-mid p-3" style={{ borderRadius: "2px" }}>
+                <h2 className="font-goldman text-base font-bold" style={{ color: "rgba(0,0,0,0.7)" }}>esina identity match</h2>
               </div>
 
               <div className="space-y-2">
                 {esinaMatches.map((match, i) => (
                   <div
                     key={match.brandId}
-                    className="p-4"
-                    style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.04)" }}
+                    className="p-4 card-dark"
+                    style={{ borderRadius: "2px" }}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-3">
-                        <span className="font-goldman text-xs w-5 text-right" style={{ color: "rgba(255,255,255,0.3)" }}>
+                        <span className="font-goldman text-xs w-5 text-right" style={{ color: "rgba(0,0,0,0.4)" }}>
                           {String(i + 1).padStart(2, "0")}
                         </span>
                         <a
                           href={`/audit/${match.brandId}`}
-                          className="text-sm text-white"
-                          style={{ transition: "opacity 0.15s" }}
+                          className="text-sm"
+                          style={{ color: "rgba(0,0,0,0.65)", transition: "opacity 0.15s" }}
                         >
                           {match.brandName}
                         </a>
                       </div>
-                      <span className="font-goldman text-base text-white tabular-nums">
+                      <span className="font-goldman text-base font-bold tabular-nums" style={{ color: "rgba(0,0,0,0.75)" }}>
                         {match.score}%
                       </span>
                     </div>
 
                     {/* Score bar */}
                     <div className="ml-8 mb-2">
-                      <div className="h-px overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
+                      <div className="h-px overflow-hidden" style={{ background: "rgba(0,0,0,0.2)" }}>
                         <div
                           className="h-full score-bar-animate"
-                          style={{ width: `${match.score}%`, background: "rgba(255,255,255,0.7)" }}
+                          style={{ width: `${match.score}%`, background: "rgba(0,0,0,0.2)" }}
                         />
                       </div>
                     </div>
 
                     {match.snippet && (
-                      <p className="ml-8 text-xs leading-relaxed line-clamp-2" style={{ color: "rgba(255,255,255,0.4)" }}>
+                      <p className="ml-8 text-xs leading-relaxed line-clamp-2" style={{ color: "rgba(0,0,0,0.4)" }}>
                         {match.snippet}
                       </p>
                     )}
@@ -209,30 +212,24 @@ export default function MatchPage() {
 
             {/* Generic AI */}
             <div>
-              <div className="flex items-center gap-3 mb-5">
-                <h2 className="font-goldman text-base" style={{ color: "rgba(255,255,255,0.45)" }}>generic ai</h2>
-                <span
-                  className="text-[10px] px-2 py-0.5"
-                  style={{ background: "rgba(0,0,0,0.15)", borderRadius: "2px", color: "rgba(255,255,255,0.4)", letterSpacing: "0.06em" }}
-                >
-                  no identity data
-                </span>
+              <div className="flex items-center gap-3 mb-5 card-mid p-3" style={{ borderRadius: "2px" }}>
+                <h2 className="font-goldman text-base font-bold" style={{ color: "rgba(0,0,0,0.3)" }}>generic ai</h2>
               </div>
 
               <div className="space-y-2">
                 {genericRecs.map((rec, i) => (
                   <div
                     key={`${rec.brand}-${i}`}
-                    className="p-4"
-                    style={{ background: "rgba(0,0,0,0.08)", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.04)" }}
+                    className="p-4 card-dark"
+                    style={{ borderRadius: "2px" }}
                   >
                     <div className="flex items-start gap-3">
-                      <span className="font-goldman text-xs w-5 text-right mt-0.5" style={{ color: "rgba(255,255,255,0.2)" }}>
+                      <span className="font-goldman text-xs w-5 text-right mt-0.5" style={{ color: "rgba(0,0,0,0.25)" }}>
                         {String(i + 1).padStart(2, "0")}
                       </span>
                       <div>
-                        <h3 className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>{rec.brand}</h3>
-                        <p className="text-xs mt-1 leading-relaxed" style={{ color: "rgba(255,255,255,0.3)" }}>
+                        <h3 className="text-sm" style={{ color: "rgba(0,0,0,0.3)" }}>{rec.brand}</h3>
+                        <p className="text-xs mt-1 leading-relaxed" style={{ color: "rgba(0,0,0,0.25)" }}>
                           {rec.reason}
                         </p>
                       </div>
@@ -242,10 +239,10 @@ export default function MatchPage() {
               </div>
 
               <div
-                className="mt-4 p-4"
-                style={{ background: "rgba(0,0,0,0.1)", borderRadius: "2px" }}
+                className="mt-4 p-4 card-dark"
+                style={{ borderRadius: "2px" }}
               >
-                <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.35)" }}>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(0,0,0,0.35)" }}>
                   esina matches against structured identity profiles — actual data about how brands define themselves. generic ai relies on training data and popular perception. the gap between these results is what esina solves.
                 </p>
               </div>
@@ -257,15 +254,15 @@ export default function MatchPage() {
         {!hasResults && !loading && !error && (
           <div className="text-center py-20 fade-up-3">
             <div
-              className="w-12 h-12 flex items-center justify-center mx-auto mb-4"
-              style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px" }}
+              className="w-12 h-12 flex items-center justify-center mx-auto mb-4 card-dark"
+              style={{ borderRadius: "2px" }}
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.2} stroke="rgba(255,255,255,0.4)">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
             </div>
-            <p className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
-              describe your preferences above and run match to see ranked brand results.
+            <p className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>
+              enter your consumer preferences above to see the match
             </p>
           </div>
         )}

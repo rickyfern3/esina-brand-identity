@@ -22,9 +22,9 @@ function statusStyle(status: string) {
   switch (status) {
     case "aligned":
       return {
-        bg: "rgba(0,0,0,0.12)",
-        border: "rgba(255,255,255,0.15)",
-        badgeBg: "rgba(255,255,255,0.12)",
+        bg: "rgba(255,255,255,0.15)",
+        border: "rgba(255,255,255,0.6)",
+        badgeBg: "rgba(255,255,255,0.2)",
         badgeColor: "rgba(255,255,255,0.9)",
         barColor: "rgba(255,255,255,0.75)",
         label: "aligned",
@@ -62,7 +62,7 @@ function statusStyle(status: string) {
 function scoreRingColor(score: number): string {
   if (score >= 70) return "rgba(255,255,255,0.9)";
   if (score >= 45) return "rgba(255,255,255,0.65)";
-  return "rgba(255,255,255,0.4)";
+  return "rgba(255,255,255,0.35)";
 }
 
 export default async function AuditReportPage({
@@ -92,7 +92,7 @@ export default async function AuditReportPage({
         <div className="text-center">
           <h1 className="font-goldman text-2xl text-white mb-2">brand not found</h1>
           <p className="text-sm mb-6" style={{ color: "rgba(255,255,255,0.45)" }}>{brandErr?.message}</p>
-          <Link href="/match" className="nav-link">← back to matching demo</Link>
+          <Link href="/" className="nav-link text-sm">← back</Link>
         </div>
       </div>
     );
@@ -104,7 +104,7 @@ export default async function AuditReportPage({
         <div className="text-center">
           <h1 className="font-goldman text-2xl text-white mb-2">no audit found for {brand.brand_name}</h1>
           <p className="text-sm mb-6" style={{ color: "rgba(255,255,255,0.45)" }}>run the audit first.</p>
-          <Link href="/match" className="nav-link">← back</Link>
+          <Link href="/" className="nav-link text-sm">← back</Link>
         </div>
       </div>
     );
@@ -125,9 +125,9 @@ export default async function AuditReportPage({
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(12px)", background: "rgba(122,122,118,0.7)" }}>
+      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(12px)", background: "rgba(122,122,118,0.75)" }}>
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="font-goldman text-white tracking-[3px] text-sm uppercase">
+          <Link href="/" className="font-goldman text-white tracking-[3px] text-base uppercase">
             ESINA
           </Link>
           <span className="section-tag">ai perception audit</span>
@@ -146,8 +146,8 @@ export default async function AuditReportPage({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-10">
           {/* Score ring */}
           <div
-            className="p-8 flex flex-col items-center justify-center"
-            style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px" }}
+            className="p-8 flex flex-col items-center justify-center card-dark"
+            style={{ borderRadius: "2px" }}
           >
             <p className="section-tag mb-6">identity alignment</p>
             <div className="relative w-36 h-36">
@@ -174,12 +174,12 @@ export default async function AuditReportPage({
 
           {/* AI description */}
           <div
-            className="lg:col-span-2 p-8 flex flex-col justify-between"
-            style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px" }}
+            className="lg:col-span-2 p-8 flex flex-col justify-between card-dark"
+            style={{ borderRadius: "2px" }}
           >
             <div>
               <p className="section-tag mb-4">how ai describes this brand</p>
-              <p className="text-lg text-white leading-relaxed" style={{ fontStyle: "normal" }}>
+              <p className="text-lg text-white leading-relaxed">
                 &ldquo;{oneSentence}&rdquo;
               </p>
             </div>
@@ -214,11 +214,11 @@ export default async function AuditReportPage({
               return (
                 <div
                   key={i}
-                  className="p-5"
-                  style={{ background: c.bg, borderRadius: "2px", border: `1px solid ${c.border}` }}
+                  className="p-5 card-mid"
+                  style={{ borderRadius: "2px", border: `1px solid ${c.border}` }}
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm text-white">{dim.dimension}</h3>
+                    <h3 className="text-sm" style={{ color: "rgba(0,0,0,0.7)" }}>{dim.dimension}</h3>
                     <span
                       className="text-[10px] px-2 py-0.5"
                       style={{ background: c.badgeBg, color: c.badgeColor, borderRadius: "2px", letterSpacing: "0.05em" }}
@@ -228,34 +228,34 @@ export default async function AuditReportPage({
                   </div>
 
                   {/* Score bar */}
-                  <div className="h-px mb-3 overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
-                    <div style={{ width: `${pct}%`, height: "1px", background: c.barColor }} />
+                  <div className="h-px mb-3 overflow-hidden" style={{ background: "rgba(0,0,0,0.2)" }}>
+                    <div style={{ width: `${pct}%`, height: "1px", background: "rgba(0,0,0,0.2)" }} />
                   </div>
-                  <p className="text-[11px] mb-3" style={{ color: "rgba(255,255,255,0.35)" }}>
+                  <p className="text-[11px] mb-3" style={{ color: "rgba(0,0,0,0.4)" }}>
                     {dim.earnedPoints} / {dim.maxPoints}
                   </p>
 
                   {/* Self vs AI */}
                   <div className="space-y-2">
                     <div>
-                      <p className="text-[10px] mb-0.5" style={{ color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em" }}>
+                      <p className="text-[10px] mb-0.5" style={{ color: "rgba(0,0,0,0.4)", letterSpacing: "0.08em" }}>
                         self-reported
                       </p>
-                      <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>
+                      <p className="text-xs leading-relaxed" style={{ color: "rgba(0,0,0,0.65)" }}>
                         {typeof dim.selfReported === "string" ? dim.selfReported : JSON.stringify(dim.selfReported)}
                       </p>
                     </div>
                     <div>
-                      <p className="text-[10px] mb-0.5" style={{ color: "rgba(255,255,255,0.35)", letterSpacing: "0.08em" }}>
+                      <p className="text-[10px] mb-0.5" style={{ color: "rgba(0,0,0,0.4)", letterSpacing: "0.08em" }}>
                         ai perceives
                       </p>
-                      <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>
+                      <p className="text-xs leading-relaxed" style={{ color: "rgba(0,0,0,0.65)" }}>
                         {typeof dim.aiPerceived === "string" ? dim.aiPerceived : JSON.stringify(dim.aiPerceived)}
                       </p>
                     </div>
                   </div>
 
-                  <p className="text-[11px] mt-3 leading-relaxed" style={{ color: "rgba(255,255,255,0.35)" }}>
+                  <p className="text-[11px] mt-3 leading-relaxed" style={{ color: "rgba(0,0,0,0.4)" }}>
                     {dim.detail}
                   </p>
                 </div>
@@ -266,15 +266,15 @@ export default async function AuditReportPage({
 
         {/* Recommendations */}
         {recommendations.length > 0 && (
-          <div className="p-8 mb-8" style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px" }}>
-            <h2 className="font-goldman text-lg text-white mb-6">recommendations</h2>
+          <div className="p-8 mb-8 card-mid" style={{ borderRadius: "2px" }}>
+            <h2 className="font-goldman text-lg mb-6" style={{ color: "rgba(0,0,0,0.75)" }}>recommendations</h2>
             <div className="space-y-4">
               {recommendations.map((rec: string, i: number) => (
                 <div key={i} className="flex items-start gap-4">
-                  <span className="font-goldman text-sm flex-shrink-0 mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>
+                  <span className="font-goldman text-sm flex-shrink-0 mt-0.5" style={{ color: "rgba(0,0,0,0.35)" }}>
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{rec}</p>
+                  <p className="text-sm leading-relaxed" style={{ color: "rgba(0,0,0,0.35)" }}>{rec}</p>
                 </div>
               ))}
             </div>
@@ -283,8 +283,8 @@ export default async function AuditReportPage({
 
         {/* Weaknesses */}
         {audit.perceived_weaknesses?.length > 0 && (
-          <div className="p-8 mb-8" style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px" }}>
-            <h2 className="font-goldman text-lg text-white mb-4">ai-perceived gaps</h2>
+          <div className="p-8 mb-8 card-mid" style={{ borderRadius: "2px" }}>
+            <h2 className="font-goldman text-lg mb-4" style={{ color: "rgba(0,0,0,0.75)" }}>ai-perceived gaps</h2>
             <div className="flex flex-wrap gap-2">
               {audit.perceived_weaknesses.map((w: string, i: number) => (
                 <span
@@ -300,18 +300,17 @@ export default async function AuditReportPage({
         )}
 
         {/* Install embed */}
-        <div className="p-8 mb-8" style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <p className="section-tag mb-4">close the loop</p>
-          <h2 className="font-goldman text-lg text-white mb-2">add your attribution pixel</h2>
-          <p className="text-sm mb-5" style={{ color: "rgba(255,255,255,0.45)" }}>
+        <div className="p-8 mb-8 card-mid" style={{ borderRadius: "2px", border: "1px solid rgba(0,0,0,0.1)" }}>
+          <p className="section-tag-mid mb-4">close the loop</p>
+          <h2 className="font-goldman text-lg mb-2" style={{ color: "rgba(0,0,0,0.75)" }}>add your attribution pixel</h2>
+          <p className="text-sm mb-5" style={{ color: "rgba(0,0,0,0.35)" }}>
             one line of code makes your brand discoverable to ai agents.
           </p>
           <div
-            className="px-5 py-4 text-xs leading-relaxed"
+            className="code-mid px-5 py-4 text-xs leading-relaxed"
             style={{
-              background: "rgba(0,0,0,0.25)",
               borderRadius: "2px",
-              color: "rgba(255,255,255,0.7)",
+              color: "rgba(0,0,0,0.7)",
               fontFamily: "'SF Mono', 'Fira Code', monospace",
               overflowX: "auto",
             }}
@@ -322,7 +321,7 @@ export default async function AuditReportPage({
 
         {/* Back */}
         <div className="text-center py-4">
-          <Link href="/brands" className="nav-link">← brand directory</Link>
+          <Link href="/" className="nav-link-light text-sm">← home</Link>
         </div>
       </main>
     </div>

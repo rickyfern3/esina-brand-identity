@@ -51,14 +51,14 @@ function InstallStep({ brandId, brandName }: { brandId: string; brandName: strin
         <div className="mb-6">
           <p className="section-tag mb-3">1. add this to your store</p>
           <div
-            className="esina-code px-4 py-4 text-xs leading-relaxed break-all mb-2"
+            className="code-mid px-4 py-4 text-xs leading-relaxed break-all mb-2"
             style={{ color: "rgba(255,255,255,0.7)", fontFamily: "'SF Mono', 'Fira Code', monospace" }}
           >
             {embedCode}
           </div>
           <button
             onClick={handleCopy}
-            className="btn-secondary w-full py-2.5 text-sm"
+            className="btn-primary w-full py-2.5 text-sm"
           >
             {copied ? "copied" : "copy embed code"}
           </button>
@@ -116,9 +116,9 @@ function ChatBubble({ message }: { message: ChatMessage }) {
       <div
         className="max-w-[80%] px-4 py-3 text-sm leading-relaxed whitespace-pre-line"
         style={{
-          background: isUser ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.15)",
+          background: isUser ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)",
           borderRadius: "2px",
-          color: isUser ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.75)",
+          color: isUser ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.85)",
           border: isUser ? "none" : "1px solid rgba(255,255,255,0.06)",
         }}
       >
@@ -139,7 +139,7 @@ function TypingIndicator() {
       </div>
       <div
         className="px-4 py-3 flex items-center gap-1.5"
-        style={{ background: "rgba(0,0,0,0.15)", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.06)" }}
+        style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.06)" }}
       >
         <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "rgba(255,255,255,0.4)", animationDelay: "0ms" }} />
         <span className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: "rgba(255,255,255,0.4)", animationDelay: "150ms" }} />
@@ -242,8 +242,11 @@ export default function OnboardPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center fade-up-1">
           <div
-            className="w-10 h-10 border border-white/20 border-t-white/80 rounded-full animate-spin mx-auto mb-6"
-            style={{ borderRadius: "50%" }}
+            className="w-10 h-10 border-2 rounded-full animate-spin mx-auto mb-6"
+            style={{
+              borderColor: "rgba(255,255,255,0.1)",
+              borderTopColor: "rgba(255,255,255,0.8)",
+            }}
           />
           <p className="font-goldman text-white mb-2">building your brand profile</p>
           <p className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
@@ -261,15 +264,15 @@ export default function OnboardPage() {
       {/* Header */}
       <header
         className="sticky top-0 z-10 backdrop-blur-md"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", background: "rgba(122,122,118,0.7)" }}
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", background: "rgba(122,122,118,0.75)", backdropFilter: "blur(12px)" }}
       >
         <div className="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="font-goldman text-white tracking-[3px] text-sm uppercase">
+          <Link href="/" className="font-goldman text-white tracking-[3px] text-base uppercase">
             ESINA
           </Link>
           <div className="flex items-center gap-4">
-            <Link href="/questionnaire" className="nav-link">prefer a form →</Link>
-            <span className="section-tag hidden sm:block">brand identity interview</span>
+            <Link href="/questionnaire" className="nav-link text-sm">prefer a form →</Link>
+            <span className="section-tag hidden sm:block text-xs">brand identity interview</span>
           </div>
         </div>
       </header>
@@ -306,7 +309,7 @@ export default function OnboardPage() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <p className="text-sm text-white">almost there. what&apos;s your email?</p>
+                  <p className="text-sm text-white">almost there. what's your email?</p>
                   <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>so we can send you your brand audit report.</p>
                   <input
                     type="email"
@@ -356,7 +359,7 @@ export default function OnboardPage() {
       {!showEmailPrompt && (
         <div
           className="sticky bottom-0 backdrop-blur-md"
-          style={{ borderTop: "1px solid rgba(255,255,255,0.08)", background: "rgba(122,122,118,0.8)" }}
+          style={{ borderTop: "1px solid rgba(255,255,255,0.08)", background: "rgba(122,122,118,0.8)", backdropFilter: "blur(12px)" }}
         >
           <div className="max-w-2xl mx-auto px-6 py-4">
             <div className="flex items-end gap-3">
@@ -387,7 +390,7 @@ export default function OnboardPage() {
                 onClick={() => sendMessage(input)}
                 disabled={!input.trim() || aiTyping}
                 className="w-10 h-10 flex items-center justify-center flex-shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
-                style={{ background: "rgba(255,255,255,0.9)", borderRadius: "2px", transition: "opacity 0.15s" }}
+                style={{ background: "#fff", borderRadius: "2px", transition: "opacity 0.15s" }}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="#4A4A46">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
