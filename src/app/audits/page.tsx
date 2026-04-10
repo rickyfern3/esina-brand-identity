@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
+import NavBar from "../components/NavBar";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -47,22 +48,9 @@ export default async function AuditsListPage() {
 
   return (
     <div className="min-h-screen">
-      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="font-goldman text-white tracking-[3px] text-[28px] uppercase font-bold" style={{ fontWeight: 700 }}>
-            esina
-          </Link>
-          <nav className="flex items-center gap-6">
-            <Link href="/brands" className="nav-link">brands</Link>
-            <Link href="/match" className="nav-link">match</Link>
-            <Link href="/audits" className="nav-link">audits</Link>
-            <Link href="/translate" className="nav-link">translate</Link>
-            <Link href="/questionnaire" className="btn-primary px-4 py-2 text-xs inline-block">add brand</Link>
-          </nav>
-        </div>
-      </header>
+      <NavBar links={[{ href: "/brands", label: "brands" }, { href: "/match", label: "match" }, { href: "/translate", label: "translate" }, { href: "/audits", label: "audits" }, { href: "/questionnaire", label: "add brand", primary: true }]} />
 
-      <main className="max-w-6xl mx-auto px-6 py-12">
+      <main className="max-w-6xl mx-auto px-6 py-12" style={{ paddingTop: "88px" }}>
         {/* Page header section */}
         <div className="mb-12 fade-up-1">
           <p className="section-tag mb-4">perception audits</p>

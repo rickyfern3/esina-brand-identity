@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
+import NavBar from "../components/NavBar";
 import type { ChatMessage } from "@/app/api/onboard/chat/route";
 
 // ── Constants ─────────────────────────────────────────────────────────
@@ -261,21 +262,10 @@ export default function OnboardPage() {
   // Chat interface
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-        <div className="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="font-goldman text-white tracking-[3px] text-base uppercase">
-            ESINA
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/questionnaire" className="nav-link text-sm">prefer a form →</Link>
-            <span className="section-tag hidden sm:block text-xs">brand identity interview</span>
-          </div>
-        </div>
-      </header>
+      <NavBar />
 
       {/* Chat area */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto" style={{ paddingTop: "88px" }}>
         <div className="max-w-2xl mx-auto px-6 py-10">
           <p className="section-tag text-center mb-10">esina · brand identity interview</p>
 

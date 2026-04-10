@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
+import NavBar from "../../components/NavBar";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -124,17 +125,9 @@ export default async function AuditReportPage({
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="font-goldman text-white tracking-[3px] text-base uppercase">
-            ESINA
-          </Link>
-          <span className="section-tag">ai perception audit</span>
-        </div>
-      </header>
+      <NavBar links={[{ href: "/audits", label: "← all audits" }]} />
 
-      <main className="max-w-6xl mx-auto px-6 py-12 fade-up-1">
+      <main className="max-w-6xl mx-auto px-6 fade-up-1" style={{ paddingTop: "100px" }}>
         {/* Brand header */}
         <div className="mb-12">
           <p className="section-tag mb-4">audit report</p>

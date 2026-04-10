@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import NavBar from "../components/NavBar";
 
 interface EsinaMatch {
   brandId: string;
@@ -66,21 +67,9 @@ export default function MatchPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="font-goldman text-white tracking-[3px] text-[28px] font-bold uppercase">
-            ESINA
-          </Link>
-          <nav className="flex items-center gap-6">
-            <Link href="/brands" className="nav-link">brands</Link>
-            <Link href="/translate" className="nav-link">translate</Link>
-            <Link href="/audits" className="nav-link">audits</Link>
-          </nav>
-        </div>
-      </header>
+      <NavBar />
 
-      <main className="max-w-6xl mx-auto px-6 py-12">
+      <main className="max-w-6xl mx-auto px-6 py-12" style={{ paddingTop: "88px" }}>
         {/* Hero */}
         <div className="mb-10 fade-up-1">
           <p className="section-tag mb-5">matching demo</p>

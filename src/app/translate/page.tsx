@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import NavBar from "../components/NavBar";
 import type { TranslatedConsumerProfile, BrandMatch, IdentityBlend } from "@/app/api/translate-identity/route";
 
 const SEED_SIGNALS = {
@@ -189,19 +190,9 @@ export default function TranslatePage() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="font-goldman text-white tracking-[3px] text-[28px] font-bold uppercase">ESINA</Link>
-          <div className="flex items-center gap-5">
-            <Link href="/match" className="nav-link">match</Link>
-            <Link href="/audits" className="nav-link">audits</Link>
-            <span className="section-tag hidden sm:block">identity translator</span>
-          </div>
-        </div>
-      </header>
+      <NavBar />
 
-      <main className="max-w-6xl mx-auto px-6 py-12">
+      <main className="max-w-6xl mx-auto px-6 pt-12" style={{ paddingTop: "88px" }}>
         {/* Hero */}
         <div className="mb-10 flex items-start justify-between gap-6 flex-wrap fade-up-1">
           <div>

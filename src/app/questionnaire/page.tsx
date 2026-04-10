@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import NavBar from "../components/NavBar";
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -984,16 +985,8 @@ export default function QuestionnairePage() {
   if (completedBrandId) {
     return (
       <div className="min-h-screen">
-        <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-          <div className="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
-            <Link href="/" className="font-goldman text-white tracking-[3px] text-base uppercase">
-              ESINA
-            </Link>
-            <span style={{ color: "rgba(255,255,255,0.35)" }} className="text-xs">Install Tracking</span>
-          </div>
-          <div style={{ height: "1px", background: "rgba(255,255,255,0.8)", width: "100%" }} />
-        </header>
-        <main className="max-w-2xl mx-auto px-6 py-10">
+        <NavBar />
+        <main className="max-w-2xl mx-auto px-6 py-10" style={{ paddingTop: "88px" }}>
           <StepInstall brandId={completedBrandId} brandName={form.brand_name} />
         </main>
       </div>
@@ -1002,20 +995,15 @@ export default function QuestionnairePage() {
 
   return (
     <div className="min-h-screen">
-      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-        <div className="max-w-2xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="font-goldman text-white tracking-[3px] text-base uppercase">
-            ESINA
-          </Link>
-          <span style={{ color: "rgba(255,255,255,0.35)" }} className="text-xs">Brand Identity Questionnaire</span>
-        </div>
-        <div style={{ height: "1px", background: "rgba(255,255,255,0.12)" }}>
-          <div
-            style={{ height: "100%", background: "rgba(255,255,255,0.9)", width: `${progress}%` }}
-            className="transition-all duration-500"
-          />
-        </div>
-      </header>
+      <NavBar />
+
+      {/* Progress bar for questionnaire */}
+      <div style={{ height: "1px", background: "rgba(255,255,255,0.12)", marginTop: "88px" }}>
+        <div
+          style={{ height: "100%", background: "rgba(255,255,255,0.9)", width: `${progress}%` }}
+          className="transition-all duration-500"
+        />
+      </div>
 
       {submitting && (
         <div style={{ position: "fixed", inset: "0", background: "rgba(100,100,96,0.92)", backdropFilter: "blur(12px)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>

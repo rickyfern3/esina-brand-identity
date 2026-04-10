@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
+import NavBar from "../components/NavBar";
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
@@ -313,41 +314,9 @@ export default function AnalyticsDashboard() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div style={{ width: "32px", height: "32px", borderRadius: "2px", background: "rgba(0,0,0,0.12)" }} className="flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <span className="font-goldman text-white tracking-[3px] text-sm uppercase">Analytics</span>
-            </Link>
-            <span style={{ color: "rgba(255,255,255,0.35)" }}>·</span>
-            <span className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>Identity Intelligence</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>Updated {generatedAt}</span>
-            <button
-              onClick={() => fetchData(apiKey)}
-              className="btn-secondary text-xs px-3 py-1.5"
-            >
-              Refresh
-            </button>
-            <button
-              onClick={() => { setApiKey(""); setData(null); }}
-              style={{ color: "rgba(255,255,255,0.35)", cursor: "pointer" }}
-              className="text-xs transition-colors"
-            >
-              Sign out
-            </button>
-          </div>
-        </div>
-      </header>
+      <NavBar />
 
-      <main className="max-w-7xl mx-auto px-6 py-8 space-y-10">
+      <main className="max-w-7xl mx-auto px-6 py-8 space-y-10" style={{ paddingTop: "88px" }}>
 
         {/* Summary stats */}
         <section>

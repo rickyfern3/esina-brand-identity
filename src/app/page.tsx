@@ -1,29 +1,10 @@
 import Link from "next/link";
+import NavBar from "./components/NavBar";
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen">
-
-      {/* ══ TOP ZONE — dark gray background, white text ══════════════════ */}
-
-      {/* Nav */}
-      <header style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link
-            href="/"
-            className="font-goldman text-white uppercase"
-            style={{ fontSize: "28px", letterSpacing: "3px", fontWeight: 700 }}
-          >
-            ESINA
-          </Link>
-          <nav className="flex items-center gap-8">
-            <Link href="/brands" className="nav-link">brands</Link>
-            <Link href="/match" className="nav-link">match</Link>
-            <Link href="/translate" className="nav-link">translate</Link>
-            <Link href="/audits" className="nav-link">audits</Link>
-          </nav>
-        </div>
-      </header>
+      <NavBar />
 
       {/* Hero */}
       <section className="px-6 fade-up-1" style={{ paddingTop: "120px", paddingBottom: "80px" }}>
