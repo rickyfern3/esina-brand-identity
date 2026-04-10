@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 export default function LandingPage() {
   return (
@@ -8,7 +7,7 @@ export default function LandingPage() {
       {/* ── Nav ──────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(12px)", background: "rgba(122,122,118,0.7)" }}>
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="font-goldman text-white tracking-[3px] text-sm uppercase">
+          <Link href="/" className="font-goldman text-white tracking-[3px] uppercase" style={{ fontSize: "28px" }}>
             ESINA
           </Link>
           <nav className="flex items-center gap-8">
@@ -22,21 +21,6 @@ export default function LandingPage() {
 
       {/* ── Hero ─────────────────────────────────────────────────────── */}
       <section className="relative min-h-[88vh] flex items-center overflow-hidden px-6">
-        {/* Fingerprint background image */}
-        <div className="absolute inset-0 pointer-events-none select-none">
-          <div className="absolute right-0 top-0 h-full w-[55%] flex items-center justify-end pr-0">
-            <Image
-              src="/fingerprint.jpg"
-              alt=""
-              fill
-              priority
-              sizes="55vw"
-              className="object-cover object-left"
-              style={{ opacity: 0.32, maskImage: "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.9) 60%, rgba(0,0,0,0.9) 100%)" }}
-            />
-          </div>
-        </div>
-
         <div className="relative max-w-6xl mx-auto w-full py-24">
           <div className="max-w-2xl fade-up-1">
             {/* Tag */}
