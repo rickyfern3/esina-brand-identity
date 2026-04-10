@@ -35,7 +35,7 @@ export default function LandingPage() {
 
             {/* Subtitle */}
             <p className="text-lg mb-10 max-w-xl leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
-              AI agents recommend based on popularity, not identity. Your brand becomes invisible. One line of code fixes that.
+              AI recommends based on popularity, not identity. Your brand becomes invisible. One line of code fixes that.
             </p>
 
             {/* CTAs */}
