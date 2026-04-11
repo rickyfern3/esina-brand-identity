@@ -40,7 +40,7 @@ export default async function BrandsDirectoryPage() {
 
   const byCategory = new Map<string, typeof brands>();
   for (const brand of brands || []) {
-    const cat = brand.category || "Other";
+    const cat = (brand.category || "other").toLowerCase().trim();
     if (!byCategory.has(cat)) byCategory.set(cat, []);
     byCategory.get(cat)!.push(brand);
   }
