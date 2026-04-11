@@ -800,8 +800,8 @@ function StepReview({ data, onEdit }: { data: FormData; onEdit: (step: number) =
 
 function StepInstall({ brandId, brandName }: { brandId: string; brandName: string }) {
   const [copied, setCopied] = useState(false);
-  const embedCode = `<script src="https://esina-brand-identity.vercel.app/esina.js?brand=${brandId}"></script>`;
-  const brandMdUrl = `https://esina-brand-identity.vercel.app/api/brand/${brandId}`;
+  const embedCode = `<script src="https://esina.app/esina.js?brand=${brandId}"></script>`;
+  const brandMdUrl = `https://esina.app/api/brand/${brandId}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(embedCode).then(() => {

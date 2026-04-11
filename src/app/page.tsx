@@ -104,7 +104,7 @@ export default function LandingPage() {
             className="mb-6"
             style={{
               fontFamily: "'General Sans', system-ui, sans-serif",
-              fontSize: "0.6875rem",
+              fontSize: "0.875rem",
               letterSpacing: "0.12em",
               textTransform: "lowercase",
               color: "rgba(255,255,255,0.45)",
@@ -141,7 +141,7 @@ export default function LandingPage() {
                 className="mb-5"
                 style={{
                   fontFamily: "'General Sans', system-ui, sans-serif",
-                  fontSize: "0.6875rem",
+                  fontSize: "0.875rem",
                   letterSpacing: "0.12em",
                   textTransform: "lowercase",
                   color: "rgba(255,255,255,0.45)",
@@ -192,7 +192,7 @@ export default function LandingPage() {
             className="mb-6"
             style={{
               fontFamily: "'General Sans', system-ui, sans-serif",
-              fontSize: "0.6875rem",
+              fontSize: "0.875rem",
               letterSpacing: "0.12em",
               textTransform: "lowercase",
               color: "rgba(255,255,255,0.45)",
@@ -261,7 +261,7 @@ export default function LandingPage() {
             className="mb-6"
             style={{
               fontFamily: "'General Sans', system-ui, sans-serif",
-              fontSize: "0.6875rem",
+              fontSize: "0.875rem",
               letterSpacing: "0.12em",
               textTransform: "lowercase",
               color: "rgba(255,255,255,0.45)",
@@ -286,9 +286,9 @@ export default function LandingPage() {
               fontFamily: "'SF Mono', 'Fira Code', monospace",
             }}
           >
-            {'<script src="https://esina-brand-identity.vercel.app/esina.js?brand=YOUR_BRAND_ID"></script>'}
+            {'<script src="https://esina.app/esina.js?brand=YOUR_BRAND_ID"></script>'}
           </div>
-          <p className="text-xs mt-4" style={{ color: "rgba(255,255,255,0.3)" }}>
+          <p className="text-xs mt-4" style={{ color: "rgba(255,255,255,0.55)" }}>
             your brand id is generated when you complete onboarding. free forever.
           </p>
         </div>
@@ -319,7 +319,7 @@ export default function LandingPage() {
               border: "1px solid rgba(0,0,0,0.06)",
             }}
           >
-            <p className="mb-2" style={{ fontSize: "0.6875rem", letterSpacing: "0.12em", color: "rgba(0,0,0,0.5)" }}>
+            <p className="mb-2" style={{ fontSize: "0.875rem", letterSpacing: "0.12em", color: "rgba(0,0,0,0.5)" }}>
               consumer →
             </p>
             <p className="text-sm" style={{ color: "rgba(0,0,0,0.55)" }}>

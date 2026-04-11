@@ -17,7 +17,7 @@ const WELCOME_MESSAGE: ChatMessage = {
 
 function InstallStep({ brandId, brandName }: { brandId: string; brandName: string }) {
   const [copied, setCopied] = useState(false);
-  const embedCode = `<script src="https://esina-brand-identity.vercel.app/esina.js?brand=${brandId}"></script>`;
+  const embedCode = `<script src="https://esina.app/esina.js?brand=${brandId}"></script>`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(embedCode).then(() => {
@@ -69,7 +69,7 @@ function InstallStep({ brandId, brandName }: { brandId: string; brandName: strin
         <div className="mb-10">
           <p className="section-tag mb-3">2. your brand.md is live</p>
           <a
-            href={`https://esina-brand-identity.vercel.app/api/brand/${brandId}`}
+            href={`https://esina.app/api/brand/${brandId}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-between px-4 py-3 text-xs"

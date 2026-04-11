@@ -308,7 +308,7 @@ export default async function AuditReportPage({
               overflowX: "auto",
             }}
           >
-            {`<script src="https://esina-brand-identity.vercel.app/esina.js?brand=${brandId}"></script>`}
+            {`<script src="https://esina.app/esina.js?brand=${brandId}"></script>`}
           </div>
         </div>
 

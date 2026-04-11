@@ -73,7 +73,7 @@ h1, h2, h3, h4 {
 /* Section tag — dark zone */
 .section-tag {
   font-family: 'General Sans', system-ui, sans-serif;
-  font-size: 0.6875rem;
+  font-size: 0.875rem;
   letter-spacing: 0.12em;
   text-transform: lowercase;
   color: rgba(255,255,255,0.35);
@@ -132,7 +132,7 @@ h1, h2, h3, h4 {
 
 .section-tag-mid {
   font-family: 'General Sans', system-ui, sans-serif;
-  font-size: 0.6875rem;
+  font-size: 0.875rem;
   letter-spacing: 0.12em;
   text-transform: lowercase;
   color: rgba(0,0,0,0.25);
@@ -160,7 +160,7 @@ h1, h2, h3, h4 {
 
 .section-tag-light {
   font-family: 'General Sans', system-ui, sans-serif;
-  font-size: 0.6875rem;
+  font-size: 0.875rem;
   letter-spacing: 0.12em;
   text-transform: lowercase;
   color: rgba(0,0,0,0.25);
