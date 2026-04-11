@@ -4,6 +4,7 @@ export const revalidate = 60;
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import NavBar from "../components/NavBar";
+import { brandSlug } from "@/lib/brand-utils";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -105,7 +106,9 @@ export default async function BrandsDirectoryPage() {
                     {/* Brand header */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm mb-1 truncate" style={{ color: "rgba(0,0,0,0.65)" }}>{brand.brand_name}</h3>
+                        <Link href={`/brands/${brandSlug(brand.brand_name)}`} style={{ textDecoration: "none" }}>
+                          <h3 className="text-sm mb-1 truncate" style={{ color: "rgba(0,0,0,0.65)" }}>{brand.brand_name}</h3>
+                        </Link>
                         <div className="flex items-center gap-2">
                           <p className="text-xs capitalize" style={{ color: "rgba(0,0,0,0.35)" }}>
                             {brand.category}
@@ -165,6 +168,9 @@ export default async function BrandsDirectoryPage() {
 
                     {/* Divider and actions */}
                     <div className="flex items-center gap-3 pt-3 text-xs" style={{ borderTop: "1px solid rgba(0,0,0,0.06)" }}>
+                      <Link href={`/brands/${brandSlug(brand.brand_name)}`} className="nav-link-light">
+                        view profile
+                      </Link>
                       <a
                         href={`/api/brand/${brand.id}`}
                         target="_blank"
@@ -174,7 +180,7 @@ export default async function BrandsDirectoryPage() {
                         brand.md ↗
                       </a>
                       <Link href={`/audit/${brand.id}`} className="nav-link-light">
-                        audit report
+                        audit
                       </Link>
                     </div>
                   </div>

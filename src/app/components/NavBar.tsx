@@ -11,9 +11,9 @@ interface NavLink {
 
 const DEFAULT_LINKS: NavLink[] = [
   { href: "/brands",   label: "brands" },
-  { href: "/match",    label: "match" },
-  { href: "/translate", label: "translate" },
+  { href: "/discover", label: "discover" },
   { href: "/audits",   label: "audits" },
+  { href: "/match",    label: "match" },
 ];
 
 interface NavBarProps {
