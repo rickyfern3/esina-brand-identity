@@ -99,13 +99,8 @@ export default async function BrandsDirectoryPage() {
                 return (
                   <div
                     key={brand.id}
-                    className="p-5 card-mid group"
-                    style={{
-                      transition: "border-color 0.15s ease",
-                      border: "1px solid rgba(0,0,0,0.08)",
-                    }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,0,0,0.2)"; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(0,0,0,0.08)"; }}
+                    className="p-5 card-mid esina-brand-card"
+                    style={{ border: "1px solid rgba(0,0,0,0.08)" }}
                   >
                     {/* Brand header */}
                     <div className="flex items-start justify-between mb-3">
@@ -175,9 +170,6 @@ export default async function BrandsDirectoryPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="nav-link-light"
-                        style={{ transition: "color 0.15s" }}
-                        onMouseEnter={(e) => { (e.target as HTMLElement).style.color = "rgba(0,0,0,0.6)"; }}
-                        onMouseLeave={(e) => { (e.target as HTMLElement).style.color = "rgba(0,0,0,0.25)"; }}
                       >
                         brand.md ↗
                       </a>
