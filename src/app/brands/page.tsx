@@ -20,7 +20,7 @@ function scoreRingColor(score: number): string {
 export default async function BrandsDirectoryPage() {
   const { data: brands } = await supabase
     .from("brand_profiles")
-    .select("id, brand_name, category, price_tier, archetypes, style_tags, status_signal_type, origin_location")
+    .select("id, brand_name, category, price_tier, archetypes, style_tags, status_signal_type")
     .order("brand_name");
 
   const { data: audits } = await supabase
@@ -36,7 +36,6 @@ export default async function BrandsDirectoryPage() {
   }
 
   const totalBrands = (brands || []).length;
-  const depopBrands = (brands || []).filter((b) => b.origin_location?.startsWith("depop:")).length;
 
   const byCategory = new Map<string, typeof brands>();
   for (const brand of brands || []) {
@@ -63,7 +62,6 @@ export default async function BrandsDirectoryPage() {
           <div className="flex gap-4 mt-8">
             {[
               { label: "brands indexed", value: totalBrands },
-              { label: "depop sellers", value: depopBrands },
               { label: "audited", value: Array.from(auditMap.keys()).length },
             ].map((s) => (
               <div
@@ -90,9 +88,6 @@ export default async function BrandsDirectoryPage() {
                 const archetypes = (brand.archetypes as { archetype: string; primary: boolean }[] | null) || [];
                 const primaryArchetype = archetypes.find((a) => a.primary)?.archetype || archetypes[0]?.archetype;
                 const styleTags = (brand.style_tags as string[] | null) || [];
-                const isDepop = brand.origin_location?.startsWith("depop:");
-                const depopUsername = isDepop ? brand.origin_location!.replace("depop:", "") : null;
-
                 const radius = 18;
                 const circumference = 2 * Math.PI * radius;
                 const offset = score !== undefined ? circumference - (score / 100) * circumference : circumference;
