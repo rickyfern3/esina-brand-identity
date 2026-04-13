@@ -10,7 +10,25 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // ── Extraction prompt ──────────────────────────────────────────────────
 
-const EXTRACT_SYSTEM_PROMPT = `Extract a structured brand identity profile from this conversation transcript. Return ONLY valid JSON — no markdown, no explanation.
+const EXTRACT_SYSTEM_PROMPT = `Extract a structured brand identity profile from this oblique identity interview transcript. Return ONLY valid JSON — no markdown, no explanation.
+
+OBLIQUE SIGNAL MAPPING — interpret these question types as follows:
+- Song choice → archetype (song energy/genre/era), emotional_resonance, visual_tone, aesthetic period
+- Party behavior (room-owner vs corner-finder) → status_signal_type (room-owner = conspicuous/accessible_premium; corner-finder = quiet_luxury/counterculture/anti_status), voice_tone, social positioning
+- Smell → design_language and visual_tone (earthy/organic/raw vs clean/synthetic/industrial vs warm/artisanal)
+- Decade → style_tags and cultural positioning (60s=classic/heritage; 70s=bohemian/organic; 80s=maximalist/bold; 90s=raw/irreverent/streetwear; 00s=futuristic/techwear; 10s=minimalist/elevated_basics; 20s=gorpcore/avant_garde)
+- Dinner party guests → values (what the guest embodies), archetypes (the guest's archetype maps to the brand's), communities and aspirational identity_statements
+- Mood board image/description → style_tags, design_language, visual_tone, color/material/texture signals
+- Trade-offs: Respected → Sage/Ruler archetype emphasis; Loved → Caregiver/Everyperson; Famous → Hero/Ruler; Mysterious → Magician/Explorer; First → Hero/creator; Best → Sage/craftsman; Loud → Rebel/Jester; Quiet → Sage/Creator — weight the PAIR together, not just one answer
+- Cultural rejection → anti_values and anti-identity markers
+- Random moment → synthesize across all dimensions; this often reveals emotional_resonance most clearly
+- Brand enemy → differentiation_claim, mission clarity, anti_values
+
+WEIGHTING RULES — CRITICAL
+- Trust oblique signals MORE than any direct claims the founder makes
+- A founder who says "we're luxury" but chose a 90s grunge song and "smells like concrete" — the oblique signals WIN
+- Layer signals: song + smell + decade together paint the aesthetic more accurately than any single direct claim
+- Contradiction between oblique and direct = oblique wins; note the tension in identity_text
 
 The JSON must match this exact schema:
 {
@@ -29,20 +47,19 @@ The JSON must match this exact schema:
   "design_language": string,    // one of: clean | ornate | raw | polished | eclectic | industrial
   "visual_tone": string,        // one of: serious | playful | ironic | aspirational | authentic | provocative
   "sustainability_level": string,// one of: none | basic | committed | leader | regenerative
-  "brand_adjacencies": [string],// brands the founder mentioned that customers also love
-  "origin_story": string,       // 1-3 sentences from what the founder shared
-  "founder_philosophy": string, // the core belief or conviction that drives the brand
-  "differentiation_claim": string, // what makes this brand different
-  "identity_statements": [string], // 2-3 statements about what choosing this brand says about the buyer
-  "identity_text": string       // 3-5 sentence narrative summary of the brand's full identity, written in third person, rich with the identity dimensions above
+  "brand_adjacencies": [string],// brands the founder mentioned that customers also love or brands referenced as enemy/cringe
+  "origin_story": string,       // 1-3 sentences from what the founder shared about how/why they started
+  "founder_philosophy": string, // the core belief or conviction that drives the brand, inferred from oblique answers
+  "differentiation_claim": string, // what makes this brand different, synthesized from brand enemy + origin + trade-offs
+  "identity_statements": [string], // 2-3 statements about what choosing this brand says about the buyer — make these specific and culturally resonant
+  "identity_text": string       // 3-5 sentence narrative summary of the brand's full identity, written in third person. Weave in specific oblique signals: reference the song/smell/decade/dinner guests if they're telling. Make it vivid, not generic.
 }
 
 Rules:
 - Use ONLY the exact controlled vocabulary listed above for each enum field
-- Infer dimensions the founder didn't explicitly state based on strong context clues
-- If a dimension genuinely cannot be inferred, use the most neutral/generic option
+- Infer missing dimensions from oblique signals — don't leave things blank
 - archetype valid values: creator, sage, explorer, rebel, lover, caregiver, jester, everyperson, hero, ruler, magician, innocent
-- identity_text should be a rich narrative that captures the full brand identity — this gets embedded and used for AI matching
+- identity_text should be a rich narrative that captures the full brand identity — this gets embedded and used for AI matching. Make it feel like a cultural brief, not a product description.
 - Return ONLY the JSON object, no other text`;
 
 // ── AI audit helpers (same as submit-profile) ─────────────────────────
@@ -141,7 +158,18 @@ export async function POST(req: NextRequest) {
 
     // ── Step 1: Format transcript for GPT ─────────────────────────────
     const transcript = messages
-      .map((m) => `${m.role === "user" ? "Founder" : "Esina"}: ${m.content}`)
+      .map((m) => {
+        const speaker = m.role === "user" ? "Founder" : "Esina";
+        const content = typeof m.content === "string"
+          ? m.content
+          : Array.isArray(m.content)
+            ? (m.content as Array<{ type: string; text?: string }>)
+                .filter((c) => c.type === "text")
+                .map((c) => c.text || "")
+                .join(" ")
+            : String(m.content);
+        return `${speaker}: ${content}`;
+      })
       .join("\n\n");
 
     // ── Step 2: Extract structured profile from transcript ────────────

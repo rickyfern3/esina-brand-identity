@@ -23,10 +23,13 @@ export default async function BrandsDirectoryPage() {
     .select("id, brand_name, category, price_tier, archetypes, style_tags, status_signal_type")
     .order("brand_name");
 
+  // Fetch all audits — explicit high limit to bypass Supabase's default 1000-row cap.
+  // The map keeps only the first (most-recent) entry per brand.
   const { data: audits } = await supabase
     .from("perception_audits")
     .select("brand_profile_id, identity_alignment_score")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(50000);
 
   const auditMap = new Map<string, number>();
   for (const a of audits || []) {

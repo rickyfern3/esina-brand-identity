@@ -101,7 +101,7 @@ export default async function BrandProfilePage({
     .eq("brand_profile_id", brand.id)
     .order("created_at", { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   // Get or generate narrative
   let narrative: string | null = (brand.identity_narrative as string) || null;

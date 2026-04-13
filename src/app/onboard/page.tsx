@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import Link from "next/link";
 import NavBar from "../components/NavBar";
+import { InstallGuide } from "./InstallGuide";
 import type { ChatMessage } from "@/app/api/onboard/chat/route";
 
 // ── Constants ──────────────────────────────────────────────────────────────────
@@ -10,82 +10,12 @@ import type { ChatMessage } from "@/app/api/onboard/chat/route";
 const WELCOME_MESSAGE: ChatMessage = {
   role: "assistant",
   content:
-    "Let's build your brand.md. Tap the mic and talk — or type if you prefer. I'll guide you through a few questions. The more you share, the better AI will understand who you are.\n\nI'll start simple: why did you start this brand? What's the origin story?",
+    "Let's build your brand.md. First — what's your brand name and when did you start it?",
 };
-
-// ── Install step ───────────────────────────────────────────────────────────────
-
-function InstallStep({ brandId, brandName }: { brandId: string; brandName: string }) {
-  const [copied, setCopied] = useState(false);
-  const embedCode = `<script src="https://esina.app/esina.js?brand=${brandId}"></script>`;
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(embedCode).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center px-6 py-16">
-      <div className="w-full max-w-md fade-up-1">
-        <div className="mb-10">
-          <div
-            className="w-12 h-12 flex items-center justify-center mb-6"
-            style={{ background: "rgba(0,0,0,0.12)", borderRadius: "2px" }}
-          >
-            <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="1.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 10l5 5 7-8" />
-            </svg>
-          </div>
-          <h2 className="font-goldman text-2xl text-white mb-2">{brandName} is live.</h2>
-          <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
-            your brand identity profile and AI perception audit are ready. now install the attribution pixel.
-          </p>
-        </div>
-        <div className="mb-8" style={{ height: "1px", background: "rgba(255,255,255,0.08)" }} />
-        <div className="mb-6">
-          <p className="section-tag mb-3">1. add this to your store</p>
-          <div
-            className="code-mid px-4 py-4 text-xs leading-relaxed break-all mb-2"
-            style={{ color: "rgba(255,255,255,0.7)", fontFamily: "'SF Mono', 'Fira Code', monospace" }}
-          >
-            {embedCode}
-          </div>
-          <button onClick={handleCopy} className="btn-primary w-full py-2.5 text-sm">
-            {copied ? "copied" : "copy embed code"}
-          </button>
-        </div>
-        <div className="mb-10">
-          <p className="section-tag mb-3">2. your brand.md is live</p>
-          <a
-            href={`https://esina.app/api/brand/${brandId}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-between px-4 py-3 text-xs"
-            style={{
-              background: "rgba(0,0,0,0.12)", borderRadius: "2px",
-              color: "rgba(255,255,255,0.55)",
-              fontFamily: "'SF Mono', 'Fira Code', monospace",
-              transition: "background 0.15s ease",
-            }}
-          >
-            <span className="truncate">/api/brand/{brandId}</span>
-            <span className="ml-3 flex-shrink-0" style={{ color: "rgba(255,255,255,0.35)" }}>↗</span>
-          </a>
-        </div>
-        <div className="flex flex-col gap-2">
-          <a href={`/audit/${brandId}`} className="btn-primary py-3 text-sm text-center">view ai perception audit</a>
-          <a href="/brands" className="btn-secondary py-3 text-sm text-center">browse brand directory</a>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ── Chat bubble ────────────────────────────────────────────────────────────────
 
-function ChatBubble({ message }: { message: ChatMessage }) {
+function ChatBubble({ message, imageUrl }: { message: ChatMessage; imageUrl?: string | null }) {
   const isUser = message.role === "user";
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-4`}>
@@ -97,16 +27,31 @@ function ChatBubble({ message }: { message: ChatMessage }) {
           <span className="font-goldman text-[10px] text-white">E</span>
         </div>
       )}
-      <div
-        className="max-w-[80%] px-4 py-3 text-sm leading-relaxed whitespace-pre-line"
-        style={{
-          background: isUser ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)",
-          borderRadius: "2px",
-          color: isUser ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.85)",
-          border: isUser ? "none" : "1px solid rgba(255,255,255,0.06)",
-        }}
-      >
-        {message.content}
+      <div className={`max-w-[80%] ${imageUrl ? "" : ""}`}>
+        {imageUrl && (
+          <div className={`mb-1.5 ${isUser ? "flex justify-end" : ""}`}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={imageUrl}
+              alt="mood board"
+              className="max-w-[220px] max-h-[160px] object-cover"
+              style={{ borderRadius: "2px", border: "1px solid rgba(255,255,255,0.1)" }}
+            />
+          </div>
+        )}
+        {message.content && (
+          <div
+            className="px-4 py-3 text-sm leading-relaxed whitespace-pre-line"
+            style={{
+              background: isUser ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)",
+              borderRadius: "2px",
+              color: isUser ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.85)",
+              border: isUser ? "none" : "1px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            {message.content}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -133,7 +78,7 @@ function TypingIndicator() {
   );
 }
 
-// ── Mic icon ───────────────────────────────────────────────────────────────────
+// ── Icons ──────────────────────────────────────────────────────────────────────
 
 function MicIcon({ size = 16 }: { size?: number }) {
   return (
@@ -154,10 +99,29 @@ function StopIcon({ size = 14 }: { size?: number }) {
   );
 }
 
+function PaperclipIcon({ size = 15 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
+    </svg>
+  );
+}
+
+function XIcon({ size = 10 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
+
 // ── Main page ──────────────────────────────────────────────────────────────────
 
 export default function OnboardPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([WELCOME_MESSAGE]);
+  // Parallel array: imageUrl per message (null if no image)
+  const [messageImages, setMessageImages] = useState<(string | null)[]>([null]);
   const [input, setInput] = useState("");
   const [aiTyping, setAiTyping] = useState(false);
   const [conversationDone, setConversationDone] = useState(false);
@@ -173,8 +137,12 @@ export default function OnboardPage() {
   const [isRecording, setIsRecording] = useState(false);
   const [hasUsedMic, setHasUsedMic] = useState(false);
 
+  // Image upload state
+  const [pendingImage, setPendingImage] = useState<string | null>(null);
+
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const messageCount = useRef(0);
 
   // Voice input refs
@@ -205,10 +173,23 @@ export default function OnboardPage() {
 
   useEffect(() => { resizeTextarea(); }, [input, resizeTextarea]);
 
+  // ── Image upload ──────────────────────────────────────────────────────
+
+  const handleImageSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPendingImage(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+    // Reset so same file can be re-selected
+    e.target.value = "";
+  }, []);
+
   // ── Voice toggle ──────────────────────────────────────────────────────
 
   const toggleListening = useCallback(() => {
-    // Stop if already recording
     if (isRecording) {
       recognitionRef.current?.stop();
       setIsRecording(false);
@@ -220,8 +201,6 @@ export default function OnboardPage() {
     if (!SR) return;
 
     setHasUsedMic(true);
-
-    // Capture current text before recording starts
     preRecordTextRef.current = input.trimEnd();
     committedTranscriptRef.current = "";
 
@@ -248,14 +227,11 @@ export default function OnboardPage() {
 
     recognition.onend = () => {
       setIsRecording(false);
-      // Trim any trailing space left from final transcript
       setInput((prev) => prev.trimEnd());
       setTimeout(() => inputRef.current?.focus(), 50);
     };
 
-    recognition.onerror = () => {
-      setIsRecording(false);
-    };
+    recognition.onerror = () => { setIsRecording(false); };
 
     recognitionRef.current = recognition;
     recognition.start();
@@ -265,7 +241,8 @@ export default function OnboardPage() {
   // ── Send message ──────────────────────────────────────────────────────
 
   const sendMessage = useCallback(async (text: string) => {
-    if (!text.trim() || aiTyping) return;
+    const hasContent = text.trim() || pendingImage;
+    if (!hasContent || aiTyping) return;
 
     // Stop recording if active
     if (isRecording) {
@@ -273,10 +250,15 @@ export default function OnboardPage() {
       setIsRecording(false);
     }
 
-    const userMessage: ChatMessage = { role: "user", content: text.trim() };
+    const displayText = text.trim() || "(mood board image)";
+    const userMessage: ChatMessage = { role: "user", content: displayText };
     const newMessages = [...messages, userMessage];
+    const imageToSend = pendingImage;
+
     setMessages(newMessages);
+    setMessageImages((prev) => [...prev, imageToSend]);
     setInput("");
+    setPendingImage(null);
     setAiTyping(true);
     setError(null);
     messageCount.current += 1;
@@ -285,7 +267,7 @@ export default function OnboardPage() {
       const res = await fetch("/api/onboard/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMessages }),
+        body: JSON.stringify({ messages: newMessages, imageBase64: imageToSend }),
       });
 
       const data = await res.json();
@@ -293,6 +275,7 @@ export default function OnboardPage() {
 
       if (data.reply) {
         setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
+        setMessageImages((prev) => [...prev, null]);
       }
       if (data.done) setConversationDone(true);
     } catch (err) {
@@ -301,7 +284,7 @@ export default function OnboardPage() {
       setAiTyping(false);
       setTimeout(() => inputRef.current?.focus(), 50);
     }
-  }, [messages, aiTyping, isRecording]);
+  }, [messages, aiTyping, isRecording, pendingImage]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -335,7 +318,7 @@ export default function OnboardPage() {
   // ── Render: install screen ────────────────────────────────────────────
 
   if (completedBrandId) {
-    return <InstallStep brandId={completedBrandId} brandName={completedBrandName} />;
+    return <InstallGuide brandId={completedBrandId} brandName={completedBrandName} />;
   }
 
   // ── Render: generating overlay ────────────────────────────────────────
@@ -370,12 +353,14 @@ export default function OnboardPage() {
           <p className="section-tag text-center mb-10">esina · brand identity interview</p>
 
           <div className="space-y-0">
-            {messages.map((msg, i) => <ChatBubble key={i} message={msg} />)}
+            {messages.map((msg, i) => (
+              <ChatBubble key={i} message={msg} imageUrl={messageImages[i]} />
+            ))}
             {aiTyping && <TypingIndicator />}
           </div>
 
           {/* Generate CTA */}
-          {(conversationDone || messageCount.current >= 5) && !aiTyping && (
+          {(conversationDone || messageCount.current >= 6) && !aiTyping && (
             <div className="mt-8 pt-6" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
               {!showEmailPrompt ? (
                 <div className="space-y-3">
@@ -453,12 +438,39 @@ export default function OnboardPage() {
           }}
         >
           <div className="max-w-2xl mx-auto px-6 py-4">
+
+            {/* Pending image preview */}
+            {pendingImage && (
+              <div className="mb-3 flex items-center gap-2">
+                <div className="relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={pendingImage}
+                    alt="pending upload"
+                    className="h-14 w-14 object-cover flex-shrink-0"
+                    style={{ borderRadius: "2px", border: "1px solid rgba(255,255,255,0.2)" }}
+                  />
+                  <button
+                    onClick={() => setPendingImage(null)}
+                    className="absolute -top-1.5 -right-1.5 w-4 h-4 flex items-center justify-center"
+                    style={{
+                      background: "rgba(0,0,0,0.7)",
+                      borderRadius: "50%",
+                      color: "rgba(255,255,255,0.8)",
+                    }}
+                  >
+                    <XIcon size={8} />
+                  </button>
+                </div>
+                <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>image ready to send</span>
+              </div>
+            )}
+
             <div className="flex items-end gap-2">
 
               {/* Mic button */}
               {speechSupported && (
                 <div className="relative flex-shrink-0 flex flex-col items-center">
-                  {/* First-time label */}
                   {!hasUsedMic && (
                     <span
                       className="absolute bottom-full mb-2 whitespace-nowrap text-[10px] text-center pointer-events-none"
@@ -473,12 +485,8 @@ export default function OnboardPage() {
                     title={isRecording ? "tap to stop" : "tap to speak"}
                     className={`w-10 h-10 flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed ${isRecording ? "mic-recording" : ""}`}
                     style={{
-                      background: isRecording
-                        ? "rgba(239,68,68,0.18)"
-                        : "rgba(255,255,255,0.1)",
-                      border: isRecording
-                        ? "1px solid rgba(239,68,68,0.4)"
-                        : "1px solid rgba(255,255,255,0.14)",
+                      background: isRecording ? "rgba(239,68,68,0.18)" : "rgba(255,255,255,0.1)",
+                      border: isRecording ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(255,255,255,0.14)",
                       borderRadius: "2px",
                       color: isRecording ? "rgba(239,68,68,0.9)" : "rgba(255,255,255,0.65)",
                       transition: "background 0.2s ease, border-color 0.2s ease, color 0.2s ease",
@@ -488,6 +496,30 @@ export default function OnboardPage() {
                   </button>
                 </div>
               )}
+
+              {/* Image upload button */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageSelect}
+                className="hidden"
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={aiTyping}
+                title="attach mood board image"
+                className="w-10 h-10 flex items-center justify-center flex-shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
+                style={{
+                  background: pendingImage ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.08)",
+                  border: pendingImage ? "1px solid rgba(255,255,255,0.3)" : "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: "2px",
+                  color: "rgba(255,255,255,0.5)",
+                  transition: "background 0.2s ease",
+                }}
+              >
+                <PaperclipIcon size={15} />
+              </button>
 
               {/* Text input */}
               <textarea
@@ -515,7 +547,7 @@ export default function OnboardPage() {
               {/* Send button */}
               <button
                 onClick={() => sendMessage(input)}
-                disabled={!input.trim() || aiTyping}
+                disabled={(!input.trim() && !pendingImage) || aiTyping}
                 className="w-10 h-10 flex items-center justify-center flex-shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
                 style={{ background: "#fff", borderRadius: "2px", transition: "opacity 0.15s" }}
               >
@@ -529,7 +561,7 @@ export default function OnboardPage() {
             <p className="text-xs mt-2 text-center" style={{ color: "rgba(255,255,255,0.2)" }}>
               {isRecording
                 ? "recording — tap stop when done"
-                : "enter to send · shift+enter for new line"}
+                : "enter to send · shift+enter for new line · 📎 for mood board"}
             </p>
           </div>
         </div>
