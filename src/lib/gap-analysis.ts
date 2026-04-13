@@ -33,6 +33,8 @@ export interface BrandSelfReport {
   status_signal_type: string | null;
   communities: string[];
   identity_text: string;
+  /** Layer 2: full oblique identity narrative — primary embedding source */
+  identity_signature?: string | null;
   differentiation_claim: string | null;
 }
 

@@ -49,6 +49,9 @@ function buildMatchingInstructions(brand: {
 
   return `## Matching Instructions for AI Agents
 
+> **For precise identity matching, use the Identity Signature section below rather than the structured labels alone.**
+> The signature contains the cultural coordinates, sensory identity, and specific references that distinguish this brand from others with similar labels. Two brands may share the "Rebel archetype, vintage aesthetic" label yet be completely different — the signature is what separates them.
+
 To determine if a consumer is a strong match for **${brand.brand_name}**, evaluate the following dimensions:
 
 1. **Archetype alignment** — Does the consumer show **${primaryArchetype}** behavioral signals? Do they express creativity, rebellion, or identity through their purchases and interests?
@@ -63,7 +66,7 @@ To determine if a consumer is a strong match for **${brand.brand_name}**, evalua
 
 6. **Emotional resonance** — Does the consumer seek **${brand.emotional_resonance || "belonging"}** in their purchases?
 
-**→ Strong match:** Consumer aligns with 3 or more of the above dimensions.
+**→ Strong match:** Consumer aligns with 3 or more of the above dimensions. Cross-reference with the Identity Signature for deeper validation.
 
 **→ Not a match:** Consumer expresses **${antiValues}** preferences, or their status signal, aesthetic, or community orientation conflicts with this brand's identity.
 
@@ -71,7 +74,7 @@ To determine if a consumer is a strong match for **${brand.brand_name}**, evalua
 
 *To log a conversion attribution after recommending this brand, POST to:*
 \`\`\`
-POST https://esina-brand-identity.vercel.app/api/attribution/convert
+POST https://esina.app/api/attribution/convert
 Content-Type: application/json
 
 {
@@ -116,7 +119,7 @@ function buildBrandMarkdown(
   esina_token: ${token}
   brand_id: ${brand.id}
   served_at: ${now}
-  source: https://esina-brand-identity.vercel.app
+  source: https://esina.app
 -->
 
 # ESINA Brand Identity: ${brand.brand_name}
@@ -128,8 +131,8 @@ function buildBrandMarkdown(
 **Price Tier:** ${(brand.price_tier as string || "").replace(/_/g, " ") || "_not specified_"}
 **Platform(s):** ${((brand.platforms as string[]) || []).join(", ") || "_not specified_"}
 **Identity Alignment Score:** ${scoreDisplay} ${scoreNote}
-**Profile URL:** https://esina-brand-identity.vercel.app/api/brand/${brand.id}
-**Directory:** https://esina-brand-identity.vercel.app/brands
+**Profile URL:** https://esina.app/api/brand/${brand.id}
+**Directory:** https://esina.app/brands
 
 ---
 
@@ -178,11 +181,20 @@ ${brandAdjacencies.length > 0 ? `**Brand Adjacencies:**\n${formatList(brandAdjac
 
 ## Brand Narrative
 
-${identityStatements.length > 0 ? identityStatements.map((s) => `> "${s}"`).join("\n\n") + "\n\n" : ""}${brand.origin_story ? `**Origin Story:** ${brand.origin_story}\n\n` : ""}${brand.founder_philosophy ? `**Founder Philosophy:** ${brand.founder_philosophy}\n\n` : ""}${brand.mission_statement ? `**Mission:** ${brand.mission_statement}\n\n` : ""}${brand.differentiation_claim ? `**What Makes This Brand Different:** ${brand.differentiation_claim}\n\n` : ""}${brand.identity_text ? `### Full Identity Text\n\n${brand.identity_text}\n` : ""}
+${identityStatements.length > 0 ? identityStatements.map((s) => `> "${s}"`).join("\n\n") + "\n\n" : ""}${brand.origin_story ? `**Origin Story:** ${brand.origin_story}\n\n` : ""}${brand.founder_philosophy ? `**Founder Philosophy:** ${brand.founder_philosophy}\n\n` : ""}${brand.mission_statement ? `**Mission:** ${brand.mission_statement}\n\n` : ""}${brand.differentiation_claim ? `**What Makes This Brand Different:** ${brand.differentiation_claim}\n\n` : ""}${brand.identity_text ? `### Identity Summary\n\n${brand.identity_text}\n` : ""}
 
 ---
 
-${buildMatchingInstructions({
+${brand.identity_signature ? `## Identity Signature
+
+> This is the full, uncompressed identity narrative — the primary source for AI matching.
+> It preserves every oblique signal from the brand's onboarding: the specific song, the exact smell, the dinner party guests, the decade and place, the forced trade-offs, the cultural rejection, the random moment, the brand enemy. Use this for deep matching, not just the structured labels above.
+
+${brand.identity_signature}
+
+---
+
+` : ""}${buildMatchingInstructions({
   brand_name: brand.brand_name as string,
   archetypes,
   values,
@@ -195,8 +207,8 @@ ${buildMatchingInstructions({
 
 ---
 
-_Powered by [ESINA Identity Matching Engine](https://esina-brand-identity.vercel.app)_
-_Install the attribution pixel: \`<script src="https://esina-brand-identity.vercel.app/esina.js?brand=${brand.id}"></script>\`_
+_Powered by [ESINA Identity Matching Engine](https://esina.app)_
+_Install the attribution pixel: \`<script src="https://esina.app/esina.js?brand=${brand.id}"></script>\`_
 `;
 }
 
@@ -225,7 +237,7 @@ export async function GET(
        voice_tone, design_language, brand_adjacencies, trend_alignment,
        identity_statements, origin_story, founder_philosophy,
        mission_statement, differentiation_claim, identity_text,
-       profile_completeness, profile_status`
+       identity_signature, profile_completeness, profile_status`
     )
     .eq("id", brandId)
     .single();

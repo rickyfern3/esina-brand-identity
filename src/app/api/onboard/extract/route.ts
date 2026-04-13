@@ -10,25 +10,36 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // ── Extraction prompt ──────────────────────────────────────────────────
 
-const EXTRACT_SYSTEM_PROMPT = `Extract a structured brand identity profile from this oblique identity interview transcript. Return ONLY valid JSON — no markdown, no explanation.
+const EXTRACT_SYSTEM_PROMPT = `Extract a two-layer brand identity profile from this oblique identity interview transcript. Return ONLY valid JSON — no markdown, no explanation.
 
-OBLIQUE SIGNAL MAPPING — interpret these question types as follows:
-- Song choice → archetype (song energy/genre/era), emotional_resonance, visual_tone, aesthetic period
-- Party behavior (room-owner vs corner-finder) → status_signal_type (room-owner = conspicuous/accessible_premium; corner-finder = quiet_luxury/counterculture/anti_status), voice_tone, social positioning
-- Smell → design_language and visual_tone (earthy/organic/raw vs clean/synthetic/industrial vs warm/artisanal)
-- Decade → style_tags and cultural positioning (60s=classic/heritage; 70s=bohemian/organic; 80s=maximalist/bold; 90s=raw/irreverent/streetwear; 00s=futuristic/techwear; 10s=minimalist/elevated_basics; 20s=gorpcore/avant_garde)
-- Dinner party guests → values (what the guest embodies), archetypes (the guest's archetype maps to the brand's), communities and aspirational identity_statements
-- Mood board image/description → style_tags, design_language, visual_tone, color/material/texture signals
-- Trade-offs: Respected → Sage/Ruler archetype emphasis; Loved → Caregiver/Everyperson; Famous → Hero/Ruler; Mysterious → Magician/Explorer; First → Hero/creator; Best → Sage/craftsman; Loud → Rebel/Jester; Quiet → Sage/Creator — weight the PAIR together, not just one answer
-- Cultural rejection → anti_values and anti-identity markers
-- Random moment → synthesize across all dimensions; this often reveals emotional_resonance most clearly
-- Brand enemy → differentiation_claim, mission clarity, anti_values
+You are producing TWO outputs in a single JSON object:
 
-WEIGHTING RULES — CRITICAL
-- Trust oblique signals MORE than any direct claims the founder makes
-- A founder who says "we're luxury" but chose a 90s grunge song and "smells like concrete" — the oblique signals WIN
-- Layer signals: song + smell + decade together paint the aesthetic more accurately than any single direct claim
-- Contradiction between oblique and direct = oblique wins; note the tension in identity_text
+OUTPUT 1 — STRUCTURED PROFILE (approximate labels for filtering)
+Extract the standard structured fields using controlled vocabulary as rough categorization. These are approximate labels. It is okay if they don't perfectly capture every nuance — that is what Output 2 is for.
+
+OUTPUT 2 — IDENTITY SIGNATURE (the real identity, full nuance preserved)
+Generate a rich, detailed identity narrative in the "identity_signature" field that preserves the full specificity of every oblique signal from the conversation. This is the most important output. Rules for identity_signature:
+- Preserve every specific cultural reference exactly as given. Do NOT generalize. "Their song is Nights by Frank Ocean" is correct. "They gravitate toward emotional R&B" is a lossy compression — you may note both but never lose the specific reference.
+- Preserve the exact smell description word for word. "Old books and cedar with wet concrete" contains identity information that "organic and industrial" does not.
+- Name every dinner party guest and explain what pattern they reveal together about the brand's aspirational identity.
+- Preserve the decade and place as a cultural coordinate. "1970s Lower East Side" is a precise identity location — do not flatten to just "vintage New York."
+- Include the exact forced trade-off choices (respected/loved, famous/mysterious, first/best, loud/quiet) and what they reveal in combination.
+- Preserve the specific cultural rejection — what popular thing they hate and why.
+- Preserve the random moment description in full — setting, mood, sensory details, emotional tone.
+- Preserve the brand enemy as stated — the specific idea or trend they exist to fight.
+- Weave all of these into a cohesive narrative that reads like a vivid portrait of the brand's soul. Someone reading this should feel like they understand this brand at an intuitive level, not just a categorical one.
+- The identity_signature should be 300-500 words of rich, specific, nuanced identity text. This is what the embedding will be generated from. Two brands that both get labeled "Rebel archetype, vintage aesthetic" in the structured fields should have very different identity signatures because one smells like thrift store leather and the other smells like grandmother's cedar closet.
+
+OBLIQUE SIGNAL MAPPING — for Output 1 label extraction:
+- Song → archetype energy, emotional_resonance, visual_tone
+- Party behavior (room-owner vs corner-finder) → status_signal_type, voice_tone
+- Smell → design_language, visual_tone
+- Decade → style_tags (60s=classic; 70s=bohemian/organic; 80s=maximalist; 90s=raw/streetwear/vintage; 00s=futuristic; 10s=minimalist; 20s=gorpcore/avant_garde)
+- Dinner party guests → archetypes, values, communities
+- Trade-off pairs: Respected=Sage/Ruler; Loved=Caregiver/Everyperson; Famous=Hero/Ruler; Mysterious=Magician/Explorer; First=Hero/creator; Best=Sage/craftsman; Loud=Rebel/Jester; Quiet=Sage/Creator
+- Cultural rejection → anti_values
+- Brand enemy → differentiation_claim, anti_values
+WEIGHTING RULE: Trust oblique signals MORE than direct claims when they conflict. Oblique wins.
 
 The JSON must match this exact schema:
 {
@@ -47,19 +58,20 @@ The JSON must match this exact schema:
   "design_language": string,    // one of: clean | ornate | raw | polished | eclectic | industrial
   "visual_tone": string,        // one of: serious | playful | ironic | aspirational | authentic | provocative
   "sustainability_level": string,// one of: none | basic | committed | leader | regenerative
-  "brand_adjacencies": [string],// brands the founder mentioned that customers also love or brands referenced as enemy/cringe
+  "brand_adjacencies": [string],// brands the founder mentioned that customers also love or referenced as enemy/cringe
   "origin_story": string,       // 1-3 sentences from what the founder shared about how/why they started
   "founder_philosophy": string, // the core belief or conviction that drives the brand, inferred from oblique answers
   "differentiation_claim": string, // what makes this brand different, synthesized from brand enemy + origin + trade-offs
   "identity_statements": [string], // 2-3 statements about what choosing this brand says about the buyer — make these specific and culturally resonant
-  "identity_text": string       // 3-5 sentence narrative summary of the brand's full identity, written in third person. Weave in specific oblique signals: reference the song/smell/decade/dinner guests if they're telling. Make it vivid, not generic.
+  "identity_text": string,      // 3-5 sentence compressed summary, third person. Use this as a short-form version of identity_signature.
+  "identity_signature": string  // OUTPUT 2: 300-500 word rich identity narrative with ALL oblique specifics preserved. This is the primary embedding source.
 }
 
 Rules:
-- Use ONLY the exact controlled vocabulary listed above for each enum field
-- Infer missing dimensions from oblique signals — don't leave things blank
 - archetype valid values: creator, sage, explorer, rebel, lover, caregiver, jester, everyperson, hero, ruler, magician, innocent
-- identity_text should be a rich narrative that captures the full brand identity — this gets embedded and used for AI matching. Make it feel like a cultural brief, not a product description.
+- For controlled vocabulary fields, use ONLY the exact values listed above
+- Infer missing structured dimensions from oblique signals — do not leave blanks
+- identity_signature must be rich enough that two vintage brands with different oblique answers produce meaningfully different signatures
 - Return ONLY the JSON object, no other text`;
 
 // ── AI audit helpers (same as submit-profile) ─────────────────────────
@@ -202,10 +214,17 @@ export async function POST(req: NextRequest) {
       ? extracted.identity_text as string
       : generatedText;
 
+    // identity_signature: the rich 300-500 word Layer 2 narrative
+    // Primary source for embedding. Falls back to identityText for older profiles.
+    const identitySignature = (extracted.identity_signature as string) || null;
+    const embeddingSource = identitySignature || identityText;
+
     // ── Step 4: Generate embedding ────────────────────────────────────
+    // Use identity_signature (Layer 2) as primary — it preserves the full nuanced
+    // oblique identity. Fall back to identity_text for profiles without a signature.
     const embeddingRes = await openai.embeddings.create({
       model: "text-embedding-3-small",
-      input: identityText,
+      input: embeddingSource,
     });
     const embedding = embeddingRes.data[0].embedding;
 
@@ -276,6 +295,7 @@ export async function POST(req: NextRequest) {
         profile_completeness: completeness,
         profile_status: "complete",
         identity_text: identityText,
+        identity_signature: identitySignature,
         identity_embedding: embedding,
         // Tag as conversation-sourced
         onboard_source: "conversational",
@@ -313,6 +333,7 @@ export async function POST(req: NextRequest) {
           profile_completeness: completeness,
           profile_status: "complete",
           identity_text: identityText,
+          identity_signature: identitySignature,
           identity_embedding: embedding,
         })
         .select("id, brand_name, category")
@@ -343,6 +364,9 @@ async function runAuditAndReturn(
   identityText: string
 ): Promise<NextResponse> {
   // ── Run AI Perception Audit ────────────────────────────────────────
+  // Use identity_signature for the consumer simulation query if available —
+  // it's the richest description of the brand's identity.
+  const identitySignature = extracted.identity_signature as string | undefined;
   const identitySnippet = [
     (extracted.values as string[])?.length
       ? `values ${(extracted.values as string[]).join(", ")}`
@@ -355,7 +379,11 @@ async function runAuditAndReturn(
   ]
     .filter(Boolean)
     .join(", ");
-  const identityDesc = identitySnippet || identityText.split(".").slice(0, 2).join(".").trim();
+  // Prefer identity_signature first sentence as the search description;
+  // it contains cultural specifics that improve AI matching accuracy.
+  const identityDesc = identitySignature
+    ? identitySignature.split(".").slice(0, 3).join(".").trim()
+    : identitySnippet || identityText.split(".").slice(0, 2).join(".").trim();
 
   const [q1, q2, q3] = await Promise.all([
     queryGeneralPerception(brand.brand_name, brand.category),
@@ -400,6 +428,7 @@ async function runAuditAndReturn(
     status_signal_type: (extracted.status_signal_type as string) || null,
     communities: (extracted.communities as string[]) || [],
     identity_text: identityText,
+    identity_signature: (extracted.identity_signature as string) || null,
     differentiation_claim: (extracted.differentiation_claim as string) || null,
   };
 
