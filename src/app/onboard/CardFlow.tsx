@@ -19,15 +19,12 @@ interface CardState {
   // Card 2
   selectedSong: Song | null;
   customSong: string;
-  songSlider: number;
   // Card 3
   selectedScents: string[];
   customScent: string;
-  scentSlider: number;
   // Card 4
   selectedNeighborhood: Neighborhood | null;
   customNeighborhood: string;
-  neighborhoodSlider: number;
   // Card 5
   guest1: string;
   guest2: string;
@@ -36,10 +33,8 @@ interface CardState {
   // Card 6
   selectedEnemies: string[];
   customEnemy: string;
-  enemySlider: number;
   // Card 7
   selectedTextures: string[];
-  textureSlider: number;
   // Card 8
   moodboardImages: string[];
   moodboardDescription: string;
@@ -73,12 +68,12 @@ interface RevealData {
 
 const INITIAL_STATE: CardState = {
   brandName: "", foundingYear: "", productDescription: "",
-  selectedSong: null, customSong: "", songSlider: 4,
-  selectedScents: [], customScent: "", scentSlider: 4,
-  selectedNeighborhood: null, customNeighborhood: "", neighborhoodSlider: 4,
+  selectedSong: null, customSong: "",
+  selectedScents: [], customScent: "",
+  selectedNeighborhood: null, customNeighborhood: "",
   guest1: "", guest2: "", guest3: "", respectedOrLoved: null,
-  selectedEnemies: [], customEnemy: "", enemySlider: 4,
-  selectedTextures: [], textureSlider: 4,
+  selectedEnemies: [], customEnemy: "",
+  selectedTextures: [],
   moodboardImages: [], moodboardDescription: "", famousOrMysterious: null,
   randomMoment: "", firstOrBest: null, loudOrQuiet: null,
   contactEmail: "",
@@ -92,27 +87,7 @@ const INITIAL_PROFILE: AccumulatedProfile = {
 // ── Shared UI components ───────────────────────────────────────────────
 
 function CardHeader({ children }: { children: React.ReactNode }) {
-  return <h2 className="font-goldman text-2xl md:text-3xl text-white mb-6 leading-tight">{children}</h2>;
-}
-
-function Slider({ value, onChange, leftLabel, rightLabel }: {
-  value: number; onChange: (v: number) => void; leftLabel: string; rightLabel: string;
-}) {
-  return (
-    <div>
-      <input
-        type="range" min={1} max={7} value={value}
-        onChange={e => onChange(Number(e.target.value))}
-        className="w-full h-1 appearance-none cursor-pointer rounded-full"
-        style={{ background: `linear-gradient(to right, rgba(255,255,255,0.6) ${((value-1)/6)*100}%, rgba(255,255,255,0.12) ${((value-1)/6)*100}%)` }}
-      />
-      <div className="flex justify-between mt-1.5">
-        <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>{leftLabel}</span>
-        <span className="text-xs font-goldman" style={{ color: "rgba(255,255,255,0.5)" }}>{value}</span>
-        <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>{rightLabel}</span>
-      </div>
-    </div>
-  );
+  return <h2 className="font-goldman text-2xl md:text-3xl mb-6 leading-tight" style={{ color: "rgba(0,0,0,0.85)" }}>{children}</h2>;
 }
 
 function Pill({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
@@ -121,10 +96,10 @@ function Pill({ label, selected, onClick }: { label: string; selected: boolean; 
       onClick={onClick}
       className="px-3 py-1.5 text-sm mr-2 mb-2 transition-all duration-150"
       style={{
-        background: selected ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.06)",
-        border: selected ? "1px solid rgba(255,255,255,0.45)" : "1px solid rgba(255,255,255,0.1)",
+        background: selected ? "rgba(0,0,0,0.12)" : "rgba(0,0,0,0.06)",
+        border: selected ? "1px solid rgba(0,0,0,0.4)" : "1px solid rgba(0,0,0,0.15)",
         borderRadius: "2px",
-        color: selected ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.55)",
+        color: selected ? "rgba(0,0,0,0.85)" : "rgba(0,0,0,0.55)",
       }}
     >
       {label}
@@ -145,10 +120,10 @@ function TradeOff({ options, value, onChange }: {
           onClick={() => onChange(opt.value)}
           className="flex-1 py-3 text-sm transition-all duration-150"
           style={{
-            background: value === opt.value ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.06)",
-            border: value === opt.value ? "1px solid rgba(255,255,255,0.45)" : "1px solid rgba(255,255,255,0.1)",
+            background: value === opt.value ? "rgba(0,0,0,0.12)" : "rgba(0,0,0,0.06)",
+            border: value === opt.value ? "1px solid rgba(0,0,0,0.4)" : "1px solid rgba(0,0,0,0.12)",
             borderRadius: "2px",
-            color: value === opt.value ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.5)",
+            color: value === opt.value ? "rgba(0,0,0,0.85)" : "rgba(0,0,0,0.5)",
             fontFamily: "'General Sans', sans-serif",
           }}
         >
@@ -163,10 +138,10 @@ function TextInput({ value, onChange, placeholder, multiline = false }: {
   value: string; onChange: (v: string) => void; placeholder: string; multiline?: boolean;
 }) {
   const style = {
-    background: "rgba(0,0,0,0.15)",
-    border: "1px solid rgba(255,255,255,0.12)",
+    background: "rgba(0,0,0,0.04)",
+    border: "1px solid rgba(0,0,0,0.15)",
     borderRadius: "2px",
-    color: "white",
+    color: "rgba(0,0,0,0.8)",
     width: "100%",
     padding: "12px 14px",
     fontSize: "0.875rem",
@@ -175,9 +150,9 @@ function TextInput({ value, onChange, placeholder, multiline = false }: {
     resize: "none" as const,
   };
   if (multiline) {
-    return <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={3} style={style} className="placeholder-white/25" />;
+    return <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={3} style={style} className="placeholder-black/25" />;
   }
-  return <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={style} className="placeholder-white/25" />;
+  return <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={style} className="placeholder-black/25" />;
 }
 
 function SearchList<T extends { id: string; name?: string; title?: string; artist?: string }>({
@@ -198,19 +173,19 @@ function SearchList<T extends { id: string; name?: string; title?: string; artis
         onChange={e => { setQuery(e.target.value); setOpen(true); if (selected) onSelect(null as unknown as T); }}
         onFocus={() => setOpen(true)}
         placeholder={placeholder}
-        style={{ background: "rgba(0,0,0,0.15)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "2px", color: "white", width: "100%", padding: "12px 14px", fontSize: "0.875rem", fontFamily: "'General Sans', sans-serif", outline: "none" }}
-        className="placeholder-white/25"
+        style={{ background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.15)", borderRadius: "2px", color: "rgba(0,0,0,0.8)", width: "100%", padding: "12px 14px", fontSize: "0.875rem", fontFamily: "'General Sans', sans-serif", outline: "none" }}
+        className="placeholder-black/25"
       />
       {open && filtered.length > 0 && (
         <div
           className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto"
-          style={{ background: "rgba(40,40,38,0.98)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "2px" }}
+          style={{ background: "rgba(255,255,255,0.95)", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "2px" }}
         >
           {filtered.map(item => (
             <button
               key={item.id}
               className="w-full text-left px-4 py-2.5 text-sm transition-colors"
-              style={{ color: "rgba(255,255,255,0.8)", fontFamily: "'General Sans', sans-serif" }}
+              style={{ color: "rgba(0,0,0,0.75)", fontFamily: "'General Sans', sans-serif" }}
               onMouseDown={() => { onSelect(item); setOpen(false); setQuery(""); }}
             >
               {renderItem(item)}
@@ -233,18 +208,18 @@ function GuestAutocomplete({ value, onChange, placeholder }: { value: string; on
         onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         placeholder={placeholder}
-        style={{ background: "rgba(0,0,0,0.15)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "2px", color: "white", width: "100%", padding: "12px 14px", fontSize: "0.875rem", fontFamily: "'General Sans', sans-serif", outline: "none" }}
-        className="placeholder-white/25"
+        style={{ background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.15)", borderRadius: "2px", color: "rgba(0,0,0,0.8)", width: "100%", padding: "12px 14px", fontSize: "0.875rem", fontFamily: "'General Sans', sans-serif", outline: "none" }}
+        className="placeholder-black/25"
       />
       {open && suggestions.length > 0 && (
         <div
           className="absolute z-50 mt-1 w-full max-h-40 overflow-y-auto"
-          style={{ background: "rgba(40,40,38,0.98)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "2px" }}
+          style={{ background: "rgba(255,255,255,0.95)", border: "1px solid rgba(0,0,0,0.12)", borderRadius: "2px" }}
         >
           {suggestions.map(g => (
-            <button key={g.id} className="w-full text-left px-4 py-2.5 text-sm" style={{ color: "rgba(255,255,255,0.8)", fontFamily: "'General Sans', sans-serif" }}
+            <button key={g.id} className="w-full text-left px-4 py-2.5 text-sm" style={{ color: "rgba(0,0,0,0.75)", fontFamily: "'General Sans', sans-serif" }}
               onMouseDown={() => { onChange(g.name); setOpen(false); }}>
-              {g.name} <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.75rem" }}>— {g.domain}</span>
+              {g.name} <span style={{ color: "rgba(0,0,0,0.4)", fontSize: "0.75rem" }}>— {g.domain}</span>
             </button>
           ))}
         </div>
@@ -289,10 +264,10 @@ function MicButton({ onTranscript, disabled }: { onTranscript: (text: string) =>
       title={recording ? "stop" : "speak"}
       className={`w-8 h-8 flex items-center justify-center flex-shrink-0 ${recording ? "mic-recording" : ""}`}
       style={{
-        background: recording ? "rgba(239,68,68,0.18)" : "rgba(255,255,255,0.08)",
-        border: recording ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(255,255,255,0.1)",
+        background: recording ? "rgba(239,68,68,0.18)" : "rgba(0,0,0,0.06)",
+        border: recording ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(0,0,0,0.1)",
         borderRadius: "2px",
-        color: recording ? "rgba(239,68,68,0.9)" : "rgba(255,255,255,0.45)",
+        color: recording ? "rgba(239,68,68,0.9)" : "rgba(0,0,0,0.4)",
       }}
     >
       {recording ? (
@@ -315,19 +290,19 @@ function Card1({ state, onChange }: { state: CardState; onChange: (u: Partial<Ca
       <CardHeader>let's start with the basics.</CardHeader>
       <div className="space-y-4">
         <div>
-          <label className="section-tag block mb-2">what's your brand name?</label>
+          <label className="section-tag block mb-2" style={{ color: "rgba(0,0,0,0.5)" }}>what's your brand name?</label>
           <TextInput value={state.brandName} onChange={v => onChange({ brandName: v })} placeholder="Brand Name" />
         </div>
         <div>
-          <label className="section-tag block mb-2">when did you start it?</label>
+          <label className="section-tag block mb-2" style={{ color: "rgba(0,0,0,0.5)" }}>when did you start it?</label>
           <TextInput value={state.foundingYear} onChange={v => onChange({ foundingYear: v })} placeholder="e.g. 2019" />
         </div>
         <div>
-          <label className="section-tag block mb-2">in one breath, what do you sell?</label>
+          <label className="section-tag block mb-2" style={{ color: "rgba(0,0,0,0.5)" }}>in one breath, what do you sell?</label>
           <TextInput value={state.productDescription} onChange={v => onChange({ productDescription: v })} placeholder="e.g. hand-dyed linen clothing for people who hate fast fashion" />
         </div>
       </div>
-      <div className="mt-2 text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>fill in name + product description to continue</div>
+      <div className="mt-2 text-xs" style={{ color: "rgba(0,0,0,0.35)" }}>fill in name + product description to continue</div>
       {!canProceed && <div style={{ height: "1px" }} />}
     </div>
   );
@@ -356,15 +331,15 @@ function Card2({ state, onChange, onLookup }: { state: CardState; onChange: (u: 
             value={state.selectedSong ? `${state.selectedSong.title} — ${state.selectedSong.artist}` : songQuery}
             onChange={e => { setSongQuery(e.target.value); if (state.selectedSong) onChange({ selectedSong: null }); }}
             placeholder="search songs…"
-            style={{ background: "rgba(0,0,0,0.15)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "2px", color: "white", width: "100%", padding: "12px 14px", fontSize: "0.875rem", fontFamily: "'General Sans', sans-serif", outline: "none" }}
-            className="placeholder-white/25"
+            style={{ background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.15)", borderRadius: "2px", color: "rgba(0,0,0,0.8)", width: "100%", padding: "12px 14px", fontSize: "0.875rem", fontFamily: "'General Sans', sans-serif", outline: "none" }}
+            className="placeholder-black/25"
           />
           {!state.selectedSong && (
-            <div className="mt-1 max-h-44 overflow-y-auto" style={{ border: "1px solid rgba(255,255,255,0.08)", borderRadius: "2px", background: "rgba(30,30,28,0.95)" }}>
+            <div className="mt-1 max-h-44 overflow-y-auto" style={{ border: "1px solid rgba(0,0,0,0.12)", borderRadius: "2px", background: "rgba(255,255,255,0.95)" }}>
               {songResults.map(s => (
-                <button key={s.id} className="w-full text-left px-4 py-2.5" style={{ color: "rgba(255,255,255,0.75)", fontFamily: "'General Sans', sans-serif", fontSize: "0.875rem" }}
+                <button key={s.id} className="w-full text-left px-4 py-2.5" style={{ color: "rgba(0,0,0,0.75)", fontFamily: "'General Sans', sans-serif", fontSize: "0.875rem" }}
                   onClick={() => { handleSelectSong(s); setSongQuery(""); }}>
-                  {s.title} <span style={{ color: "rgba(255,255,255,0.35)" }}>— {s.artist}</span>
+                  {s.title} <span style={{ color: "rgba(0,0,0,0.4)" }}>— {s.artist}</span>
                 </button>
               ))}
             </div>
@@ -373,16 +348,11 @@ function Card2({ state, onChange, onLookup }: { state: CardState; onChange: (u: 
 
         {/* Custom song */}
         <div>
-          <label className="section-tag block mb-2">not on the list? type it</label>
+          <label className="section-tag block mb-2" style={{ color: "rgba(0,0,0,0.5)" }}>not on the list? type it</label>
           <div className="flex gap-2">
             <TextInput value={state.customSong} onChange={handleCustomSong} placeholder="Song title — Artist name" />
             <MicButton onTranscript={v => handleCustomSong(v)} />
           </div>
-        </div>
-
-        <div>
-          <label className="section-tag block mb-2">this song feels more…</label>
-          <Slider value={state.songSlider} onChange={v => onChange({ songSlider: v })} leftLabel="raw & rebellious" rightLabel="polished & serene" />
         </div>
       </div>
     </div>
@@ -402,18 +372,17 @@ function Card3({ state, onChange, onLookup }: { state: CardState; onChange: (u: 
   return (
     <div>
       <CardHeader>what does your brand smell like? not a perfume — the actual scent.</CardHeader>
-      <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>pick 2–4</p>
+      <p className="text-sm mb-4" style={{ color: "rgba(0,0,0,0.5)" }}>pick 2–4</p>
       <div className="mb-4 flex flex-wrap">
         {SCENT_PILLS.map(s => <Pill key={s} label={s} selected={state.selectedScents.includes(s)} onClick={() => toggleScent(s)} />)}
       </div>
       <div className="mb-4">
-        <label className="section-tag block mb-2">or describe it yourself</label>
+        <label className="section-tag block mb-2" style={{ color: "rgba(0,0,0,0.5)" }}>or describe it yourself</label>
         <div className="flex gap-2">
           <TextInput value={state.customScent} onChange={v => onChange({ customScent: v })} placeholder="e.g. dusty library, old vinyl records…" />
           <MicButton onTranscript={v => onChange({ customScent: v })} />
         </div>
       </div>
-      <Slider value={state.scentSlider} onChange={v => onChange({ scentSlider: v })} leftLabel="nostalgic & warm" rightLabel="fresh & modern" />
     </div>
   );
 }
@@ -435,13 +404,12 @@ function Card4({ state, onChange, onLookup }: { state: CardState; onChange: (u: 
           placeholder="search neighborhoods…"
         />
         <div>
-          <label className="section-tag block mb-2">or type your own</label>
+          <label className="section-tag block mb-2" style={{ color: "rgba(0,0,0,0.5)" }}>or type your own</label>
           <div className="flex gap-2">
             <TextInput value={state.customNeighborhood} onChange={v => { onChange({ customNeighborhood: v, selectedNeighborhood: null }); }} placeholder="e.g. Oaxaca city center, early 2000s Portland…" />
             <MicButton onTranscript={v => onChange({ customNeighborhood: v })} />
           </div>
         </div>
-        <Slider value={state.neighborhoodSlider} onChange={v => onChange({ neighborhoodSlider: v })} leftLabel="underground & raw" rightLabel="established & refined" />
       </div>
     </div>
   );
@@ -461,7 +429,7 @@ function Card5({ state, onChange }: { state: CardState; onChange: (u: Partial<Ca
         ))}
       </div>
       <div>
-        <label className="section-tag block mb-3">your brand is deeply…</label>
+        <label className="section-tag block mb-3" style={{ color: "rgba(0,0,0,0.5)" }}>your brand is deeply…</label>
         <TradeOff
           options={[{ label: "deeply respected", value: "respected" }, { label: "deeply loved", value: "loved" }]}
           value={state.respectedOrLoved}
@@ -488,15 +456,11 @@ function Card6({ state, onChange, onLookup }: { state: CardState; onChange: (u: 
         {ENEMY_PILLS.map(e => <Pill key={e} label={e} selected={state.selectedEnemies.includes(e)} onClick={() => toggleEnemy(e)} />)}
       </div>
       <div className="mb-4">
-        <label className="section-tag block mb-2">or name your own enemy</label>
+        <label className="section-tag block mb-2" style={{ color: "rgba(0,0,0,0.5)" }}>or name your own enemy</label>
         <div className="flex gap-2">
           <TextInput value={state.customEnemy} onChange={v => onChange({ customEnemy: v })} placeholder="e.g. vanilla-safe DTC startups…" />
           <MicButton onTranscript={v => onChange({ customEnemy: v })} />
         </div>
-      </div>
-      <div>
-        <label className="section-tag block mb-2">how loud is your brand about this?</label>
-        <Slider value={state.enemySlider} onChange={v => onChange({ enemySlider: v })} leftLabel="quiet resistance" rightLabel="loud rebellion" />
       </div>
     </div>
   );
@@ -514,13 +478,9 @@ function Card7({ state, onChange, onLookup }: { state: CardState; onChange: (u: 
   return (
     <div>
       <CardHeader>if your brand was a texture you could touch, what would it feel like?</CardHeader>
-      <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>pick 2–3</p>
+      <p className="text-sm mb-4" style={{ color: "rgba(0,0,0,0.5)" }}>pick 2–3</p>
       <div className="mb-4 flex flex-wrap">
         {TEXTURE_PILLS.map(t => <Pill key={t} label={t} selected={state.selectedTextures.includes(t)} onClick={() => toggleTexture(t)} />)}
-      </div>
-      <div>
-        <label className="section-tag block mb-2">this texture feels more…</label>
-        <Slider value={state.textureSlider} onChange={v => onChange({ textureSlider: v })} leftLabel="handmade & imperfect" rightLabel="precise & engineered" />
       </div>
     </div>
   );
@@ -543,12 +503,12 @@ function Card8({ state, onChange }: { state: CardState; onChange: (u: Partial<Ca
   return (
     <div>
       <CardHeader>show us your brand. upload 1–5 images that ARE you.</CardHeader>
-      <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>photos, textures, places, objects, screenshots — anything visual that feels like your brand.</p>
+      <p className="text-sm mb-4" style={{ color: "rgba(0,0,0,0.5)" }}>photos, textures, places, objects, screenshots — anything visual that feels like your brand.</p>
 
       {/* Upload zone */}
       <div
         className="mb-4 flex flex-col items-center justify-center cursor-pointer"
-        style={{ border: "2px dashed rgba(255,255,255,0.18)", borderRadius: "4px", padding: "32px", minHeight: "100px" }}
+        style={{ border: "2px dashed rgba(0,0,0,0.15)", borderRadius: "4px", padding: "32px", minHeight: "100px" }}
         onClick={() => fileRef.current?.click()}
         onDragOver={e => e.preventDefault()}
         onDrop={e => { e.preventDefault(); handleFiles(e.dataTransfer.files); }}
@@ -556,11 +516,11 @@ function Card8({ state, onChange }: { state: CardState; onChange: (u: Partial<Ca
         <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={e => handleFiles(e.target.files)} />
         {state.moodboardImages.length === 0 ? (
           <>
-            <svg className="w-8 h-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.3)" strokeWidth={1.5}>
+            <svg className="w-8 h-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="rgba(0,0,0,0.3)" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <p className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>drag & drop or tap to upload</p>
-            <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.2)" }}>jpg, png, webp · max 5 images</p>
+            <p className="text-sm" style={{ color: "rgba(0,0,0,0.4)" }}>drag & drop or tap to upload</p>
+            <p className="text-xs mt-1" style={{ color: "rgba(0,0,0,0.25)" }}>jpg, png, webp · max 5 images</p>
           </>
         ) : (
           <div className="flex flex-wrap gap-2 w-full justify-center">
@@ -576,7 +536,7 @@ function Card8({ state, onChange }: { state: CardState; onChange: (u: Partial<Ca
               </div>
             ))}
             {state.moodboardImages.length < 5 && (
-              <div className="h-16 w-16 flex items-center justify-center" style={{ border: "1px dashed rgba(255,255,255,0.2)", borderRadius: "2px", color: "rgba(255,255,255,0.3)", fontSize: "1.5rem" }}>+</div>
+              <div className="h-16 w-16 flex items-center justify-center" style={{ border: "1px dashed rgba(0,0,0,0.15)", borderRadius: "2px", color: "rgba(0,0,0,0.3)", fontSize: "1.5rem" }}>+</div>
             )}
           </div>
         )}
@@ -584,7 +544,7 @@ function Card8({ state, onChange }: { state: CardState; onChange: (u: Partial<Ca
 
       {/* Fallback description */}
       <div className="mb-4">
-        <label className="section-tag block mb-2">or describe what you'd show us</label>
+        <label className="section-tag block mb-2" style={{ color: "rgba(0,0,0,0.5)" }}>or describe what you'd show us</label>
         <div className="flex gap-2">
           <TextInput value={state.moodboardDescription} onChange={v => onChange({ moodboardDescription: v })} placeholder="colors, textures, scenes, vibes — paint the picture" multiline />
           <MicButton onTranscript={v => onChange({ moodboardDescription: v })} />
@@ -592,7 +552,7 @@ function Card8({ state, onChange }: { state: CardState; onChange: (u: Partial<Ca
       </div>
 
       <div>
-        <label className="section-tag block mb-3">your brand is…</label>
+        <label className="section-tag block mb-3" style={{ color: "rgba(0,0,0,0.5)" }}>your brand is…</label>
         <TradeOff
           options={[{ label: "famous", value: "famous" }, { label: "mysterious", value: "mysterious" }]}
           value={state.famousOrMysterious}
@@ -609,7 +569,7 @@ function Card9({ state, onChange }: { state: CardState; onChange: (u: Partial<Ca
       <CardHeader>almost done. two last things.</CardHeader>
       <div className="space-y-6">
         <div>
-          <label className="section-tag block mb-2">describe a random moment that feels like your brand. not a product — a scene.</label>
+          <label className="section-tag block mb-2" style={{ color: "rgba(0,0,0,0.5)" }}>describe a random moment that feels like your brand. not a product — a scene.</label>
           <div className="flex gap-2">
             <TextInput value={state.randomMoment} onChange={v => onChange({ randomMoment: v })} placeholder="e.g. 6am light through a warehouse window, a half-finished cup of coffee, the sound of a vinyl crackle…" multiline />
             <MicButton onTranscript={v => onChange({ randomMoment: v })} />
@@ -617,7 +577,7 @@ function Card9({ state, onChange }: { state: CardState; onChange: (u: Partial<Ca
         </div>
 
         <div>
-          <label className="section-tag block mb-3">your brand would rather be…</label>
+          <label className="section-tag block mb-3" style={{ color: "rgba(0,0,0,0.5)" }}>your brand would rather be…</label>
           <div className="space-y-3">
             <TradeOff
               options={[{ label: "first", value: "first" }, { label: "best", value: "best" }]}
@@ -633,7 +593,7 @@ function Card9({ state, onChange }: { state: CardState; onChange: (u: Partial<Ca
         </div>
 
         <div>
-          <label className="section-tag block mb-2">where should we send your brand audit?</label>
+          <label className="section-tag block mb-2" style={{ color: "rgba(0,0,0,0.5)" }}>where should we send your brand audit?</label>
           <TextInput value={state.contactEmail} onChange={v => onChange({ contactEmail: v })} placeholder="you@brand.com" />
         </div>
       </div>
@@ -855,12 +815,12 @@ export default function CardFlow({ onSwitchToChat, onComplete }: CardFlowProps) 
         brandName: state.brandName,
         foundingYear: state.foundingYear,
         productDescription: state.productDescription,
-        song: { selected: state.selectedSong, custom: state.customSong, slider: state.songSlider },
-        scent: { selected: state.selectedScents, custom: state.customScent, slider: state.scentSlider },
-        neighborhood: { selected: state.selectedNeighborhood, custom: state.customNeighborhood, slider: state.neighborhoodSlider },
+        song: { selected: state.selectedSong, custom: state.customSong },
+        scent: { selected: state.selectedScents, custom: state.customScent },
+        neighborhood: { selected: state.selectedNeighborhood, custom: state.customNeighborhood },
         dinnerParty: { guest1: state.guest1, guest2: state.guest2, guest3: state.guest3, respectedOrLoved: state.respectedOrLoved },
-        enemies: { selected: state.selectedEnemies, custom: state.customEnemy, slider: state.enemySlider },
-        textures: { selected: state.selectedTextures, slider: state.textureSlider },
+        enemies: { selected: state.selectedEnemies, custom: state.customEnemy },
+        textures: { selected: state.selectedTextures },
         moodboard: { images: state.moodboardImages, description: state.moodboardDescription, famousOrMysterious: state.famousOrMysterious },
         final: { randomMoment: state.randomMoment, firstOrBest: state.firstOrBest, loudOrQuiet: state.loudOrQuiet },
         contactEmail: state.contactEmail,
@@ -922,10 +882,10 @@ export default function CardFlow({ onSwitchToChat, onComplete }: CardFlowProps) 
     <div className="min-h-screen flex flex-col">
 
       {/* Progress bar */}
-      <div className="fixed top-0 left-0 right-0 z-50" style={{ height: "2px", background: "rgba(255,255,255,0.08)" }}>
+      <div className="fixed top-0 left-0 right-0 z-50" style={{ height: "2px", background: "rgba(0,0,0,0.08)" }}>
         <div
           className="h-full"
-          style={{ width: `${((currentCard + 1) / TOTAL_CARDS) * 100}%`, background: "rgba(255,255,255,0.55)", transition: "width 0.4s ease" }}
+          style={{ width: `${((currentCard + 1) / TOTAL_CARDS) * 100}%`, background: "rgba(0,0,0,0.4)", transition: "width 0.4s ease" }}
         />
       </div>
 
@@ -1019,14 +979,6 @@ export default function CardFlow({ onSwitchToChat, onComplete }: CardFlowProps) 
           from { opacity: 0; transform: translateX(-30px); }
           to   { opacity: 1; transform: translateX(0); }
         }
-        input[type=range]::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          width: 14px; height: 14px;
-          border-radius: 50%;
-          background: white;
-          cursor: pointer;
-        }
-        input[type=range] { -webkit-appearance: none; appearance: none; }
       `}</style>
     </div>
   );

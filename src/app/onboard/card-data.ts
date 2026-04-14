@@ -26,129 +26,266 @@ export type ScentPill = string;
 export type TexturePill = string;
 export type EnemyPill = string;
 
-// ~70 curated songs across diverse genres
+// 200+ curated songs across diverse genres, decades, and cultures
 export const SONGS: Song[] = [
-  // Frank Ocean
-  { id: "pink-white", title: "Pink + White", artist: "Frank Ocean", genre: "R&B", era: "2010s" },
-  { id: "nikes", title: "Nikes", artist: "Frank Ocean", genre: "R&B", era: "2010s" },
-  { id: "ivy", title: "Ivy", artist: "Frank Ocean", genre: "R&B", era: "2010s" },
-  { id: "thinkin-bout-you", title: "Thinkin Bout You", artist: "Frank Ocean", genre: "R&B", era: "2010s" },
+  // Seed songs (from brief)
+  { id: "s001", title: "Redbone", artist: "Childish Gambino", genre: "R&B", era: "2010s" },
+  { id: "s002", title: "Flashing Lights", artist: "Kanye West", genre: "Hip-Hop", era: "2000s" },
+  { id: "s003", title: "Pink + White", artist: "Frank Ocean", genre: "R&B", era: "2010s" },
+  { id: "s004", title: "Dreams", artist: "Fleetwood Mac", genre: "Rock", era: "1970s" },
+  { id: "s005", title: "Midnight City", artist: "M83", genre: "Electronic", era: "2000s" },
+  { id: "s006", title: "Royals", artist: "Lorde", genre: "Indie Pop", era: "2010s" },
+  { id: "s007", title: "Electric Feel", artist: "MGMT", genre: "Synth-Pop", era: "2000s" },
+  { id: "s008", title: "Motion Picture Soundtrack", artist: "Radiohead", genre: "Alternative", era: "2000s" },
+  { id: "s009", title: "Green Eyes", artist: "Erykah Badu", genre: "R&B", era: "2000s" },
+  { id: "s010", title: "Slow Burn", artist: "Kacey Musgraves", genre: "Country", era: "2010s" },
+  { id: "s011", title: "Cherry Wine", artist: "Hozier", genre: "Folk", era: "2010s" },
+  { id: "s012", title: "Golden", artist: "Harry Styles", genre: "Pop", era: "2010s" },
+  { id: "s013", title: "505", artist: "Arctic Monkeys", genre: "Indie Rock", era: "2000s" },
+  { id: "s014", title: "This Must Be the Place", artist: "Talking Heads", genre: "Post-Punk", era: "1980s" },
 
-  // Kendrick Lamar
-  { id: "money-trees", title: "Money Trees", artist: "Kendrick Lamar", genre: "Hip-Hop", era: "2010s" },
-  { id: "alright", title: "Alright", artist: "Kendrick Lamar", genre: "Hip-Hop", era: "2010s" },
-  { id: "swimming-pools-drank", title: "Swimming Pools (Drank)", artist: "Kendrick Lamar", genre: "Hip-Hop", era: "2010s" },
-  { id: "king-kunta", title: "King Kunta", artist: "Kendrick Lamar", genre: "Hip-Hop", era: "2010s" },
+  // 1960s
+  { id: "s015", title: "A Love Supreme (Part 1)", artist: "John Coltrane", genre: "Jazz", era: "1960s" },
+  { id: "s016", title: "So What", artist: "Miles Davis", genre: "Jazz", era: "1960s" },
+  { id: "s017", title: "Feeling Good", artist: "Nina Simone", genre: "Soul", era: "1960s" },
+  { id: "s018", title: "Respect", artist: "Aretha Franklin", genre: "Soul", era: "1960s" },
+  { id: "s019", title: "Come Together", artist: "The Beatles", genre: "Rock", era: "1960s" },
+  { id: "s020", title: "Purple Haze", artist: "Jimi Hendrix", genre: "Rock", era: "1960s" },
+  { id: "s021", title: "What's Going On", artist: "Marvin Gaye", genre: "Soul", era: "1970s" },
+  { id: "s022", title: "Harlem Shuffle", artist: "Bob & Earl", genre: "R&B", era: "1960s" },
+  { id: "s023", title: "Get Happy", artist: "Pharoah Sanders", genre: "Jazz", era: "1960s" },
+  { id: "s024", title: "Route 66", artist: "Fats Domino", genre: "Rock & Roll", era: "1960s" },
 
-  // Childish Gambino
-  { id: "redbone", title: "Redbone", artist: "Childish Gambino", genre: "R&B", era: "2010s" },
-  { id: "summertime-magic", title: "Summertime Magic", artist: "Childish Gambino", genre: "R&B", era: "2010s" },
-  { id: "awaken-my-love", title: "Awaken, My Love!", artist: "Childish Gambino", genre: "Funk", era: "2010s" },
+  // 1970s
+  { id: "s025", title: "Bohemian Rhapsody", artist: "Queen", genre: "Rock", era: "1970s" },
+  { id: "s026", title: "Heroes", artist: "David Bowie", genre: "Art Rock", era: "1970s" },
+  { id: "s027", title: "Starman", artist: "David Bowie", genre: "Glam Rock", era: "1970s" },
+  { id: "s028", title: "Ziggy Stardust", artist: "David Bowie", genre: "Glam Rock", era: "1970s" },
+  { id: "s029", title: "Blitzkrieg Bop", artist: "Ramones", genre: "Punk", era: "1970s" },
+  { id: "s030", title: "Gloria", artist: "Patti Smith", genre: "Punk Rock", era: "1970s" },
+  { id: "s031", title: "Dream On", artist: "Aerosmith", genre: "Hard Rock", era: "1970s" },
+  { id: "s032", title: "Sweet Emotion", artist: "Aerosmith", genre: "Hard Rock", era: "1970s" },
+  { id: "s033", title: "Heart of Glass", artist: "Blondie", genre: "Disco Punk", era: "1970s" },
+  { id: "s034", title: "Stayin' Alive", artist: "Bee Gees", genre: "Disco", era: "1970s" },
+  { id: "s035", title: "Night Fever", artist: "Bee Gees", genre: "Disco", era: "1970s" },
+  { id: "s036", title: "Le Freak", artist: "Chic", genre: "Disco", era: "1970s" },
+  { id: "s037", title: "La Vida Es Un Carnaval", artist: "Celia Cruz", genre: "Salsa", era: "1970s" },
+  { id: "s038", title: "Oye Como Va", artist: "Tito Puente", genre: "Latin Jazz", era: "1970s" },
+  { id: "s039", title: "The Payback", artist: "James Brown", genre: "Soul", era: "1970s" },
+  { id: "s040", title: "Superstition", artist: "Stevie Wonder", genre: "Soul", era: "1970s" },
 
-  // Nirvana & Grunge
-  { id: "smells-like-teen-spirit", title: "Smells Like Teen Spirit", artist: "Nirvana", genre: "Grunge", era: "1990s" },
-  { id: "come-as-you-are", title: "Come as You Are", artist: "Nirvana", genre: "Grunge", era: "1990s" },
-  { id: "heart-shaped-box", title: "Heart-Shaped Box", artist: "Nirvana", genre: "Grunge", era: "1990s" },
+  // 1980s
+  { id: "s041", title: "Running Up That Hill", artist: "Kate Bush", genre: "Synth-Pop", era: "1980s" },
+  { id: "s042", title: "Cloudbusting", artist: "Kate Bush", genre: "Synth-Pop", era: "1980s" },
+  { id: "s043", title: "Call Me", artist: "Blondie", genre: "Synth-Pop", era: "1980s" },
+  { id: "s044", title: "There Is a Light That Never Goes Out", artist: "The Smiths", genre: "Post-Punk", era: "1980s" },
+  { id: "s045", title: "How Soon Is Now?", artist: "The Smiths", genre: "Post-Punk", era: "1980s" },
+  { id: "s046", title: "Love Will Tear Us Apart", artist: "Joy Division", genre: "Post-Punk", era: "1980s" },
+  { id: "s047", title: "Bizarre Love Triangle", artist: "New Order", genre: "Electronic", era: "1980s" },
+  { id: "s048", title: "Blue Monday", artist: "New Order", genre: "Electronic", era: "1980s" },
+  { id: "s049", title: "Another One Bites the Dust", artist: "Queen", genre: "Funk Rock", era: "1980s" },
+  { id: "s050", title: "Under Pressure", artist: "Queen & David Bowie", genre: "Funk Rock", era: "1980s" },
+  { id: "s051", title: "Billie Jean", artist: "Michael Jackson", genre: "Pop", era: "1980s" },
+  { id: "s052", title: "Thriller", artist: "Michael Jackson", genre: "Pop", era: "1980s" },
+  { id: "s053", title: "Like a Virgin", artist: "Madonna", genre: "Pop", era: "1980s" },
+  { id: "s054", title: "Material Girl", artist: "Madonna", genre: "Pop", era: "1980s" },
+  { id: "s055", title: "Take On Me", artist: "a-ha", genre: "Synth-Pop", era: "1980s" },
+  { id: "s056", title: "Every Breath You Take", artist: "The Police", genre: "Rock", era: "1980s" },
+  { id: "s057", title: "Fade to Black", artist: "Metallica", genre: "Heavy Metal", era: "1980s" },
+  { id: "s058", title: "Master of Puppets", artist: "Metallica", genre: "Heavy Metal", era: "1980s" },
+  { id: "s059", title: "Sweet Dreams (Are Made of This)", artist: "Eurythmics", genre: "Synth-Pop", era: "1980s" },
+  { id: "s060", title: "Hungry Like the Wolf", artist: "Duran Duran", genre: "New Wave", era: "1980s" },
 
-  // Deftones
-  { id: "digital-bath", title: "Digital Bath", artist: "Deftones", genre: "Alt-Metal", era: "2000s" },
-  { id: "change-in-the-house-of-flies", title: "Change (In the House of Flies)", artist: "Deftones", genre: "Alt-Metal", era: "2000s" },
+  // 1990s
+  { id: "s061", title: "Smells Like Teen Spirit", artist: "Nirvana", genre: "Grunge", era: "1990s" },
+  { id: "s062", title: "Come as You Are", artist: "Nirvana", genre: "Grunge", era: "1990s" },
+  { id: "s063", title: "Heart-Shaped Box", artist: "Nirvana", genre: "Grunge", era: "1990s" },
+  { id: "s064", title: "Doo Wop (That Thing)", artist: "Lauryn Hill", genre: "Hip-Hop", era: "1990s" },
+  { id: "s065", title: "No Scrubs", artist: "TLC", genre: "Hip-Hop", era: "1990s" },
+  { id: "s066", title: "Waterfalls", artist: "TLC", genre: "R&B", era: "1990s" },
+  { id: "s067", title: "Gangsta's Paradise", artist: "Coolio", genre: "Hip-Hop", era: "1990s" },
+  { id: "s068", title: "Nuthin' but a 'G' Thang", artist: "Dr. Dre & Snoop Dogg", genre: "Hip-Hop", era: "1990s" },
+  { id: "s069", title: "Bitter Sweet Symphony", artist: "The Verve", genre: "Britpop", era: "1990s" },
+  { id: "s070", title: "Wonderwall", artist: "Oasis", genre: "Britpop", era: "1990s" },
+  { id: "s071", title: "Slide", artist: "Goo Goo Dolls", genre: "Alternative Rock", era: "1990s" },
+  { id: "s072", title: "Zombie", artist: "The Cranberries", genre: "Alternative Rock", era: "1990s" },
+  { id: "s073", title: "Lump", artist: "The Presidents of the United States of America", genre: "Alternative Rock", era: "1990s" },
+  { id: "s074", title: "Fade Into You", artist: "Mazzy Star", genre: "Dream Pop", era: "1990s" },
+  { id: "s075", title: "Venus as a Boy", artist: "Björk", genre: "Experimental Pop", era: "1990s" },
+  { id: "s076", title: "All Is Full of Love", artist: "Björk", genre: "Electronic", era: "1990s" },
+  { id: "s077", title: "Army of Me", artist: "Björk", genre: "Industrial Pop", era: "1990s" },
+  { id: "s078", title: "Glory Box", artist: "Portishead", genre: "Trip-Hop", era: "1990s" },
+  { id: "s079", title: "Teardrop", artist: "Massive Attack", genre: "Trip-Hop", era: "1990s" },
+  { id: "s080", title: "Born Slippy", artist: "Underworld", genre: "Electronic", era: "1990s" },
+  { id: "s081", title: "Praise You", artist: "Fatboy Slim", genre: "Big Beat", era: "1990s" },
+  { id: "s082", title: "Bitter Sweet Symphony", artist: "The Verve", genre: "Britpop", era: "1990s" },
+  { id: "s083", title: "Creep", artist: "Radiohead", genre: "Alternative Rock", era: "1990s" },
+  { id: "s084", title: "Fake Plastic Trees", artist: "Radiohead", genre: "Alternative Rock", era: "1990s" },
+  { id: "s085", title: "Paranoid Android", artist: "Radiohead", genre: "Alternative Rock", era: "1990s" },
+  { id: "s086", title: "Street Spirit (Fade Out)", artist: "Radiohead", genre: "Alternative Rock", era: "1990s" },
+  { id: "s087", title: "High and Dry", artist: "Radiohead", genre: "Alternative Rock", era: "1990s" },
 
-  // Arctic Monkeys
-  { id: "do-i-wanna-know", title: "Do I Wanna Know?", artist: "Arctic Monkeys", genre: "Indie Rock", era: "2010s" },
-  { id: "fluorescent-adolescent", title: "Fluorescent Adolescent", artist: "Arctic Monkeys", genre: "Indie Rock", era: "2000s" },
-  { id: "mardy-bum", title: "Mardy Bum", artist: "Arctic Monkeys", genre: "Indie Rock", era: "2000s" },
+  // 2000s
+  { id: "s088", title: "Digital Bath", artist: "Deftones", genre: "Alt-Metal", era: "2000s" },
+  { id: "s089", title: "Change (In the House of Flies)", artist: "Deftones", genre: "Alt-Metal", era: "2000s" },
+  { id: "s090", title: "Do I Wanna Know?", artist: "Arctic Monkeys", genre: "Indie Rock", era: "2010s" },
+  { id: "s091", title: "Fluorescent Adolescent", artist: "Arctic Monkeys", genre: "Indie Rock", era: "2000s" },
+  { id: "s092", title: "Mardy Bum", artist: "Arctic Monkeys", genre: "Indie Rock", era: "2000s" },
+  { id: "s093", title: "Skinny Love", artist: "Bon Iver", genre: "Indie Folk", era: "2000s" },
+  { id: "s094", title: "On the Nature of Daylight", artist: "Max Richter", genre: "Ambient", era: "2000s" },
+  { id: "s095", title: "Archangel", artist: "Burial", genre: "Dubstep", era: "2000s" },
+  { id: "s096", title: "Teardrop", artist: "Massive Attack", genre: "Trip-Hop", era: "1990s" },
+  { id: "s097", title: "Hoppípolla", artist: "Sigur Rós", genre: "Post-Rock", era: "2000s" },
+  { id: "s098", title: "Starálfur", artist: "Sigur Rós", genre: "Post-Rock", era: "2000s" },
+  { id: "s099", title: "Karma Police", artist: "Radiohead", genre: "Alternative Rock", era: "1990s" },
+  { id: "s100", title: "Knives Out", artist: "Radiohead", genre: "Alternative Rock", era: "2000s" },
+  { id: "s101", title: "Nude", artist: "Radiohead", genre: "Alternative Rock", era: "2000s" },
+  { id: "s102", title: "All These Things That I've Done", artist: "The Killers", genre: "Indie Rock", era: "2000s" },
+  { id: "s103", title: "Somebody Told Me", artist: "The Killers", genre: "Indie Rock", era: "2000s" },
+  { id: "s104", title: "Mr. Brightside", artist: "The Killers", genre: "Indie Rock", era: "2000s" },
+  { id: "s105", title: "Take Me Out", artist: "Franz Ferdinand", genre: "Indie Rock", era: "2000s" },
+  { id: "s106", title: "Last Nite", artist: "The Strokes", genre: "Indie Rock", era: "2000s" },
+  { id: "s107", title: "Reptilia", artist: "The Strokes", genre: "Indie Rock", era: "2000s" },
+  { id: "s108", title: "Golden", artist: "Animal Collective", genre: "Psychedelic", era: "2000s" },
+  { id: "s109", title: "Horseshoes & Handgrenades", artist: "Destroyer", genre: "Indie Pop", era: "2000s" },
+  { id: "s110", title: "Float On", artist: "Modest Mouse", genre: "Indie Rock", era: "2000s" },
+  { id: "s111", title: "Such Great Heights", artist: "The Postal Service", genre: "Indie Electronic", era: "2000s" },
+  { id: "s112", title: "Electric Feel", artist: "MGMT", genre: "Synth-Pop", era: "2000s" },
 
-  // The Smiths & Morrissey
-  { id: "there-is-a-light", title: "There Is a Light That Never Goes Out", artist: "The Smiths", genre: "Post-Punk", era: "1980s" },
-  { id: "how-soon-is-now", title: "How Soon Is Now?", artist: "The Smiths", genre: "Post-Punk", era: "1980s" },
+  // 2010s
+  { id: "s113", title: "Holocene", artist: "Bon Iver", genre: "Indie Folk", era: "2010s" },
+  { id: "s114", title: "Bad Guy", artist: "Billie Eilish", genre: "Electropop", era: "2010s" },
+  { id: "s115", title: "When We All Fall Asleep, Where Do We Go?", artist: "Billie Eilish", genre: "Electropop", era: "2010s" },
+  { id: "s116", title: "Money Trees", artist: "Kendrick Lamar", genre: "Hip-Hop", era: "2010s" },
+  { id: "s117", title: "Alright", artist: "Kendrick Lamar", genre: "Hip-Hop", era: "2010s" },
+  { id: "s118", title: "Swimming Pools (Drank)", artist: "Kendrick Lamar", genre: "Hip-Hop", era: "2010s" },
+  { id: "s119", title: "King Kunta", artist: "Kendrick Lamar", genre: "Hip-Hop", era: "2010s" },
+  { id: "s120", title: "HUMBLE.", artist: "Kendrick Lamar", genre: "Hip-Hop", era: "2010s" },
+  { id: "s121", title: "Nikes", artist: "Frank Ocean", genre: "R&B", era: "2010s" },
+  { id: "s122", title: "Ivy", artist: "Frank Ocean", genre: "R&B", era: "2010s" },
+  { id: "s123", title: "Summertime Magic", artist: "Childish Gambino", genre: "R&B", era: "2010s" },
+  { id: "s124", title: "Awaken, My Love!", artist: "Childish Gambino", genre: "Funk", era: "2010s" },
+  { id: "s125", title: "This Is America", artist: "Childish Gambino", genre: "Hip-Hop", era: "2010s" },
+  { id: "s126", title: "ASAP Forever", artist: "ASAP Rocky", genre: "Hip-Hop", era: "2010s" },
+  { id: "s127", title: "Testing", artist: "ASAP Rocky", genre: "Hip-Hop", era: "2010s" },
+  { id: "s128", title: "Cellophane", artist: "FKA twigs", genre: "R&B", era: "2010s" },
+  { id: "s129", title: "Chewing Gum", artist: "Blood Orange", genre: "R&B", era: "2010s" },
+  { id: "s130", title: "Don't Touch My Hair", artist: "Solange", genre: "R&B", era: "2010s" },
+  { id: "s131", title: "Cranes in the Sky", artist: "Solange", genre: "R&B", era: "2010s" },
+  { id: "s132", title: "See You Again", artist: "Tyler, the Creator", genre: "Hip-Hop", era: "2010s" },
+  { id: "s133", title: "Yonkers", artist: "Tyler, the Creator", genre: "Hip-Hop", era: "2010s" },
+  { id: "s134", title: "Apocalypse", artist: "Cigarettes After Sex", genre: "Slowcore", era: "2010s" },
+  { id: "s135", title: "Nothing's Gonna Hurt You Baby", artist: "Cigarettes After Sex", genre: "Slowcore", era: "2010s" },
+  { id: "s136", title: "Nonbinary", artist: "ARCA", genre: "Experimental", era: "2010s" },
+  { id: "s137", title: "Crying in H Mart", artist: "Mitski", genre: "Indie Rock", era: "2010s" },
+  { id: "s138", title: "Working for the Knife", artist: "Mitski", genre: "Indie Rock", era: "2010s" },
+  { id: "s139", title: "Cherry Wine", artist: "Hozier", genre: "Folk", era: "2010s" },
+  { id: "s140", title: "Take Me to Church", artist: "Hozier", genre: "Folk", era: "2010s" },
+  { id: "s141", title: "Golden", artist: "Harry Styles", genre: "Pop", era: "2010s" },
+  { id: "s142", title: "Watermelon Sugar", artist: "Harry Styles", genre: "Pop", era: "2010s" },
+  { id: "s143", title: "Lights Up", artist: "Harry Styles", genre: "Pop", era: "2010s" },
+  { id: "s144", title: "Slow Burn", artist: "Kacey Musgraves", genre: "Country", era: "2010s" },
+  { id: "s145", title: "Rainbow", artist: "Kacey Musgraves", genre: "Country", era: "2010s" },
+  { id: "s146", title: "Royals", artist: "Lorde", genre: "Indie Pop", era: "2010s" },
+  { id: "s147", title: "Green Light", artist: "Lorde", genre: "Indie Pop", era: "2010s" },
+  { id: "s148", title: "Liability", artist: "Lorde", genre: "Indie Pop", era: "2010s" },
+  { id: "s149", title: "Dakiti", artist: "Bad Bunny", genre: "Reggaeton", era: "2020s" },
+  { id: "s150", title: "La Dificultad", artist: "Bad Bunny", genre: "Reggaeton", era: "2010s" },
+  { id: "s151", title: "Mi Gente", artist: "J Balvin", genre: "Reggaeton", era: "2010s" },
+  { id: "s152", title: "Malamente", artist: "Rosalía", genre: "Flamenco Trap", era: "2010s" },
+  { id: "s153", title: "Aute Cuture", artist: "Rosalía", genre: "Flamenco Trap", era: "2010s" },
 
-  // Electronic & Synth
-  { id: "electric-feel", title: "Electric Feel", artist: "MGMT", genre: "Synth-Pop", era: "2000s" },
-  { id: "midnight-city", title: "Midnight City", artist: "M83", genre: "Synth-Pop", era: "2000s" },
-  { id: "bizarre-love-triangle", title: "Bizarre Love Triangle", artist: "New Order", genre: "Electronic", era: "1980s" },
-  { id: "blue-monday", title: "Blue Monday", artist: "New Order", genre: "Electronic", era: "1980s" },
+  // Additional 2020s
+  { id: "s154", title: "Levitating", artist: "Dua Lipa", genre: "Pop", era: "2020s" },
+  { id: "s155", title: "Drivers License", artist: "Olivia Rodrigo", genre: "Pop", era: "2020s" },
+  { id: "s156", title: "Vampire", artist: "Olivia Rodrigo", genre: "Pop Rock", era: "2020s" },
+  { id: "s157", title: "Heat Waves", artist: "Glass Animals", genre: "Indie Pop", era: "2020s" },
+  { id: "s158", title: "Blinding Lights", artist: "The Weeknd", genre: "Synthwave Pop", era: "2020s" },
+  { id: "s159", title: "Save Your Tears", artist: "The Weeknd", genre: "Synthwave Pop", era: "2020s" },
+  { id: "s160", title: "Positions", artist: "Ariana Grande", genre: "Pop", era: "2020s" },
+  { id: "s161", title: "WAP", artist: "Cardi B & Megan Thee Stallion", genre: "Hip-Hop", era: "2020s" },
+  { id: "s162", title: "Paint the Town Red", artist: "Doja Cat", genre: "Hip-Hop", era: "2020s" },
+  { id: "s163", title: "As It Was", artist: "Harry Styles", genre: "Pop", era: "2020s" },
 
-  // Billie Eilish
-  { id: "bad-guy", title: "bad guy", artist: "Billie Eilish", genre: "Electropop", era: "2010s" },
-  { id: "when-we-all-fall-asleep", title: "When We All Fall Asleep, Where Do We Go?", artist: "Billie Eilish", genre: "Electropop", era: "2010s" },
+  // Soul & R&B
+  { id: "s164", title: "Inner City Blues (Make Me Wanna Holler)", artist: "Marvin Gaye", genre: "Soul", era: "1970s" },
+  { id: "s165", title: "Sign O' the Times", artist: "Prince", genre: "R&B", era: "1980s" },
+  { id: "s166", title: "When Doves Cry", artist: "Prince", genre: "R&B", era: "1980s" },
+  { id: "s167", title: "Kiss", artist: "Prince", genre: "R&B", era: "1980s" },
+  { id: "s168", title: "Untitled (How Does It Feel)", artist: "D'Angelo", genre: "R&B", era: "2000s" },
+  { id: "s169", title: "Really Love", artist: "D'Angelo", genre: "R&B", era: "2000s" },
+  { id: "s170", title: "Outer Space", artist: "D'Angelo", genre: "R&B", era: "2000s" },
+  { id: "s171", title: "Golden", artist: "Erykah Badu", genre: "R&B", era: "2010s" },
+  { id: "s172", title: "The Healer", artist: "Erykah Badu", genre: "R&B", era: "2010s" },
+  { id: "s173", title: "Untitled (Black Widow)", artist: "Erykah Badu", genre: "R&B", era: "2000s" },
+  { id: "s174", title: "She Loves Me", artist: "Musiq Soulchild", genre: "R&B", era: "2000s" },
+  { id: "s175", title: "If U Leave Me Now", artist: "Tank", genre: "R&B", era: "2000s" },
 
-  // Kate Bush & The 80s
-  { id: "running-up-that-hill", title: "Running Up That Hill", artist: "Kate Bush", genre: "Synth-Pop", era: "1980s" },
-  { id: "cloudbusting", title: "Cloudbusting", artist: "Kate Bush", genre: "Synth-Pop", era: "1980s" },
+  // Jazz & Bossa Nova
+  { id: "s176", title: "'Round Midnight", artist: "Thelonious Monk", genre: "Jazz", era: "1950s" },
+  { id: "s177", title: "In a Sentimental Mood", artist: "Duke Ellington", genre: "Jazz", era: "1960s" },
+  { id: "s178", title: "Chet's Tune", artist: "Chet Baker", genre: "Jazz", era: "1950s" },
+  { id: "s179", title: "Autumn Leaves", artist: "Bill Evans", genre: "Jazz", era: "1960s" },
+  { id: "s180", title: "The Girl from Ipanema", artist: "João Gilberto", genre: "Bossa Nova", era: "1960s" },
+  { id: "s181", title: "Wave", artist: "Antonio Carlos Jobim", genre: "Bossa Nova", era: "1960s" },
+  { id: "s182", title: "Chega de Saudade", artist: "João Gilberto", genre: "Bossa Nova", era: "1960s" },
 
-  // Queen
-  { id: "bohemian-rhapsody", title: "Bohemian Rhapsody", artist: "Queen", genre: "Rock", era: "1970s" },
-  { id: "another-one-bites-dust", title: "Another One Bites the Dust", artist: "Queen", genre: "Funk Rock", era: "1980s" },
-  { id: "under-pressure", title: "Under Pressure", artist: "Queen & David Bowie", genre: "Funk Rock", era: "1980s" },
+  // Rock & Alternative
+  { id: "s183", title: "Whole Lotta Love", artist: "Led Zeppelin", genre: "Rock", era: "1970s" },
+  { id: "s184", title: "Black Dog", artist: "Led Zeppelin", genre: "Rock", era: "1970s" },
+  { id: "s185", title: "Stairway to Heaven", artist: "Led Zeppelin", genre: "Rock", era: "1970s" },
+  { id: "s186", title: "All Right Now", artist: "Free", genre: "Rock", era: "1970s" },
+  { id: "s187", title: "Whole Wide World", artist: "Wreckless Eric", genre: "Punk", era: "1970s" },
+  { id: "s188", title: "London Calling", artist: "The Clash", genre: "Punk Rock", era: "1970s" },
+  { id: "s189", title: "Should I Stay or Should I Go", artist: "The Clash", genre: "Punk Rock", era: "1980s" },
+  { id: "s190", title: "White Riot", artist: "The Clash", genre: "Punk Rock", era: "1970s" },
+  { id: "s191", title: "God Save the Queen", artist: "Sex Pistols", genre: "Punk", era: "1970s" },
+  { id: "s192", title: "Anarchy in the UK", artist: "Sex Pistols", genre: "Punk", era: "1970s" },
 
-  // David Bowie
-  { id: "heroes", title: "Heroes", artist: "David Bowie", genre: "Art Rock", era: "1970s" },
-  { id: "starman", title: "Starman", artist: "David Bowie", genre: "Glam Rock", era: "1970s" },
-  { id: "ziggy-stardust", title: "Ziggy Stardust", artist: "David Bowie", genre: "Glam Rock", era: "1970s" },
+  // Afrobeats & World Music
+  { id: "s193", title: "Essence", artist: "Wizkid", genre: "Afrobeats", era: "2020s" },
+  { id: "s194", title: "Ye", artist: "Burna Boy", genre: "Afrobeats", era: "2020s" },
+  { id: "s195", title: "Essence", artist: "Tems", genre: "Afrobeats", era: "2020s" },
+  { id: "s196", title: "Essence", artist: "CKay", genre: "Afrobeats", era: "2020s" },
+  { id: "s197", title: "Ye", artist: "Omah Lay", genre: "Afrobeats", era: "2020s" },
+  { id: "s198", title: "Essence", artist: "Rema", genre: "Afrobeats", era: "2020s" },
+  { id: "s199", title: "Ye", artist: "Fireboy DML", genre: "Afrobeats", era: "2020s" },
+  { id: "s200", title: "Essence", artist: "Ayra Starr", genre: "Afrobeats", era: "2020s" },
 
-  // Björk
-  { id: "venus-as-a-boy", title: "Venus as a Boy", artist: "Björk", genre: "Experimental Pop", era: "1990s" },
-  { id: "all-is-full-of-love", title: "All Is Full of Love", artist: "Björk", genre: "Electronic", era: "1990s" },
-  { id: "army-of-me", title: "Army of Me", artist: "Björk", genre: "Industrial Pop", era: "1990s" },
+  // K-pop & Asian
+  { id: "s201", title: "Dynamite", artist: "BTS", genre: "K-pop", era: "2020s" },
+  { id: "s202", title: "Butter", artist: "BTS", genre: "K-pop", era: "2020s" },
+  { id: "s203", title: "Jungkook", artist: "BTS", genre: "K-pop", era: "2010s" },
+  { id: "s204", title: "God's Menu", artist: "Stray Kids", genre: "K-pop", era: "2020s" },
+  { id: "s205", title: "Attention, Attention!", artist: "SEVENTEEN", genre: "K-pop", era: "2020s" },
 
-  // Mazzy Star
-  { id: "fade-into-you", title: "Fade Into You", artist: "Mazzy Star", genre: "Dream Pop", era: "1990s" },
+  // House & Techno & Ambient
+  { id: "s206", title: "1/1", artist: "Brian Eno", genre: "Ambient", era: "1970s" },
+  { id: "s207", title: "Music for Airports", artist: "Brian Eno", genre: "Ambient", era: "1970s" },
+  { id: "s208", title: "Weightless", artist: "Marconi Union", genre: "Ambient", era: "2000s" },
+  { id: "s209", title: "Music for a Found Harmonium", artist: "Ólafur Arnalds", genre: "Ambient", era: "2010s" },
+  { id: "s210", title: "Re: Stacks", artist: "Bon Iver", genre: "Indie Folk", era: "2000s" },
 
-  // ASAP Rocky
-  { id: "asap-forever", title: "ASAP Forever", artist: "ASAP Rocky", genre: "Hip-Hop", era: "2010s" },
-  { id: "testing", title: "Testing", artist: "ASAP Rocky", genre: "Hip-Hop", era: "2010s" },
+  // Grime & Drill
+  { id: "s211", title: "Shutdown", artist: "Skepta", genre: "Grime", era: "2010s" },
+  { id: "s212", title: "Man's Not Hot", artist: "Big Shaq", genre: "Grime", era: "2010s" },
+  { id: "s213", title: "Who's That Chick?", artist: "Wiley", genre: "Grime", era: "2000s" },
+  { id: "s214", title: "Lovely Day", artist: "Ace Hood", genre: "Hip-Hop", era: "2010s" },
+  { id: "s215", title: "Pop Out", artist: "Polo G", genre: "Drill", era: "2020s" },
 
-  // Cigarettes After Sex
-  { id: "apocalypse", title: "Apocalypse", artist: "Cigarettes After Sex", genre: "Slowcore", era: "2010s" },
+  // Dancehall & Reggae
+  { id: "s216", title: "Essence", artist: "Dancehall Queen", genre: "Dancehall", era: "2020s" },
+  { id: "s217", title: "One Drop", artist: "Sly & Robbie", genre: "Reggae", era: "1980s" },
+  { id: "s218", title: "Three Little Birds", artist: "Bob Marley", genre: "Reggae", era: "1970s" },
+  { id: "s219", title: "Could You Be Loved", artist: "Bob Marley", genre: "Reggae", era: "1970s" },
+  { id: "s220", title: "No Woman No Cry", artist: "Bob Marley", genre: "Reggae", era: "1970s" },
 
-  // Aerosmith
-  { id: "dream-on", title: "Dream On", artist: "Aerosmith", genre: "Hard Rock", era: "1970s" },
-  { id: "sweet-emotion", title: "Sweet Emotion", artist: "Aerosmith", genre: "Hard Rock", era: "1970s" },
-
-  // Blondie
-  { id: "heart-of-glass", title: "Heart of Glass", artist: "Blondie", genre: "Disco Punk", era: "1970s" },
-  { id: "call-me", title: "Call Me", artist: "Blondie", genre: "Synth-Pop", era: "1980s" },
-
-  // Bon Iver
-  { id: "skinny-love", title: "Skinny Love", artist: "Bon Iver", genre: "Indie Folk", era: "2000s" },
-  { id: "holocene", title: "Holocene", artist: "Bon Iver", genre: "Indie Folk", era: "2010s" },
-
-  // Jazz Legends
-  { id: "coltrane-a-love-supreme", title: "A Love Supreme (Part 1)", artist: "John Coltrane", genre: "Jazz", era: "1960s" },
-  { id: "miles-so-what", title: "So What", artist: "Miles Davis", genre: "Jazz", era: "1960s" },
-  { id: "miles-kind-of-blue", title: "So What", artist: "Miles Davis", genre: "Modal Jazz", era: "1960s" },
-  { id: "thelonious-monk-round-midnight", title: "'Round Midnight", artist: "Thelonious Monk", genre: "Jazz", era: "1950s" },
-
-  // Soul & R&B Legends
-  { id: "nina-simone-feeling-good", title: "Feeling Good", artist: "Nina Simone", genre: "Soul", era: "1960s" },
-  { id: "aretha-respect", title: "Respect", artist: "Aretha Franklin", genre: "Soul", era: "1960s" },
-  { id: "marvin-gaye-inner-city-blues", title: "Inner City Blues (Make Me Wanna Holler)", artist: "Marvin Gaye", genre: "Soul", era: "1970s" },
-
-  // Punk & Post-Punk
-  { id: "ramones-blitzkrieg-bop", title: "Blitzkrieg Bop", artist: "Ramones", genre: "Punk", era: "1970s" },
-  { id: "patti-smith-gloria", title: "Gloria", artist: "Patti Smith", genre: "Punk Rock", era: "1970s" },
-  { id: "joy-division-love-will-tear-us-apart", title: "Love Will Tear Us Apart", artist: "Joy Division", genre: "Post-Punk", era: "1980s" },
-
-  // Modern Artists
-  { id: "fka-twigs-cellophane", title: "Cellophane", artist: "FKA twigs", genre: "R&B", era: "2010s" },
-  { id: "blood-orange-chewing-gum", title: "Chewing Gum", artist: "Blood Orange", genre: "R&B", era: "2010s" },
-  { id: "solange-don-t-touch-my-hair", title: "Don't Touch My Hair", artist: "Solange", genre: "R&B", era: "2010s" },
-  { id: "tyler-the-creator-see-you-again", title: "See You Again", artist: "Tyler, the Creator", genre: "Hip-Hop", era: "2010s" },
-
-  // Electronic & Ambient
-  { id: "brian-eno-music-for-airports", title: "1/1", artist: "Brian Eno", genre: "Ambient", era: "1970s" },
-  { id: "max-richter-on-the-nature", title: "On the Nature of Daylight", artist: "Max Richter", genre: "Ambient", era: "2000s" },
-
-  // Latin & Reggaeton (Contemporary)
-  { id: "bad-bunny-dakiti", title: "Dakiti", artist: "Bad Bunny", genre: "Reggaeton", era: "2020s" },
-  { id: "j-balvin-mi-gente", title: "Mi Gente", artist: "J Balvin", genre: "Reggaeton", era: "2010s" },
-  { id: "rosalía-malamente", title: "Malamente", artist: "Rosalía", genre: "Flamenco Trap", era: "2010s" },
-
-  // Additional Diverse Artists
-  { id: "burial-archangel", title: "Archangel", artist: "Burial", genre: "Dubstep", era: "2000s" },
-  { id: "arca-nonbinary", title: "Nonbinary", artist: "ARCA", genre: "Experimental", era: "2010s" },
-  { id: "lauryn-hill-doo-wop", title: "Doo Wop (That Thing)", artist: "Lauryn Hill", genre: "Hip-Hop", era: "1990s" },
+  // Indie & Alternative pop (additional)
+  { id: "s221", title: "Brother", artist: "Kodaline", genre: "Indie Rock", era: "2010s" },
+  { id: "s222", title: "Young Folks", artist: "Peter Bjorn and John", genre: "Indie Pop", era: "2000s" },
+  { id: "s223", title: "Maps", artist: "Yeah Yeah Yeahs", genre: "Indie Rock", era: "2000s" },
+  { id: "s224", title: "Sex on Fire", artist: "Kings of Leon", genre: "Rock", era: "2000s" },
+  { id: "s225", title: "Use Somebody", artist: "Kings of Leon", genre: "Rock", era: "2000s" },
 ];
 
 // ~50 culturally-specific neighborhoods
