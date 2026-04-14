@@ -1,79 +1,77 @@
 #!/usr/bin/env node
 /**
- * test-glossier.mjs
+ * test-liquid-death.mjs
  *
- * Deletes existing Glossier audits, runs a fresh audit,
- * and stores the new result with updated scoring logic.
+ * Self-contained test: deletes all old audits, runs a fresh audit
+ * on Liquid Death ONLY, prints detailed debug output for every
+ * dimension comparison to verify the scoring engine works.
  */
 
 import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 
-const SUPABASE_URL = "https://cjyyloeimnemikmsvqjo.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqeXlsb2VpbW5lbWlrbXN2cWpvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDYyNDM3NSwiZXhwIjoyMDkwMjAwMzc1fQ.6bRB78RFfwzp-3J7wnubpljfsECpgyMDD1jhHfz5goU";
-const OPENAI_KEY = "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";
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const OPENAI_KEY = process.env.OPENAI_API_KEY;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 const openai = new OpenAI({ apiKey: OPENAI_KEY });
 
-// ── STEP 1: Delete Glossier audits only ──────────────────────────────
+// ══════════════════════════════════════════════════════════════════════
+// STEP 1: DELETE ALL OLD AUDITS
+// ══════════════════════════════════════════════════════════════════════
 
-async function deleteGlossierAudits() {
-  console.log("━━━ STEP 1: Deleting Glossier audits ━━━");
+async function deleteAllAudits() {
+  console.log("━━━ STEP 1: Deleting all old audits ━━━");
 
-  // Find Glossier's brand_profile_id
-  const { data: brand, error: bErr } = await supabase
-    .from("brand_profiles")
-    .select("id")
-    .ilike("brand_name", "%glossier%")
-    .single();
-
-  if (bErr || !brand) {
-    console.log("  Could not find Glossier brand profile. Skipping delete.");
-    return;
-  }
-
-  // Delete audits for this brand
-  const { error: delErr } = await supabase
+  // Count existing
+  const { data: existing, error: countErr } = await supabase
     .from("perception_audits")
-    .delete()
-    .eq("brand_profile_id", brand.id);
+    .select("id", { count: "exact" });
 
-  if (delErr) {
-    console.log(`  ⚠️  Delete via API failed: ${delErr.message}`);
-    console.log("  Run in Supabase SQL Editor:");
-    console.log(`    DELETE FROM perception_audits WHERE brand_profile_id = '${brand.id}';`);
-    console.log("  Then re-run this script.");
-    process.exit(1);
+  console.log(`  Found ${existing?.length ?? 0} existing audit rows`);
+
+  if (existing && existing.length > 0) {
+    // Delete each row by ID to guarantee deletion
+    for (const row of existing) {
+      const { error } = await supabase
+        .from("perception_audits")
+        .delete()
+        .eq("id", row.id);
+      if (error) console.log(`  Delete error for ${row.id}: ${error.message}`);
+    }
+
+    // Verify
+    const { data: remaining } = await supabase
+      .from("perception_audits")
+      .select("id");
+    console.log(`  After delete: ${remaining?.length ?? 0} rows remaining`);
+
+    if (remaining && remaining.length > 0) {
+      console.log("  ⚠️  Delete via API failed (RLS likely blocking).");
+      console.log("  ⚠️  Please run this in Supabase SQL Editor:");
+      console.log("      DELETE FROM perception_audits;");
+      console.log("  Then re-run this script.");
+      process.exit(1);
+    }
   }
 
-  // Verify
-  const { data: remaining } = await supabase
-    .from("perception_audits")
-    .select("id")
-    .eq("brand_profile_id", brand.id);
-
-  if (remaining && remaining.length > 0) {
-    console.log(`  ⚠️  ${remaining.length} rows still exist (RLS blocking).`);
-    console.log("  Run in Supabase SQL Editor:");
-    console.log(`    DELETE FROM perception_audits WHERE brand_profile_id = '${brand.id}';`);
-    process.exit(1);
-  }
-
-  console.log("  ✓ Glossier audits deleted\n");
+  console.log("  ✓ All audits deleted\n");
 }
 
-// ── STEP 2: Fetch Glossier ───────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════
+// STEP 2: FETCH LIQUID DEATH
+// ══════════════════════════════════════════════════════════════════════
 
-async function fetchGlossier() {
-  console.log("━━━ STEP 2: Fetching Glossier profile ━━━");
+async function fetchLiquidDeath() {
+  console.log("━━━ STEP 2: Fetching Liquid Death profile ━━━");
   const { data, error } = await supabase
     .from("brand_profiles")
     .select("*")
-    .ilike("brand_name", "%glossier%")
+    .ilike("brand_name", "%liquid death%")
     .single();
 
-  if (error || !data) throw new Error(`Couldn't find Glossier: ${error?.message}`);
+  if (error || !data) throw new Error(`Couldn't find Liquid Death: ${error?.message}`);
 
   console.log(`  Brand: ${data.brand_name}`);
   console.log(`  Category: ${data.category}`);
@@ -88,7 +86,9 @@ async function fetchGlossier() {
   return data;
 }
 
-// ── STEP 3: AI Queries ───────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════
+// STEP 3: RUN AI QUERIES
+// ══════════════════════════════════════════════════════════════════════
 
 function parseJSON(raw) {
   return JSON.parse(raw.replace(/^```json?\s*/i, "").replace(/\s*```$/i, "").trim());
@@ -105,13 +105,6 @@ async function queryAI(system, user) {
 async function runAIQueries(brand) {
   console.log("━━━ STEP 3: Running AI perception queries ━━━");
 
-  const idSnippet = [
-    brand.values?.length ? `values ${brand.values.join(", ")}` : "",
-    brand.style_tags?.length ? `style is ${brand.style_tags.join(", ")}` : "",
-    brand.voice_tone ? `voice is ${brand.voice_tone}` : "",
-  ].filter(Boolean).join(", ");
-  const idDesc = idSnippet || (brand.identity_text || "").split(".").slice(0, 2).join(".").trim();
-
   const [q1, q2, q3] = await Promise.all([
     queryAI(
       "You are a brand analyst. Respond ONLY in valid JSON format with no additional text.",
@@ -123,7 +116,7 @@ async function runAIQueries(brand) {
     ),
     queryAI(
       "You are a shopping assistant. Respond ONLY in valid JSON format.",
-      `A consumer asks: "I'm looking for a ${brand.category} brand that is ${idDesc}. What would you recommend?"\n{\n  "brand_mentioned": true,\n  "mention_position": 1,\n  "brands_recommended_instead": ["b1", "b2"],\n  "why_recommended_or_not": "explanation",\n  "identity_accuracy": "description"\n}`
+      `A consumer asks: "I'm looking for a ${brand.category} brand that has values ${(brand.values || []).join(", ")}, style is ${(brand.style_tags || []).join(", ")}, voice is ${brand.voice_tone}. What would you recommend?"\n{\n  "brand_mentioned": true,\n  "mention_position": 1,\n  "brands_recommended_instead": ["b1", "b2"],\n  "why_recommended_or_not": "explanation",\n  "identity_accuracy": "description"\n}`
     ),
   ]);
 
@@ -142,7 +135,9 @@ async function runAIQueries(brand) {
   return { q1, q2, q3 };
 }
 
-// ── STEP 4: Scoring Engine ───────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════
+// STEP 4: SCORING ENGINE (with full debug output)
+// ══════════════════════════════════════════════════════════════════════
 
 const SYNONYMS = {
   everyperson: ["everyman", "everyperson", "regular guy", "common man"],
@@ -193,12 +188,15 @@ const SYNONYMS = {
   warm: ["warm", "welcoming", "approachable", "nurturing"],
   authoritative: ["authoritative", "expert", "professional", "confident"],
   formal: ["formal", "professional", "polished", "sophisticated"],
-  elevated_basics: ["elevated basics", "elevated_basics", "elevated", "basics", "essentials"],
-  wellness_val: ["wellness", "wellbeing", "health", "healthy"],
 };
 
 function normalize(s) {
-  return (s || "").toLowerCase().replace(/^(the|a|an)\s+/i, "").replace(/[_\-]+/g, " ").replace(/\s+/g, " ").trim();
+  return (s || "")
+    .toLowerCase()
+    .replace(/^(the|a|an)\s+/i, "")
+    .replace(/[_\-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function extractKeywords(phrase) {
@@ -238,30 +236,42 @@ function fuzzyMatch(a, b) {
   return false;
 }
 
-function overlapScore(label, a, b) {
-  if (!a.length || !b.length) { console.log(`    ${label}: empty array → 0`); return 0; }
+function overlapScoreDebug(label, a, b) {
+  if (!a.length || !b.length) {
+    console.log(`    ${label}: self=[] or ai=[] → 0 matches`);
+    return 0;
+  }
   let matches = 0;
   const usedB = new Set();
   for (const itemA of a) {
     let found = false;
     for (let i = 0; i < b.length; i++) {
       if (usedB.has(i)) continue;
-      if (fuzzyMatch(itemA, b[i])) {
-        console.log(`    ${label}: "${itemA}" ↔ "${b[i]}" → ✓`);
-        matches++; usedB.add(i); found = true; break;
+      const isMatch = fuzzyMatch(itemA, b[i]);
+      if (isMatch) {
+        console.log(`    ${label}: "${itemA}" ↔ "${b[i]}" → ✓ MATCH`);
+        matches++;
+        usedB.add(i);
+        found = true;
+        break;
       }
     }
-    if (!found) console.log(`    ${label}: "${itemA}" → ✗ no match`);
+    if (!found) {
+      console.log(`    ${label}: "${itemA}" → ✗ no match in [${b.join(", ")}]`);
+    }
   }
   const score = matches / a.length;
-  console.log(`    ${label}: ${matches}/${a.length} → ${score.toFixed(2)}`);
+  console.log(`    ${label}: ${matches}/${a.length} matched → overlap=${score.toFixed(2)}`);
   return score;
 }
 
-function flexMatch(label, a, b) {
-  if (!a || !b) { console.log(`    ${label}: null → ✗`); return false; }
+function flexMatchDebug(label, a, b) {
+  if (!a || !b) {
+    console.log(`    ${label}: "${a}" vs "${b}" → null → ✗`);
+    return false;
+  }
   const result = fuzzyMatch(a, b);
-  console.log(`    ${label}: "${a}" vs "${b}" → ${result ? "✓" : "✗"}`);
+  console.log(`    ${label}: "${a}" vs "${b}" → ${result ? "✓ MATCH" : "✗ no match"}`);
   return result;
 }
 
@@ -273,134 +283,159 @@ function safeStringify(val) {
   return String(val);
 }
 
-function calculateGap(brand, q1, q2, q3) {
-  console.log("━━━ STEP 4: Scoring ━━━\n");
+function calculateGapDebug(brand, q1, q2, q3) {
+  console.log("━━━ STEP 4: Scoring (with debug) ━━━\n");
   const dims = [];
-  let total = 0;
+  let totalScore = 0;
 
-  // 1. Archetypes (15)
+  // 1. ARCHETYPES (15)
   console.log("  [1] ARCHETYPES (max 15):");
   const selfArch = (brand.archetypes || []).map(a => a.archetype || a);
   const aiArch = q1.perceived_archetypes || [];
-  const archOv = overlapScore("Arch", selfArch, aiArch);
+  console.log(`    Self: [${selfArch.join(", ")}]`);
+  console.log(`    AI:   [${aiArch.join(", ")}]`);
+  const archOv = overlapScoreDebug("Arch", selfArch, aiArch);
   const archPts = Math.round(archOv * 15);
-  console.log(`    → ${archPts}/15\n`);
-  total += archPts;
+  console.log(`    → ${archPts}/15 points\n`);
+  totalScore += archPts;
   dims.push({ dimension: "Archetypes", maxPoints: 15, earnedPoints: archPts,
     status: archPts >= 10 ? "aligned" : archPts > 0 ? "gap" : "missing",
-    selfReported: selfArch.join(", ") || "Not set", aiPerceived: aiArch.join(", ") || "Unknown",
+    selfReported: selfArch.join(", ") || "Not set",
+    aiPerceived: aiArch.join(", ") || "Unknown",
     detail: archPts >= 10 ? "AI closely matches self-reported archetypes." : archPts > 0 ? "Partial archetype overlap." : "AI doesn't see claimed archetypes." });
 
-  // 2. Values (15)
+  // 2. VALUES (15)
   console.log("  [2] VALUES (max 15):");
-  const valOv = overlapScore("Vals", brand.values || [], q1.perceived_values || []);
+  const selfVals = brand.values || [];
+  const aiVals = q1.perceived_values || [];
+  console.log(`    Self: [${selfVals.join(", ")}]`);
+  console.log(`    AI:   [${aiVals.join(", ")}]`);
+  const valOv = overlapScoreDebug("Vals", selfVals, aiVals);
   const valPts = Math.round(valOv * 15);
-  console.log(`    → ${valPts}/15\n`);
-  total += valPts;
+  console.log(`    → ${valPts}/15 points\n`);
+  totalScore += valPts;
   dims.push({ dimension: "Values", maxPoints: 15, earnedPoints: valPts,
     status: valPts >= 10 ? "aligned" : valPts > 0 ? "gap" : "missing",
-    selfReported: (brand.values || []).join(", ") || "Not set", aiPerceived: (q1.perceived_values || []).join(", ") || "Unknown",
+    selfReported: selfVals.join(", ") || "Not set",
+    aiPerceived: aiVals.join(", ") || "Unknown",
     detail: valPts >= 10 ? "Core values well-represented." : valPts > 0 ? "Some values come through." : "Values not recognized." });
 
-  // 3. Style (10)
-  console.log("  [3] STYLE (max 10):");
-  const styleOv = overlapScore("Style", brand.style_tags || [], q1.perceived_style_tags || []);
+  // 3. STYLE (10)
+  console.log("  [3] STYLE & AESTHETIC (max 10):");
+  const selfStyle = brand.style_tags || [];
+  const aiStyle = q1.perceived_style_tags || [];
+  console.log(`    Self: [${selfStyle.join(", ")}]`);
+  console.log(`    AI:   [${aiStyle.join(", ")}]`);
+  const styleOv = overlapScoreDebug("Style", selfStyle, aiStyle);
   const stylePts = Math.round(styleOv * 10);
-  console.log(`    → ${stylePts}/10\n`);
-  total += stylePts;
+  console.log(`    → ${stylePts}/10 points\n`);
+  totalScore += stylePts;
   dims.push({ dimension: "Style & Aesthetic", maxPoints: 10, earnedPoints: stylePts,
     status: stylePts >= 7 ? "aligned" : stylePts > 0 ? "gap" : "missing",
-    selfReported: (brand.style_tags || []).join(", ") || "Not set", aiPerceived: (q1.perceived_style_tags || []).join(", ") || "Unknown",
+    selfReported: selfStyle.join(", ") || "Not set",
+    aiPerceived: aiStyle.join(", ") || "Unknown",
     detail: stylePts >= 7 ? "Aesthetic clearly perceived." : stylePts > 0 ? "Partial style recognition." : "Style differs significantly." });
 
-  // 4. Price (10)
-  console.log("  [4] PRICE (max 10):");
-  const priceOk = flexMatch("Price", brand.price_tier, q1.perceived_price_tier);
+  // 4. PRICE (10)
+  console.log("  [4] PRICE TIER (max 10):");
+  const priceOk = flexMatchDebug("Price", brand.price_tier, q1.perceived_price_tier);
   const pricePts = priceOk ? 10 : 0;
-  console.log(`    → ${pricePts}/10\n`);
-  total += pricePts;
+  console.log(`    → ${pricePts}/10 points\n`);
+  totalScore += pricePts;
   dims.push({ dimension: "Price Tier", maxPoints: 10, earnedPoints: pricePts,
     status: priceOk ? "aligned" : "gap",
-    selfReported: brand.price_tier || "Not set", aiPerceived: q1.perceived_price_tier || "Unknown",
+    selfReported: brand.price_tier || "Not set",
+    aiPerceived: q1.perceived_price_tier || "Unknown",
     detail: priceOk ? "Price accurately perceived." : `Self: "${brand.price_tier}", AI: "${q1.perceived_price_tier}".` });
 
-  // 5. Communities (10)
+  // 5. COMMUNITIES (10)
   console.log("  [5] COMMUNITIES (max 10):");
-  const commOv = overlapScore("Comm", brand.communities || [], q1.perceived_communities || []);
+  const selfComm = brand.communities || [];
+  const aiComm = q1.perceived_communities || [];
+  console.log(`    Self: [${selfComm.join(", ")}]`);
+  console.log(`    AI:   [${aiComm.join(", ")}]`);
+  const commOv = overlapScoreDebug("Comm", selfComm, aiComm);
   const commPts = Math.round(commOv * 10);
-  console.log(`    → ${commPts}/10\n`);
-  total += commPts;
+  console.log(`    → ${commPts}/10 points\n`);
+  totalScore += commPts;
   dims.push({ dimension: "Communities", maxPoints: 10, earnedPoints: commPts,
     status: commPts >= 7 ? "aligned" : commPts > 0 ? "gap" : "missing",
-    selfReported: (brand.communities || []).join(", ") || "Not set", aiPerceived: (q1.perceived_communities || []).join(", ") || "Unknown",
+    selfReported: selfComm.join(", ") || "Not set",
+    aiPerceived: aiComm.join(", ") || "Unknown",
     detail: commPts >= 7 ? "Community ties well-recognized." : commPts > 0 ? "Some communities visible." : "Different communities perceived." });
 
-  // 6. Status Signal (10)
+  // 6. STATUS SIGNAL (10)
   console.log("  [6] STATUS SIGNAL (max 10):");
-  const statusOk = flexMatch("Status", brand.status_signal_type, q1.perceived_status_signal);
+  const statusOk = flexMatchDebug("Status", brand.status_signal_type, q1.perceived_status_signal);
   const statusPts = statusOk ? 10 : 0;
-  console.log(`    → ${statusPts}/10\n`);
-  total += statusPts;
+  console.log(`    → ${statusPts}/10 points\n`);
+  totalScore += statusPts;
   dims.push({ dimension: "Status Signal", maxPoints: 10, earnedPoints: statusPts,
     status: statusOk ? "aligned" : "gap",
-    selfReported: brand.status_signal_type || "Not set", aiPerceived: q1.perceived_status_signal || "Unknown",
+    selfReported: brand.status_signal_type || "Not set",
+    aiPerceived: q1.perceived_status_signal || "Unknown",
     detail: statusOk ? "Status positioning matches." : `Self: "${brand.status_signal_type}", AI: "${q1.perceived_status_signal}".` });
 
-  // 7. Voice / Tone (10)
+  // 7. VOICE / TONE (10)
   console.log("  [7] VOICE & TONE (max 10):");
-  const voiceOk = flexMatch("Voice", brand.voice_tone, q1.perceived_voice_tone);
+  const voiceOk = flexMatchDebug("Voice", brand.voice_tone, q1.perceived_voice_tone);
   const voicePts = voiceOk ? 10 : 0;
-  console.log(`    → ${voicePts}/10\n`);
-  total += voicePts;
+  console.log(`    → ${voicePts}/10 points\n`);
+  totalScore += voicePts;
   dims.push({ dimension: "Voice & Tone", maxPoints: 10, earnedPoints: voicePts,
     status: voiceOk ? "aligned" : "gap",
-    selfReported: brand.voice_tone || "Not set", aiPerceived: q1.perceived_voice_tone || "Unknown",
+    selfReported: brand.voice_tone || "Not set",
+    aiPerceived: q1.perceived_voice_tone || "Unknown",
     detail: voiceOk ? "Brand voice perceived as intended." : `Self: "${brand.voice_tone}", AI: "${q1.perceived_voice_tone}".` });
 
-  // 8. Consumer Discovery (10)
+  // 8. CONSUMER DISCOVERY (10)
   console.log("  [8] CONSUMER DISCOVERY (max 10):");
   const bn = normalize(brand.brand_name);
   let mentioned = q3.brand_mentioned === true && q3.mention_position;
   let mentionPos = q3.mention_position || 99;
-  console.log(`    Brand: "${bn}", AI said mentioned=${q3.brand_mentioned}, pos=${q3.mention_position}`);
+  console.log(`    Brand name normalized: "${bn}"`);
+  console.log(`    AI brand_mentioned: ${q3.brand_mentioned}, position: ${q3.mention_position}`);
+  console.log(`    brands_recommended_instead: ${JSON.stringify(q3.brands_recommended_instead)}`);
 
+  // Check recommended list
   const recList = q3.brands_recommended_instead || [];
   if (!mentioned) {
     for (let i = 0; i < recList.length; i++) {
       const item = typeof recList[i] === "string" ? recList[i] : safeStringify(recList[i]);
       const ni = normalize(item);
+      console.log(`    Checking rec[${i}]: "${item}" → normalized: "${ni}" includes "${bn}"? ${ni.includes(bn)}`);
       if (ni.includes(bn) || bn.includes(ni)) {
-        mentioned = true; mentionPos = i + 1;
-        console.log(`    Found in rec list at position ${mentionPos}`);
+        mentioned = true;
+        mentionPos = i + 1;
+        console.log(`    → Found brand at position ${mentionPos}!`);
         break;
       }
     }
   }
+  // Check why text
   if (!mentioned) {
     const whyNorm = normalize(q3.why_recommended_or_not || "");
-    if (whyNorm.includes(bn)) { mentioned = true; mentionPos = 3; console.log("    Found in why_recommended text"); }
-  }
-  if (!mentioned) {
-    const accNorm = normalize(q3.identity_accuracy || "");
-    if (accNorm.includes(bn)) { mentioned = true; mentionPos = 3; console.log("    Found in identity_accuracy text"); }
+    if (whyNorm.includes(bn)) { mentioned = true; mentionPos = 3; console.log(`    → Found in why_recommended text`); }
   }
 
   const demoPts = mentioned ? (mentionPos <= 2 ? 10 : mentionPos <= 4 ? 6 : 3) : 0;
   const recBrandsStr = safeStringify(recList.slice(0, 3));
-  console.log(`    Mentioned: ${mentioned}, Pos: ${mentionPos} → ${demoPts}/10\n`);
-  total += demoPts;
+  console.log(`    Mentioned: ${mentioned}, Position: ${mentionPos}, Points: ${demoPts}`);
+  console.log(`    → ${demoPts}/10 points\n`);
+  totalScore += demoPts;
   dims.push({ dimension: "Consumer Discovery", maxPoints: 10, earnedPoints: demoPts,
     status: demoPts >= 7 ? "aligned" : demoPts > 0 ? "gap" : "missing",
     selfReported: "Should appear when consumers search its identity",
     aiPerceived: mentioned ? `Mentioned at position ${mentionPos}` : `Not mentioned — AI recommended: ${recBrandsStr}`,
     detail: mentioned ? (demoPts >= 7 ? "Top recommendation." : "Appears but not top.") : "AI doesn't recommend this brand — critical gap." });
 
-  // 9. Competitive Differentiation (10)
-  console.log("  [9] COMPETITIVE DIFF (max 10):");
+  // 9. COMPETITIVE DIFFERENTIATION (10)
+  console.log("  [9] COMPETITIVE DIFFERENTIATION (max 10):");
   const recLike = normalize(q2.recommendation_likelihood || "");
   const diffPts = recLike === "high" ? 10 : recLike === "medium" ? 5 : 0;
-  console.log(`    Likelihood: "${q2.recommendation_likelihood}" → ${diffPts}/10\n`);
-  total += diffPts;
+  console.log(`    Recommendation likelihood: "${q2.recommendation_likelihood}" → normalized: "${recLike}"`);
+  console.log(`    → ${diffPts}/10 points\n`);
+  totalScore += diffPts;
   dims.push({ dimension: "Competitive Differentiation", maxPoints: 10, earnedPoints: diffPts,
     status: diffPts >= 7 ? "aligned" : diffPts > 0 ? "gap" : "missing",
     selfReported: brand.differentiation_claim || "Not set",
@@ -408,23 +443,25 @@ function calculateGap(brand, q1, q2, q3) {
     detail: diffPts >= 7 ? "Unique positioning clearly recognized." : diffPts > 0 ? "Some recognition." : "Not strongly differentiated." });
 
   console.log("═══════════════════════════════════════════════");
-  console.log(`  GLOSSIER ALIGNMENT SCORE: ${total}/100`);
+  console.log(`  TOTAL ALIGNMENT SCORE: ${totalScore}/100`);
   console.log("═══════════════════════════════════════════════\n");
 
   const aligned = dims.filter(d => d.status === "aligned").map(d => d.dimension);
   const gaps = dims.filter(d => d.status === "gap").map(d => d.dimension);
   const missing = dims.filter(d => d.status === "missing").map(d => d.dimension);
+
   const recs = [];
   for (const d of dims) {
     if (d.status === "missing") recs.push(`Critical: "${d.dimension}" invisible to AI.`);
     else if (d.status === "gap") recs.push(`Improve: "${d.dimension}".`);
   }
-  if (!mentioned) recs.push("Critical: AI doesn't recommend you when consumers describe your identity.");
 
-  return { score: total, dims, aligned, gaps, missing, recs, oneSentence: q1.one_sentence_description || "" };
+  return { score: totalScore, dims, aligned, gaps, missing, recs, oneSentence: q1.one_sentence_description || "" };
 }
 
-// ── STEP 5: Store ────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════
+// STEP 5: STORE AND REPORT
+// ══════════════════════════════════════════════════════════════════════
 
 async function storeAudit(brandId, q1, q2, q3, gap) {
   console.log("━━━ STEP 5: Storing audit result ━━━");
@@ -470,18 +507,20 @@ async function storeAudit(brandId, q1, q2, q3, gap) {
   return true;
 }
 
-// ── Main ─────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════
+// MAIN
+// ══════════════════════════════════════════════════════════════════════
 
 async function main() {
   try {
-    await deleteGlossierAudits();
-    const brand = await fetchGlossier();
+    await deleteAllAudits();
+    const brand = await fetchLiquidDeath();
     const { q1, q2, q3 } = await runAIQueries(brand);
-    const gap = calculateGap(brand, q1, q2, q3);
+    const gap = calculateGapDebug(brand, q1, q2, q3);
     await storeAudit(brand.id, q1, q2, q3, gap);
 
     console.log("━━━ DONE ━━━");
-    console.log(`Glossier Alignment Score: ${gap.score}/100`);
+    console.log(`Liquid Death Alignment Score: ${gap.score}/100`);
     console.log(`View report at: http://localhost:3000/audit/${brand.id}`);
   } catch (err) {
     console.error("Fatal:", err);

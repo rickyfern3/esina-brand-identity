@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import NavBar from "../components/NavBar";
 import { InstallGuide } from "./InstallGuide";
+import CardFlow from "./CardFlow";
 import type { ChatMessage } from "@/app/api/onboard/chat/route";
 
 // ── Constants ──────────────────────────────────────────────────────────────────
@@ -12,6 +13,8 @@ const WELCOME_MESSAGE: ChatMessage = {
   content:
     "Let's build your brand.md. First — what's your brand name and when did you start it?",
 };
+
+type Path = null | "cards" | "chat";
 
 // ── Chat bubble ────────────────────────────────────────────────────────────────
 
@@ -116,9 +119,148 @@ function XIcon({ size = 10 }: { size?: number }) {
   );
 }
 
+// ── Landing screen ─────────────────────────────────────────────────────────────
+
+function LandingScreen({ onSelect }: { onSelect: (path: "cards" | "chat") => void }) {
+  const [hovered, setHovered] = useState<"cards" | "chat" | null>(null);
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <NavBar />
+      <main className="flex-1 flex flex-col items-center justify-center px-6" style={{ paddingTop: "88px" }}>
+        <div className="w-full max-w-2xl fade-up-1">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <p className="section-tag mb-3">esina · brand identity</p>
+            <h1 className="font-goldman text-3xl text-white mb-3">build your brand.md</h1>
+            <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
+              two ways to map your identity. same output.
+            </p>
+          </div>
+
+          {/* Path cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+            {/* Cards path — default/highlighted */}
+            <button
+              onClick={() => onSelect("cards")}
+              onMouseEnter={() => setHovered("cards")}
+              onMouseLeave={() => setHovered(null)}
+              className="relative text-left p-6 flex flex-col gap-3 transition-all duration-200"
+              style={{
+                background: hovered === "cards"
+                  ? "rgba(255,255,255,0.14)"
+                  : "rgba(255,255,255,0.10)",
+                border: "1px solid rgba(255,255,255,0.22)",
+                borderRadius: "3px",
+                cursor: "pointer",
+              }}
+            >
+              {/* Default badge */}
+              <div
+                className="absolute top-3 right-3 px-1.5 py-0.5 text-[9px] font-goldman tracking-wider uppercase"
+                style={{
+                  background: "rgba(255,255,255,0.15)",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  borderRadius: "2px",
+                  color: "rgba(255,255,255,0.6)",
+                }}
+              >
+                recommended
+              </div>
+
+              {/* Icon */}
+              <div className="flex gap-1 mb-1">
+                {[1, 2, 3].map(i => (
+                  <div
+                    key={i}
+                    className="h-1.5 rounded-full"
+                    style={{ width: `${[40, 28, 20][i - 1]}px`, background: "rgba(255,255,255,0.5)" }}
+                  />
+                ))}
+              </div>
+
+              <div>
+                <p className="font-goldman text-white text-base mb-1">quick version</p>
+                <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>5 minutes</p>
+              </div>
+
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
+                Visual cards. Tap your way through nine oblique prompts — songs, scents, places, enemies.
+              </p>
+
+              <div
+                className="mt-auto pt-3 flex items-center justify-between"
+                style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
+              >
+                <span className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>9 cards · live preview</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeLinecap="round">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </div>
+            </button>
+
+            {/* Chat path */}
+            <button
+              onClick={() => onSelect("chat")}
+              onMouseEnter={() => setHovered("chat")}
+              onMouseLeave={() => setHovered(null)}
+              className="text-left p-6 flex flex-col gap-3 transition-all duration-200"
+              style={{
+                background: hovered === "chat"
+                  ? "rgba(255,255,255,0.07)"
+                  : "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                borderRadius: "3px",
+                cursor: "pointer",
+              }}
+            >
+              {/* Icon */}
+              <div className="flex flex-col gap-1 mb-1">
+                {[60, 45].map((w, i) => (
+                  <div
+                    key={i}
+                    className="h-1.5 rounded-full"
+                    style={{ width: `${w}%`, background: "rgba(255,255,255,0.25)" }}
+                  />
+                ))}
+              </div>
+
+              <div>
+                <p className="font-goldman text-white text-base mb-1">tell us everything</p>
+                <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>10–15 minutes</p>
+              </div>
+
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.4)" }}>
+                Have a real conversation about your brand. Richer narrative, deeper identity extraction.
+              </p>
+
+              <div
+                className="mt-auto pt-3 flex items-center justify-between"
+                style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+              >
+                <span className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>conversational · voice + images</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2" strokeLinecap="round">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </div>
+            </button>
+          </div>
+
+          <p className="text-center text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
+            both paths generate the same brand.md · ai audit · identity embedding
+          </p>
+        </div>
+      </main>
+    </div>
+  );
+}
+
 // ── Main page ──────────────────────────────────────────────────────────────────
 
 export default function OnboardPage() {
+  const [path, setPath] = useState<Path>(null);
+
+  // Chat state
   const [messages, setMessages] = useState<ChatMessage[]>([WELCOME_MESSAGE]);
   // Parallel array: imageUrl per message (null if no image)
   const [messageImages, setMessageImages] = useState<(string | null)[]>([null]);
@@ -341,6 +483,26 @@ export default function OnboardPage() {
     );
   }
 
+  // ── Render: landing ───────────────────────────────────────────────────
+
+  if (path === null) {
+    return <LandingScreen onSelect={setPath} />;
+  }
+
+  // ── Render: cards path ────────────────────────────────────────────────
+
+  if (path === "cards") {
+    return (
+      <CardFlow
+        onSwitchToChat={() => setPath("chat")}
+        onComplete={(brandId, brandName) => {
+          setCompletedBrandId(brandId);
+          setCompletedBrandName(brandName);
+        }}
+      />
+    );
+  }
+
   // ── Render: chat interface ────────────────────────────────────────────
 
   return (
@@ -350,7 +512,16 @@ export default function OnboardPage() {
       {/* Chat area */}
       <main className="flex-1 overflow-y-auto" style={{ paddingTop: "88px" }}>
         <div className="max-w-2xl mx-auto px-6 py-10">
-          <p className="section-tag text-center mb-10">esina · brand identity interview</p>
+          <div className="flex items-center justify-between mb-10">
+            <p className="section-tag">esina · brand identity interview</p>
+            <button
+              onClick={() => setPath(null)}
+              className="text-xs"
+              style={{ color: "rgba(255,255,255,0.25)" }}
+            >
+              ← back
+            </button>
+          </div>
 
           <div className="space-y-0">
             {messages.map((msg, i) => (
@@ -378,7 +549,7 @@ export default function OnboardPage() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <p className="text-sm text-white">almost there. what's your email?</p>
+                  <p className="text-sm text-white">almost there. what&apos;s your email?</p>
                   <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>so we can send you your brand audit report.</p>
                   <input
                     type="email"
