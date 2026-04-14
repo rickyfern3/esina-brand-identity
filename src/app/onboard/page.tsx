@@ -181,10 +181,10 @@ function LandingScreen({ onSelect }: { onSelect: (path: "cards" | "chat") => voi
 
               <div>
                 <p className="font-goldman text-white text-base mb-1">quick version</p>
-                <p className="text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>5 minutes</p>
+                <p className="text-xs" style={{ color: "rgba(255,255,255,0.8)" }}>5 minutes</p>
               </div>
 
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.7)" }}>
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.9)" }}>
                 Visual cards. Tap your way through nine oblique prompts — songs, scents, places, enemies.
               </p>
 
@@ -192,7 +192,7 @@ function LandingScreen({ onSelect }: { onSelect: (path: "cards" | "chat") => voi
                 className="mt-auto pt-3 flex items-center justify-between"
                 style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
               >
-                <span className="text-xs" style={{ color: "rgba(255,255,255,0.55)" }}>9 cards · live preview</span>
+                <span className="text-xs" style={{ color: "rgba(255,255,255,0.7)" }}>9 cards · live preview</span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeLinecap="round">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
@@ -227,10 +227,10 @@ function LandingScreen({ onSelect }: { onSelect: (path: "cards" | "chat") => voi
 
               <div>
                 <p className="font-goldman text-white text-base mb-1">tell us everything</p>
-                <p className="text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>10–15 minutes</p>
+                <p className="text-xs" style={{ color: "rgba(255,255,255,0.8)" }}>10–15 minutes</p>
               </div>
 
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.7)" }}>
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.9)" }}>
                 Have a real conversation about your brand. Richer narrative, deeper identity extraction.
               </p>
 
@@ -238,7 +238,7 @@ function LandingScreen({ onSelect }: { onSelect: (path: "cards" | "chat") => voi
                 className="mt-auto pt-3 flex items-center justify-between"
                 style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
               >
-                <span className="text-xs" style={{ color: "rgba(255,255,255,0.55)" }}>conversational · voice + images</span>
+                <span className="text-xs" style={{ color: "rgba(255,255,255,0.7)" }}>conversational · voice + images</span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2" strokeLinecap="round">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
@@ -246,7 +246,7 @@ function LandingScreen({ onSelect }: { onSelect: (path: "cards" | "chat") => voi
             </button>
           </div>
 
-          <p className="text-center text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
+          <p className="text-center text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>
             both paths generate the same brand.md · ai audit · identity embedding
           </p>
         </div>
