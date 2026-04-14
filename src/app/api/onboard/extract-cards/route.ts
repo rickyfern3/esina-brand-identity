@@ -174,6 +174,45 @@ const sanitizeEnum = (val: unknown, validSet: Set<string>, fallback: string | nu
   return fallback;
 };
 
+type NormalizedArchetype = { archetype: string; weight: number; primary: boolean };
+
+/**
+ * Normalize GPT archetypes output to a consistent array.
+ * GPT-4o-mini sometimes returns an array of objects, sometimes a keyed object:
+ *   Array: [{archetype:"creator", weight:0.22, primary:true}, ...]
+ *   Object: {creator: 0.22, ...}  OR  {creator: {weight:0.22, primary:true}, ...}
+ */
+function normalizeArchetypes(raw: unknown): NormalizedArchetype[] {
+  if (Array.isArray(raw)) {
+    return (raw as Array<Record<string, unknown>>)
+      .filter(a => typeof a.archetype === "string" && VALID_ARCHETYPES.has(a.archetype as string))
+      .map(a => ({
+        archetype: a.archetype as string,
+        weight: typeof a.weight === "number" ? a.weight : 0,
+        primary: a.primary === true,
+      }));
+  }
+  if (raw && typeof raw === "object") {
+    // Keyed object: {creator: 0.22} or {creator: {weight: 0.22, primary: true}}
+    const entries = Object.entries(raw as Record<string, unknown>).filter(([key]) => VALID_ARCHETYPES.has(key));
+    const sorted = entries
+      .map(([key, val]): NormalizedArchetype | null => {
+        if (typeof val === "number") return { archetype: key, weight: val, primary: false };
+        if (val && typeof val === "object") {
+          const v = val as { weight?: number; primary?: boolean };
+          return { archetype: key, weight: typeof v.weight === "number" ? v.weight : 0, primary: v.primary === true };
+        }
+        return null;
+      })
+      .filter((a): a is NormalizedArchetype => a !== null)
+      .sort((a, b) => b.weight - a.weight);
+    // Mark the highest-weight entry as primary if none flagged
+    if (sorted.length > 0 && !sorted.some(a => a.primary)) sorted[0].primary = true;
+    return sorted;
+  }
+  return [];
+}
+
 // ── Build user prompt from card payload ───────────────────────────────
 
 function buildUserPrompt(payload: CardPayload): string {
@@ -294,8 +333,7 @@ export async function POST(req: NextRequest) {
     const completeness = calculateCompleteness(extracted);
 
     // Sanitize
-    const rawArchetypes = Array.isArray(extracted.archetypes) ? extracted.archetypes as Array<{ archetype?: string; weight?: number; primary?: boolean }> : [];
-    const sanitizedArchetypes = rawArchetypes.filter(a => a.archetype && VALID_ARCHETYPES.has(a.archetype));
+    const sanitizedArchetypes = normalizeArchetypes(extracted.archetypes);
 
     // Insert brand profile
     const insertData = {
@@ -362,9 +400,7 @@ async function runAuditAndReturn(
   identitySignature: string | null
 ): Promise<NextResponse> {
   // Normalize archetypes — GPT sometimes returns an object instead of an array
-  const safeArchetypes = Array.isArray(extracted.archetypes)
-    ? (extracted.archetypes as Array<{ archetype: string; weight: number; primary: boolean }>)
-    : [];
+  const safeArchetypes = normalizeArchetypes(extracted.archetypes);
 
   const identityDesc = identitySignature
     ? identitySignature.split(".").slice(0, 3).join(".").trim()

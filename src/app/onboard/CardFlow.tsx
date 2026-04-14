@@ -52,7 +52,8 @@ interface RevealData {
   brandName: string;
   auditScore: number | null;
   profile: {
-    archetypes: Array<{ archetype: string; weight: number; primary: boolean }>;
+    // unknown: GPT sometimes returns an array [{archetype,weight,primary}] or a keyed object {creator:0.22}
+    archetypes: unknown;
     values: string[];
     anti_values: string[];
     style_tags: string[];
@@ -603,8 +604,27 @@ function Card9({ state, onChange }: { state: CardState; onChange: (u: Partial<Ca
 
 // ── Reveal page ────────────────────────────────────────────────────────
 
+type RevealArchetype = { archetype: string; weight: number; primary?: boolean };
+
+/** Defensive normalization: GPT-4o-mini sometimes returns archetypes as a keyed
+ *  object {creator:0.22, rebel:0.18} or {creator:{weight:0.22,primary:true}}
+ *  instead of the expected array. Convert either format to a consistent array. */
+function normalizeRevealArchetypes(raw: unknown): RevealArchetype[] {
+  if (Array.isArray(raw)) return raw as RevealArchetype[];
+  if (raw && typeof raw === "object") {
+    return Object.entries(raw as Record<string, unknown>).map(([key, val]) => ({
+      archetype: key,
+      weight: typeof val === "number" ? val
+        : val && typeof val === "object" ? ((val as { weight?: number }).weight ?? 0)
+        : 0,
+      primary: val && typeof val === "object" ? (val as { primary?: boolean }).primary ?? false : false,
+    }));
+  }
+  return [];
+}
+
 function RevealPage({ data, onInstall, onBack }: { data: RevealData; onInstall: () => void; onBack: () => void }) {
-  const archetypes = (data.profile.archetypes || []).sort((a, b) => b.weight - a.weight);
+  const archetypes = normalizeRevealArchetypes(data.profile.archetypes).sort((a, b) => b.weight - a.weight);
   const scoreColor = data.auditScore !== null
     ? data.auditScore >= 65 ? "#4ade80" : data.auditScore >= 40 ? "#fbbf24" : "#f87171"
     : "rgba(255,255,255,0.4)";
