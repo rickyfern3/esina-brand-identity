@@ -246,7 +246,7 @@ function LandingScreen({ onSelect }: { onSelect: (path: "cards" | "chat") => voi
             </button>
           </div>
 
-          <p className="text-center text-xs" style={{ color: "rgba(255,255,255,0.6)" }}>
+          <p className="text-center text-xs" style={{ color: "rgba(0,0,0,0.45)" }}>
             both paths generate the same brand.md · ai audit · identity embedding
           </p>
         </div>
