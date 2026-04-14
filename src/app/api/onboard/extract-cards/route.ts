@@ -15,17 +15,17 @@ export interface CardPayload {
   foundingYear: string;
   productDescription: string;
   // Card 2
-  song: { selected: { title: string; artist: string } | null; custom: string; slider: number };
+  song: { selected: { title: string; artist: string } | null; custom: string };
   // Card 3
-  scent: { selected: string[]; custom: string; slider: number };
+  scent: { selected: string[]; custom: string };
   // Card 4
-  neighborhood: { selected: { name: string; city: string } | null; custom: string; slider: number };
+  neighborhood: { selected: { name: string; city: string } | null; custom: string };
   // Card 5
   dinnerParty: { guest1: string; guest2: string; guest3: string; respectedOrLoved: "respected" | "loved" | null };
   // Card 6
-  enemies: { selected: string[]; custom: string; slider: number };
+  enemies: { selected: string[]; custom: string };
   // Card 7
-  textures: { selected: string[]; slider: number };
+  textures: { selected: string[] };
   // Card 8
   moodboard: { images: string[]; description: string; famousOrMysterious: "famous" | "mysterious" | null };
   // Card 9
@@ -38,13 +38,13 @@ export interface CardPayload {
 
 const EXTRACT_SYSTEM_PROMPT = `You are extracting a structured brand identity profile from a multi-modal oblique identity extraction session. The founder provided sensory, cultural, and scenario-based responses. Map these signals to identity dimensions:
 
-- Song + raw/polished slider → primary archetype, emotional resonance, aesthetic era, energy level
-- Scent descriptors + nostalgic/fresh slider → aesthetic identity, design language, emotional tone
-- Neighborhood + underground/refined slider → cultural positioning, community, status signal
+- Song → primary archetype, emotional resonance, aesthetic era, energy level
+- Scent descriptors → aesthetic identity, design language, emotional tone
+- Neighborhood → cultural positioning, community, status signal
 - Dinner party guests → values, aspirations. Look for the PATTERN across all three guests.
 - Respected/loved → Respected = Sage/Ruler. Loved = Caregiver/Everyman.
-- Cultural enemies + quiet/loud slider → anti-values, differentiation, brand mission
-- Texture descriptors + handmade/engineered slider → design language, visual tone
+- Cultural enemies → anti-values, differentiation, brand mission
+- Texture descriptors → design language, visual tone
 - Moodboard images or description → visual tone, aesthetic, color palette, emotional register
 - Famous/mysterious → Famous = Hero/Ruler. Mysterious = Magician/Explorer.
 - Random moment → holistic identity synthesis
@@ -153,6 +153,7 @@ function calculateCompleteness(profile: Record<string, unknown>): number {
   return Math.round((filled.length / fields.length) * 100) / 100;
 }
 
+const VALID_CATEGORIES = new Set(["Fashion & Apparel","Food & Beverage","Beauty & Personal Care","Health & Wellness","Home & Lifestyle","Tech & Accessories","Sports & Outdoor","Entertainment & Media","Other"]);
 const VALID_VALUES = new Set(["sustainability","transparency","craftsmanship","community","innovation","inclusivity","heritage","irreverence","minimalism","wellness","independence","authenticity","luxury","affordability","boldness","rebellion","simplicity","creativity","performance","tradition"]);
 const VALID_ANTI_VALUES = new Set(["corporate","mass_market","disposable","pretentious","basic","generic","exclusive","cheap","boring","conformist","wasteful","elitist"]);
 const VALID_STYLE_TAGS = new Set(["minimalist","maximalist","brutalist","cottagecore","gorpcore","streetwear","vintage","futuristic","bohemian","preppy","industrial","organic","techwear","avant_garde","classic","heritage","artisanal","raw","elevated_basics","athleisure"]);
@@ -181,21 +182,18 @@ function buildUserPrompt(payload: CardPayload): string {
   const songDesc = song.selected
     ? `"${song.selected.title}" by ${song.selected.artist}`
     : song.custom || "not specified";
-  const songSliderDesc = song.slider <= 2 ? "very raw and rebellious" : song.slider >= 6 ? "very polished and serene" : "somewhat balanced";
 
-  const scentList = [...song.selected ? [] : [], ...scent.selected, ...(scent.custom ? [scent.custom] : [])].join(", ") || "not specified";
-  const scentSliderDesc = scent.slider <= 2 ? "very nostalgic and warm" : scent.slider >= 6 ? "very fresh and modern" : "balanced";
+  const scentList = [...scent.selected, ...(scent.custom ? [scent.custom] : [])].join(", ") || "not specified";
 
-  const neighborhoodName = neighborhood.selected ? `${neighborhood.selected.name}` : neighborhood.custom || "not specified";
-  const neighborhoodSliderDesc = neighborhood.slider <= 2 ? "underground and raw" : neighborhood.slider >= 6 ? "established and refined" : "mid-spectrum";
+  const neighborhoodName = neighborhood.selected
+    ? `${neighborhood.selected.name}${neighborhood.selected.city ? `, ${neighborhood.selected.city}` : ""}`
+    : neighborhood.custom || "not specified";
 
   const guests = [dinnerParty.guest1, dinnerParty.guest2, dinnerParty.guest3].filter(Boolean).join(", ");
 
   const enemyList = [...enemies.selected, ...(enemies.custom ? [enemies.custom] : [])].join(", ") || "not specified";
-  const enemySliderDesc = enemies.slider <= 2 ? "quiet resistance" : enemies.slider >= 6 ? "loud rebellion" : "moderate";
 
   const textureList = textures.selected.join(", ") || "not specified";
-  const textureSliderDesc = textures.slider <= 2 ? "very handmade and imperfect" : textures.slider >= 6 ? "very precise and engineered" : "balanced";
 
   const moodboardDesc = moodboard.description || (moodboard.images.length > 0 ? `[${moodboard.images.length} image(s) uploaded]` : "none");
 
@@ -207,15 +205,12 @@ WHAT THEY SELL: ${productDescription}
 
 CARD 2 — SONG:
 Selected song: ${songDesc}
-Raw/polished slider (1=raw, 7=polished): ${song.slider}/7 — feels ${songSliderDesc}
 
 CARD 3 — SCENT:
 Scent descriptors: ${scentList}
-Nostalgic/fresh slider (1=nostalgic, 7=fresh): ${scent.slider}/7 — feels ${scentSliderDesc}
 
 CARD 4 — NEIGHBORHOOD:
 Selected neighborhood: ${neighborhoodName}
-Underground/refined slider (1=underground, 7=refined): ${neighborhood.slider}/7 — feels ${neighborhoodSliderDesc}
 
 CARD 5 — DINNER PARTY:
 Guests: ${guests || "not specified"}
@@ -223,11 +218,9 @@ Trade-off: deeply ${dinnerParty.respectedOrLoved || "not chosen"}
 
 CARD 6 — CULTURAL ENEMY:
 Enemies: ${enemyList}
-Quiet/loud slider (1=quiet resistance, 7=loud rebellion): ${enemies.slider}/7 — feels ${enemySliderDesc}
 
 CARD 7 — TEXTURE:
 Textures: ${textureList}
-Handmade/engineered slider (1=handmade, 7=engineered): ${textures.slider}/7 — feels ${textureSliderDesc}
 
 CARD 8 — MOODBOARD:
 ${moodboardDesc}
@@ -308,7 +301,7 @@ export async function POST(req: NextRequest) {
     const insertData = {
       brand_name: payload.brandName,
       contact_email: payload.contactEmail || null,
-      category: (extracted.category as string) || "Other",
+      category: VALID_CATEGORIES.has(extracted.category as string) ? (extracted.category as string) : "Other",
       price_tier: sanitizeEnum(extracted.price_tier, VALID_PRICE_TIERS),
       archetypes: sanitizedArchetypes,
       values: sanitizeArr(extracted.values, VALID_VALUES).slice(0, 5),
