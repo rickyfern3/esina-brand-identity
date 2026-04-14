@@ -300,7 +300,7 @@ export async function POST(req: NextRequest) {
     // Insert brand profile
     const insertData = {
       brand_name: payload.brandName,
-      contact_email: payload.contactEmail || null,
+      ...(payload.contactEmail ? { contact_email: payload.contactEmail } : {}),
       category: VALID_CATEGORIES.has(extracted.category as string) ? (extracted.category as string) : "Other",
       price_tier: sanitizeEnum(extracted.price_tier, VALID_PRICE_TIERS),
       archetypes: sanitizedArchetypes,
@@ -361,6 +361,11 @@ async function runAuditAndReturn(
   identityText: string,
   identitySignature: string | null
 ): Promise<NextResponse> {
+  // Normalize archetypes — GPT sometimes returns an object instead of an array
+  const safeArchetypes = Array.isArray(extracted.archetypes)
+    ? (extracted.archetypes as Array<{ archetype: string; weight: number; primary: boolean }>)
+    : [];
+
   const identityDesc = identitySignature
     ? identitySignature.split(".").slice(0, 3).join(".").trim()
     : identityText.split(".").slice(0, 2).join(".").trim();
@@ -400,7 +405,7 @@ async function runAuditAndReturn(
   const selfReport: BrandSelfReport = {
     brand_name: brand.brand_name,
     category: brand.category,
-    archetypes: (extracted.archetypes as BrandSelfReport["archetypes"]) || [],
+    archetypes: safeArchetypes,
     values: (extracted.values as string[]) || [],
     style_tags: (extracted.style_tags as string[]) || [],
     price_tier: (extracted.price_tier as string) || null,
@@ -443,7 +448,7 @@ async function runAuditAndReturn(
     brandName: brand.brand_name,
     auditScore: gap.alignmentScore,
     profile: {
-      archetypes: extracted.archetypes,
+      archetypes: safeArchetypes,
       values: extracted.values,
       anti_values: extracted.anti_values,
       style_tags: extracted.style_tags,
