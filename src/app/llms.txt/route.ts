@@ -12,10 +12,7 @@ const supabase = createClient(
 export async function GET() {
   const { data: brands } = await supabase
     .from("brand_profiles")
-    .select(
-      "id, brand_name, category, price_tier, archetypes, style_tags, values, communities, " +
-      "status_signal_type, emotional_resonance, differentiation_claim, identity_text"
-    )
+    .select("id, brand_name, category, price_tier, archetypes, style_tags, values, communities, status_signal_type, emotional_resonance, differentiation_claim, identity_text")
     .order("brand_name");
 
   const all = brands || [];

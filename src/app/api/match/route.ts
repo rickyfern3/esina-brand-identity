@@ -150,10 +150,7 @@ export async function GET(req: NextRequest) {
 
   const { data: details } = await supabase
     .from("brand_profiles")
-    .select(
-      "id, brand_name, category, price_tier, archetypes, values, " +
-      "emotional_resonance, status_signal_type, differentiation_claim"
-    )
+    .select("id, brand_name, category, price_tier, archetypes, values, emotional_resonance, status_signal_type, differentiation_claim")
     .in("id", ids);
 
   const detailMap = new Map(
