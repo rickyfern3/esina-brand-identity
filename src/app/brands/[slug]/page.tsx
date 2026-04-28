@@ -6,6 +6,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import OpenAI from "openai";
 import NavBar from "../../components/NavBar";
+import { CopyButton } from "../../components/CopyButton";
 import { brandSlug, dimensionSlug } from "@/lib/brand-utils";
 
 const supabase = createClient(
@@ -152,6 +153,21 @@ export default async function BrandProfilePage({
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
+
+  // Load agent activity
+  const { data: agentVisitsRaw } = await supabase
+    .from("agent_visits")
+    .select("id, visit_type, is_ai_agent, created_at")
+    .eq("brand_id", brand.id)
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  const agentVisits = agentVisitsRaw || [];
+  const totalAiVisits = agentVisits.filter((v) => v.is_ai_agent).length;
+  const totalConversions = agentVisits.filter(
+    (v) => v.visit_type === "conversion"
+  ).length;
+  const hasActivity = agentVisits.length > 0;
 
   // Get or generate narrative
   let narrative: string | null = (brand.identity_narrative as string) || null;
@@ -584,13 +600,93 @@ export default async function BrandProfilePage({
           </div>
         )}
 
+        {/* ── Installation ──────────────────────────────────────────────── */}
+        <div
+          className="p-6 mb-4 card-dark"
+          style={{ border: "1px solid rgba(255,255,255,0.06)", borderRadius: "2px" }}
+        >
+          <p className="section-tag mb-4">installation</p>
+          <p className="text-sm mb-4 leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
+            Paste this one line into your website settings to make your brand
+            visible to AI agents.
+          </p>
+          <div
+            style={{
+              background: "rgba(0,0,0,0.35)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: "4px",
+              padding: "12px 14px",
+              fontFamily: "'SF Mono','Fira Code',monospace",
+              fontSize: 11,
+              color: "rgba(255,255,255,0.7)",
+              wordBreak: "break-all",
+              lineHeight: 1.6,
+              marginBottom: 10,
+            }}
+          >
+            {`<script async src="https://esina.app/api/esina.js?brand=${brand.id}"></script>`}
+          </div>
+          <CopyButton
+            text={`<script async src="https://esina.app/api/esina.js?brand=${brand.id}"></script>`}
+            size="sm"
+          />
+        </div>
+
+        {/* ── Agent Activity ─────────────────────────────────────────────── */}
+        <div
+          className="p-6 mb-4 card-dark"
+          style={{ border: "1px solid rgba(255,255,255,0.06)", borderRadius: "2px" }}
+        >
+          <p className="section-tag mb-5">agent activity</p>
+          {!hasActivity ? (
+            <div className="flex items-center gap-3">
+              <div
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: "50%",
+                  background: "rgba(255,255,255,0.15)",
+                  flexShrink: 0,
+                }}
+              />
+              <p className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>
+                Waiting for data — install the pixel to start tracking AI visits.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { label: "AI visits",    value: totalAiVisits   },
+                { label: "conversions",  value: totalConversions },
+              ].map(({ label, value }) => (
+                <div
+                  key={label}
+                  className="p-4"
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    borderRadius: "2px",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                  }}
+                >
+                  <p className="text-[10px] mb-2" style={{ color: "rgba(255,255,255,0.3)", letterSpacing: "0.08em" }}>
+                    {label}
+                  </p>
+                  <p className="font-goldman text-2xl text-white" style={{ fontWeight: 700 }}>
+                    {value}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* ── Actions ───────────────────────────────────────────────────── */}
         <div
           className="flex items-center gap-6 py-6 mb-12"
           style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
         >
           <a
-            href={`/api/brand/${brand.id}`}
+            href={`/brands/${brandSlug(brand.brand_name)}/brand.md`}
             target="_blank"
             rel="noopener noreferrer"
             className="nav-link text-sm"
@@ -603,10 +699,7 @@ export default async function BrandProfilePage({
           <Link href="/brands" className="nav-link text-sm">
             ← all brands
           </Link>
-          <Link
-            href="/questionnaire"
-            className="nav-link text-sm ml-auto"
-          >
+          <Link href="/questionnaire" className="nav-link text-sm ml-auto">
             add your brand →
           </Link>
         </div>

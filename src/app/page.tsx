@@ -44,10 +44,10 @@ export default function LandingPage() {
 
             <div className="flex flex-wrap gap-3">
               <Link href="/onboard" className="btn-primary px-7 py-3.5 text-sm font-medium inline-block">
-                build your brand.md
+                add your brand — it&apos;s free
               </Link>
-              <Link href="/questionnaire" className="btn-secondary px-7 py-3.5 text-sm inline-block">
-                tell us about your brand
+              <Link href="/match" className="btn-secondary px-7 py-3.5 text-sm inline-block">
+                see the demo
               </Link>
             </div>
           </div>
@@ -219,13 +219,13 @@ export default function LandingPage() {
               },
               {
                 num: "02",
-                title: "get your brand.md",
-                desc: "AI perception audit runs automatically. We score the gap between your self-reported identity and how AI actually perceives you.",
+                title: "see your AI score",
+                desc: "An AI perception audit runs automatically. We score the gap between your self-reported identity and how AI actually perceives you.",
               },
               {
                 num: "03",
                 title: "add one line",
-                desc: "Drop one script tag in your store header. AI agents now have a machine-readable identity profile to match against.",
+                desc: "Paste one line into your website settings. AI agents can now find your brand and we track every sale they drive.",
               },
             ].map((step, i, arr) => (
               <div
@@ -267,30 +267,83 @@ export default function LandingPage() {
               color: "rgba(255,255,255,0.45)",
             }}
           >
-            the integration
+            the install
           </p>
           <h2
             className="font-goldman mb-3"
             style={{ fontSize: "clamp(24px, 3vw, 30px)", color: "rgba(255,255,255,0.95)" }}
           >
-            this is all you add.
+            one line. every major platform.
           </h2>
-          <p className="text-sm mb-10" style={{ color: "rgba(255,255,255,0.5)" }}>
-            paste it in your store&apos;s &lt;head&gt;. nothing else.
+          <p className="text-sm mb-8 max-w-lg" style={{ color: "rgba(255,255,255,0.5)", lineHeight: 1.7 }}>
+            AI agents can find your brand and we track every sale they drive.
+            Free to join — pay only when it works.
           </p>
+
+          {/* Code block */}
           <div
-            className="esina-code px-6 py-5 text-sm leading-relaxed overflow-x-auto"
+            className="esina-code px-6 py-5 text-sm leading-relaxed overflow-x-auto mb-10"
             style={{
-              maxWidth: "640px",
+              maxWidth: "680px",
               color: "rgba(255,255,255,0.8)",
               fontFamily: "'SF Mono', 'Fira Code', monospace",
+              wordBreak: "break-all",
             }}
           >
-            {'<script src="https://esina.app/esina.js?brand=YOUR_BRAND_ID"></script>'}
+            {'<script async src="https://esina.app/api/esina.js?brand=YOUR_BRAND_ID"></script>'}
           </div>
-          <p className="text-xs mt-4" style={{ color: "rgba(255,255,255,0.55)" }}>
-            your brand id is generated when you complete onboarding. free forever.
-          </p>
+
+          {/* Platform logos / names */}
+          <div>
+            <p className="text-xs mb-5" style={{ color: "rgba(255,255,255,0.3)", letterSpacing: "0.08em" }}>
+              works on every platform
+            </p>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 10,
+              }}
+            >
+              {[
+                { name: "Shopify",      color: "#96bf48" },
+                { name: "Squarespace",  color: "#aaa"    },
+                { name: "Wix",          color: "#5b8dee" },
+                { name: "WordPress",    color: "#21759b" },
+                { name: "Framer",       color: "#0099ff" },
+                { name: "Webflow",      color: "#4353ff" },
+              ].map((p) => (
+                <div
+                  key={p.name}
+                  style={{
+                    padding: "7px 14px",
+                    background: "rgba(255,255,255,0.06)",
+                    border: `1px solid ${p.color}30`,
+                    borderRadius: 6,
+                    fontSize: 13,
+                    color: "rgba(255,255,255,0.6)",
+                    fontFamily: "'General Sans', system-ui, sans-serif",
+                    fontWeight: 500,
+                  }}
+                >
+                  {p.name}
+                </div>
+              ))}
+              <div
+                style={{
+                  padding: "7px 14px",
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px dashed rgba(255,255,255,0.1)",
+                  borderRadius: 6,
+                  fontSize: 13,
+                  color: "rgba(255,255,255,0.3)",
+                  fontFamily: "'General Sans', system-ui, sans-serif",
+                }}
+              >
+                + any other
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -379,14 +432,14 @@ export default function LandingPage() {
             className="font-goldman mb-2"
             style={{ fontSize: "clamp(24px, 3vw, 30px)", color: "rgba(0,0,0,0.75)" }}
           >
-            free forever. pay when ai sends you customers.
+            free to join. pay only when it works.
           </h2>
-          <p className="text-sm mb-12" style={{ color: "rgba(0,0,0,0.35)" }}>
-            No subscriptions. No setup. One line of code.
+          <p className="text-sm mb-12 max-w-sm mx-auto" style={{ color: "rgba(0,0,0,0.35)", lineHeight: 1.7 }}>
+            One line of code. AI agents can find your brand and we track every sale they drive.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link href="/onboard" className="btn-cta-dark px-8 py-4 text-sm font-medium inline-block">
-              get your brand.md
+              add your brand — it&apos;s free
             </Link>
             <Link
               href="/match"

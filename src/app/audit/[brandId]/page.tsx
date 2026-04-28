@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import NavBar from "../../components/NavBar";
+import { CopyButton } from "../../components/CopyButton";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -293,22 +294,38 @@ export default async function AuditReportPage({
         )}
 
         {/* Install embed */}
-        <div className="p-8 mb-8 card-mid" style={{ borderRadius: "2px", border: "1px solid rgba(0,0,0,0.1)" }}>
-          <p className="section-tag-mid mb-4">close the loop</p>
-          <h2 className="font-goldman text-lg mb-2" style={{ color: "rgba(0,0,0,0.75)" }}>add your attribution pixel</h2>
-          <p className="text-sm mb-5" style={{ color: "rgba(0,0,0,0.35)" }}>
-            one line of code makes your brand discoverable to ai agents.
+        <div className="p-8 mb-8 card-mid" style={{ borderRadius: "2px", border: "1px solid rgba(0,0,0,0.08)" }}>
+          <p className="section-tag-mid mb-4">make your brand findable</p>
+          <h2 className="font-goldman text-lg mb-2" style={{ color: "rgba(0,0,0,0.75)" }}>
+            Paste this one line into your website settings.
+          </h2>
+          <p className="text-sm mb-5" style={{ color: "rgba(0,0,0,0.4)" }}>
+            That&apos;s all it takes. AI agents will start finding your brand immediately.
           </p>
           <div
-            className="code-mid px-5 py-4 text-xs leading-relaxed"
+            className="code-mid px-5 py-4 text-xs leading-relaxed mb-4"
             style={{
               borderRadius: "2px",
-              color: "rgba(0,0,0,0.7)",
+              color: "rgba(0,0,0,0.65)",
               fontFamily: "'SF Mono', 'Fira Code', monospace",
               overflowX: "auto",
+              wordBreak: "break-all",
             }}
           >
-            {`<script src="https://esina.app/esina.js?brand=${brandId}"></script>`}
+            {`<script async src="https://esina.app/api/esina.js?brand=${brandId}"></script>`}
+          </div>
+          <div className="flex items-center gap-3 flex-wrap">
+            <CopyButton
+              text={`<script async src="https://esina.app/api/esina.js?brand=${brandId}"></script>`}
+              size="sm"
+            />
+            <Link
+              href={`/onboard`}
+              className="text-xs"
+              style={{ color: "rgba(0,0,0,0.4)", textDecoration: "underline" }}
+            >
+              view step-by-step install guide →
+            </Link>
           </div>
         </div>
 

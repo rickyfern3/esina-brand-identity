@@ -1,10 +1,18 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
+import React from "react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-type Platform = "shopify" | "squarespace" | "wix" | "wordpress" | "other";
+type Platform =
+  | "shopify"
+  | "squarespace"
+  | "wix"
+  | "wordpress"
+  | "framer"
+  | "webflow"
+  | "other";
 
 interface InstallGuideProps {
   brandId: string;
@@ -14,95 +22,72 @@ interface InstallGuideProps {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function embedCode(brandId: string) {
-  return `<script src="https://esina.app/esina.js?brand=${brandId}"></script>`;
+  return `<script async src="https://esina.app/api/esina.js?brand=${brandId}"></script>`;
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+// ── Confetti ─────────────────────────────────────────────────────────────────
 
-/** A fake browser chrome wrapper so screenshots look consistent */
-function BrowserFrame({
-  url,
-  children,
-}: {
-  url: string;
-  children: React.ReactNode;
-}) {
+function Confetti() {
+  const pieces = [
+    { left: "5%",  delay: 0,    color: "#22c55e", shape: "circle"  },
+    { left: "15%", delay: 0.1,  color: "#86efac", shape: "square"  },
+    { left: "25%", delay: 0.05, color: "#4ade80", shape: "circle"  },
+    { left: "35%", delay: 0.2,  color: "#bbf7d0", shape: "square"  },
+    { left: "45%", delay: 0,    color: "#22c55e", shape: "circle"  },
+    { left: "55%", delay: 0.15, color: "#86efac", shape: "circle"  },
+    { left: "65%", delay: 0.08, color: "#4ade80", shape: "square"  },
+    { left: "75%", delay: 0.12, color: "#bbf7d0", shape: "circle"  },
+    { left: "85%", delay: 0.22, color: "#22c55e", shape: "square"  },
+    { left: "92%", delay: 0.07, color: "#86efac", shape: "circle"  },
+    { left: "10%", delay: 0.3,  color: "#4ade80", shape: "square"  },
+    { left: "30%", delay: 0.25, color: "#22c55e", shape: "circle"  },
+    { left: "50%", delay: 0.18, color: "#bbf7d0", shape: "square"  },
+    { left: "70%", delay: 0.33, color: "#4ade80", shape: "circle"  },
+    { left: "88%", delay: 0.14, color: "#86efac", shape: "square"  },
+  ];
   return (
-    <div
-      style={{
-        border: "1px solid rgba(0,0,0,0.1)",
-        borderRadius: "6px",
-        overflow: "hidden",
-        background: "#f0f0f0",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-      }}
-    >
-      {/* chrome bar */}
+    <>
+      <style>{`
+        @keyframes confettiRise {
+          0%   { transform: translateY(0)     rotate(0deg);   opacity: 1; }
+          100% { transform: translateY(-110px) rotate(200deg); opacity: 0; }
+        }
+      `}</style>
       <div
         style={{
-          background: "#e4e4e4",
-          padding: "7px 12px",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          borderBottom: "1px solid rgba(0,0,0,0.08)",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 0,
+          pointerEvents: "none",
+          overflow: "visible",
+          zIndex: 10,
         }}
       >
-        <div style={{ display: "flex", gap: "5px" }}>
-          {["#ff5f57", "#ffbd2e", "#27c93f"].map((c) => (
-            <div
-              key={c}
-              style={{ width: 10, height: 10, borderRadius: "50%", background: c }}
-            />
-          ))}
-        </div>
-        <div
-          style={{
-            flex: 1,
-            background: "white",
-            borderRadius: "4px",
-            padding: "3px 10px",
-            fontSize: 11,
-            color: "#888",
-            fontFamily: "monospace",
-          }}
-        >
-          {url}
-        </div>
+        {pieces.map((p, i) => (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              left: p.left,
+              top: 0,
+              width: i % 3 === 0 ? 9 : 6,
+              height: i % 3 === 0 ? 9 : 6,
+              background: p.color,
+              borderRadius: p.shape === "circle" ? "50%" : "2px",
+              animation: "confettiRise 1.6s ease-out forwards",
+              animationDelay: `${p.delay}s`,
+            }}
+          />
+        ))}
       </div>
-      <div style={{ background: "white" }}>{children}</div>
-    </div>
+    </>
   );
 }
 
-/** Orange highlight box with arrow — the key visual on each screenshot */
-function Highlight({ label, x = "50%", y = "50%", width = "auto" }: { label: string; x?: string; y?: string; width?: string }) {
-  return (
-    <div
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "6px",
-        background: "rgba(249,115,22,0.12)",
-        border: "2.5px solid #f97316",
-        borderRadius: "4px",
-        padding: "6px 12px",
-        fontSize: 12,
-        fontFamily: "'General Sans', system-ui, sans-serif",
-        color: "#9a3d00",
-        fontWeight: 600,
-        width,
-      }}
-    >
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="#f97316">
-        <path d="M7 10l5 5 5-5H7z" />
-      </svg>
-      {label}
-    </div>
-  );
-}
+// ── CopyCodeBlock ─────────────────────────────────────────────────────────────
 
-/** The copy-code block — massive and obvious */
 function CopyCodeBlock({ brandId }: { brandId: string }) {
   const [copied, setCopied] = useState(false);
   const code = embedCode(brandId);
@@ -117,62 +102,77 @@ function CopyCodeBlock({ brandId }: { brandId: string }) {
   return (
     <div
       style={{
-        background: "rgba(0,0,0,0.5)",
-        borderRadius: "6px",
+        border: "1px solid rgba(255,255,255,0.12)",
+        borderRadius: 8,
         overflow: "hidden",
-        border: "1px solid rgba(255,255,255,0.1)",
       }}
     >
-      {/* code */}
+      {/* code display */}
       <div
         style={{
           padding: "16px 18px",
           fontFamily: "'SF Mono','Fira Code',monospace",
-          fontSize: 12,
-          color: "rgba(255,255,255,0.85)",
+          fontSize: 13,
+          color: "rgba(255,255,255,0.8)",
           lineHeight: 1.6,
           wordBreak: "break-all",
-          letterSpacing: "0.01em",
+          background: "rgba(0,0,0,0.45)",
+          userSelect: "all",
         }}
       >
         {code}
       </div>
+
       {/* big copy button */}
       <button
         onClick={copy}
         style={{
           width: "100%",
-          padding: "16px",
-          background: copied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.12)",
+          padding: "18px",
+          background: copied ? "rgba(34,197,94,0.18)" : "rgba(255,255,255,0.1)",
           border: "none",
-          borderTop: "1px solid rgba(255,255,255,0.08)",
+          borderTop: "1px solid rgba(255,255,255,0.1)",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          gap: "10px",
-          fontSize: 15,
-          fontWeight: 600,
-          fontFamily: "'General Sans', system-ui, sans-serif",
-          color: copied ? "rgba(134,239,172,0.9)" : "white",
+          gap: 10,
+          fontSize: 16,
+          fontWeight: 700,
+          color: copied ? "rgba(134,239,172,0.95)" : "white",
           transition: "background 0.2s, color 0.2s",
+          fontFamily: "'General Sans', system-ui, sans-serif",
           letterSpacing: "0.02em",
         }}
       >
         {copied ? (
           <>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
               <polyline points="20 6 9 17 4 12" />
             </svg>
             Copied!
           </>
         ) : (
           <>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <rect x="9" y="9" width="13" height="13" rx="2" />
               <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
             </svg>
-            Copy your code
+            Copy Code
           </>
         )}
       </button>
@@ -180,13 +180,393 @@ function CopyCodeBlock({ brandId }: { brandId: string }) {
   );
 }
 
-/** Verify button + result */
+// ── Step visual helpers ───────────────────────────────────────────────────────
+
+/** Navigation path breadcrumb — shows exactly where to go in the platform */
+function NavPath({
+  path,
+  color = "#f97316",
+}: {
+  path: string[];
+  color?: string;
+}) {
+  return (
+    <div
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 4,
+        padding: "9px 14px",
+        background: "rgba(255,255,255,0.05)",
+        border: "1px solid rgba(255,255,255,0.1)",
+        borderRadius: 8,
+        fontSize: 12,
+        fontFamily: "'General Sans', system-ui, sans-serif",
+        flexWrap: "wrap",
+      }}
+    >
+      {path.map((item, i) => (
+        <React.Fragment key={i}>
+          {i > 0 && (
+            <span style={{ color: "rgba(255,255,255,0.2)", padding: "0 1px" }}>
+              ›
+            </span>
+          )}
+          <span
+            style={{
+              color: i === path.length - 1 ? "white" : "rgba(255,255,255,0.4)",
+              fontWeight: i === path.length - 1 ? 600 : 400,
+              ...(i === path.length - 1
+                ? {
+                    background: `${color}22`,
+                    border: `1px solid ${color}44`,
+                    borderRadius: 4,
+                    padding: "2px 8px",
+                  }
+                : {}),
+            }}
+          >
+            {item}
+          </span>
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+
+/** Header paste field indicator */
+function PasteField({ label }: { label: string }) {
+  return (
+    <div style={{ maxWidth: 360 }}>
+      <div
+        style={{
+          fontSize: 11,
+          color: "rgba(255,255,255,0.3)",
+          marginBottom: 5,
+          fontFamily: "'General Sans', system-ui, sans-serif",
+          letterSpacing: "0.06em",
+          textTransform: "uppercase",
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          padding: "11px 14px",
+          border: "2px dashed rgba(249,115,22,0.55)",
+          borderRadius: 6,
+          background: "rgba(249,115,22,0.06)",
+          fontSize: 12,
+          color: "rgba(249,115,22,0.75)",
+          fontFamily: "'General Sans', system-ui, sans-serif",
+        }}
+      >
+        ← paste your line here
+      </div>
+    </div>
+  );
+}
+
+/** Save / apply button visual */
+function SaveBtn({ label }: { label: string }) {
+  return (
+    <div
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "10px 20px",
+        background: "rgba(249,115,22,0.1)",
+        border: "2px solid rgba(249,115,22,0.45)",
+        borderRadius: 6,
+        fontSize: 13,
+        fontWeight: 700,
+        color: "rgba(249,115,22,0.9)",
+        fontFamily: "'General Sans', system-ui, sans-serif",
+      }}
+    >
+      {label}
+    </div>
+  );
+}
+
+// ── Step row ─────────────────────────────────────────────────────────────────
+
+function Step({
+  num,
+  instruction,
+  visual,
+}: {
+  num: number;
+  instruction: React.ReactNode;
+  visual?: React.ReactNode;
+}) {
+  return (
+    <div style={{ display: "flex", gap: 20, marginBottom: 28 }}>
+      {/* big bold number */}
+      <div
+        style={{
+          flexShrink: 0,
+          width: 48,
+          height: 48,
+          background: "rgba(255,255,255,0.1)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          borderRadius: 8,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <span
+          className="font-goldman"
+          style={{ fontSize: 22, color: "white", fontWeight: 700, lineHeight: 1 }}
+        >
+          {num}
+        </span>
+      </div>
+
+      <div style={{ flex: 1, paddingTop: 3 }}>
+        <p
+          style={{
+            fontSize: 15,
+            color: "rgba(255,255,255,0.9)",
+            lineHeight: 1.55,
+            fontFamily: "'General Sans', system-ui, sans-serif",
+            fontWeight: 500,
+            marginBottom: visual ? 12 : 0,
+          }}
+        >
+          {instruction}
+        </p>
+        {visual}
+      </div>
+    </div>
+  );
+}
+
+// ── Platform instructions (exactly 3 steps each) ──────────────────────────────
+
+function ShopifyInstructions() {
+  return (
+    <>
+      <Step
+        num={1}
+        instruction="Log into your Shopify admin and go to Settings → Custom Code."
+        visual={<NavPath path={["Settings", "Custom Code"]} color="#96bf48" />}
+      />
+      <Step
+        num={2}
+        instruction="Paste the line you copied into the Header field."
+        visual={<PasteField label="Header" />}
+      />
+      <Step
+        num={3}
+        instruction="Click Save."
+        visual={<SaveBtn label="Save" />}
+      />
+    </>
+  );
+}
+
+function SquarespaceInstructions() {
+  return (
+    <>
+      <Step
+        num={1}
+        instruction="Go to Settings → Advanced → Code Injection."
+        visual={
+          <NavPath
+            path={["Settings", "Advanced", "Code Injection"]}
+            color="#888"
+          />
+        }
+      />
+      <Step
+        num={2}
+        instruction="Paste the line you copied into the Header field."
+        visual={<PasteField label="Header" />}
+      />
+      <Step
+        num={3}
+        instruction="Click Save."
+        visual={<SaveBtn label="Save" />}
+      />
+    </>
+  );
+}
+
+function WixInstructions() {
+  return (
+    <>
+      <Step
+        num={1}
+        instruction="Go to Settings → Custom Code → Add Code."
+        visual={
+          <NavPath
+            path={["Settings", "Custom Code", "Add Code"]}
+            color="#0057e7"
+          />
+        }
+      />
+      <Step
+        num={2}
+        instruction={
+          <>
+            Paste the line you copied and select{" "}
+            <strong style={{ color: "white" }}>'Head'</strong> as the placement.
+          </>
+        }
+        visual={
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <PasteField label="Paste code here" />
+            <div
+              style={{
+                padding: "11px 14px",
+                border: "2px solid rgba(0,87,231,0.4)",
+                borderRadius: 6,
+                background: "rgba(0,87,231,0.08)",
+                fontSize: 12,
+                color: "rgba(100,150,255,0.85)",
+                fontFamily: "'General Sans', system-ui, sans-serif",
+                display: "flex",
+                flexDirection: "column",
+                gap: 3,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 10,
+                  color: "rgba(255,255,255,0.3)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.06em",
+                }}
+              >
+                Place code in
+              </span>
+              <strong>Head ✓</strong>
+            </div>
+          </div>
+        }
+      />
+      <Step
+        num={3}
+        instruction="Click Apply."
+        visual={<SaveBtn label="Apply" />}
+      />
+    </>
+  );
+}
+
+function WordPressInstructions() {
+  return (
+    <>
+      <Step
+        num={1}
+        instruction="Go to Appearance → Theme → Custom Code, or install the Insert Headers plugin."
+        visual={
+          <NavPath
+            path={["Appearance", "Theme", "Custom Code"]}
+            color="#21759b"
+          />
+        }
+      />
+      <Step
+        num={2}
+        instruction="Paste the line you copied into the Header field."
+        visual={<PasteField label="Header" />}
+      />
+      <Step
+        num={3}
+        instruction="Click Save."
+        visual={<SaveBtn label="Save" />}
+      />
+    </>
+  );
+}
+
+function FramerInstructions() {
+  return (
+    <>
+      <Step
+        num={1}
+        instruction="Go to Site Settings → Custom Code."
+        visual={
+          <NavPath path={["Site Settings", "Custom Code"]} color="#0099ff" />
+        }
+      />
+      <Step
+        num={2}
+        instruction="Paste the line you copied into the Header field."
+        visual={<PasteField label="Header" />}
+      />
+      <Step
+        num={3}
+        instruction="Click Save."
+        visual={<SaveBtn label="Save" />}
+      />
+    </>
+  );
+}
+
+function WebflowInstructions() {
+  return (
+    <>
+      <Step
+        num={1}
+        instruction="Go to Project Settings → Custom Code."
+        visual={
+          <NavPath
+            path={["Project Settings", "Custom Code"]}
+            color="#4353ff"
+          />
+        }
+      />
+      <Step
+        num={2}
+        instruction="Paste the line you copied into the Head Code field."
+        visual={<PasteField label="Head Code" />}
+      />
+      <Step
+        num={3}
+        instruction="Click Save and publish."
+        visual={<SaveBtn label="Save and publish" />}
+      />
+    </>
+  );
+}
+
+function OtherInstructions() {
+  return (
+    <>
+      <Step
+        num={1}
+        instruction="Find the 'Add custom code to header' option in your website platform's settings."
+        visual={<NavPath path={["Settings", "Custom code / header"]} />}
+      />
+      <Step
+        num={2}
+        instruction="Paste the line you copied."
+        visual={<PasteField label="Header / head section" />}
+      />
+      <Step
+        num={3}
+        instruction="Save your changes."
+        visual={<SaveBtn label="Save" />}
+      />
+    </>
+  );
+}
+
+// ── Verify block ──────────────────────────────────────────────────────────────
+
 function VerifyBlock({ brandId }: { brandId: string }) {
   const [url, setUrl] = useState("");
-  const [status, setStatus] = useState<"idle" | "checking" | "success" | "fail">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "checking" | "success" | "fail"
+  >("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const verify = useCallback(async () => {
+  const verify = async () => {
     if (!url.trim()) return;
     setStatus("checking");
     setErrorMsg("");
@@ -199,27 +579,27 @@ function VerifyBlock({ brandId }: { brandId: string }) {
         setStatus("success");
       } else {
         setStatus("fail");
-        setErrorMsg(data.error || "We couldn't detect the code yet.");
+        setErrorMsg(data.error || "");
       }
     } catch {
       setStatus("fail");
       setErrorMsg("Something went wrong connecting to our servers.");
     }
-  }, [url, brandId]);
+  };
 
   return (
-    <div style={{ marginTop: 8 }}>
+    <div>
       {status !== "success" && (
         <div style={{ marginBottom: 10 }}>
           <p
             style={{
-              fontSize: 12,
-              color: "rgba(255,255,255,0.45)",
-              marginBottom: 6,
+              fontSize: 13,
+              color: "rgba(255,255,255,0.4)",
+              marginBottom: 8,
               fontFamily: "'General Sans', system-ui, sans-serif",
             }}
           >
-            What's your website address?
+            Your website address:
           </p>
           <input
             type="url"
@@ -229,12 +609,12 @@ function VerifyBlock({ brandId }: { brandId: string }) {
             placeholder="https://yourbrand.com"
             style={{
               width: "100%",
-              padding: "10px 14px",
+              padding: "12px 14px",
               background: "rgba(0,0,0,0.2)",
               border: "1px solid rgba(255,255,255,0.12)",
-              borderRadius: "4px",
+              borderRadius: 6,
               color: "white",
-              fontSize: 13,
+              fontSize: 14,
               fontFamily: "'General Sans', system-ui, sans-serif",
               outline: "none",
               boxSizing: "border-box",
@@ -249,45 +629,44 @@ function VerifyBlock({ brandId }: { brandId: string }) {
           disabled={!url.trim()}
           style={{
             width: "100%",
-            padding: "14px",
-            background: "rgba(255,255,255,0.1)",
+            padding: "16px",
+            background: url.trim()
+              ? "rgba(255,255,255,0.12)"
+              : "rgba(255,255,255,0.04)",
             border: "1px solid rgba(255,255,255,0.18)",
-            borderRadius: "4px",
-            color: "white",
-            fontSize: 14,
+            borderRadius: 6,
+            color: url.trim() ? "white" : "rgba(255,255,255,0.3)",
+            fontSize: 15,
             fontWeight: 600,
             cursor: url.trim() ? "pointer" : "not-allowed",
-            opacity: url.trim() ? 1 : 0.4,
             fontFamily: "'General Sans', system-ui, sans-serif",
-            transition: "background 0.15s",
+            transition: "all 0.15s",
           }}
         >
-          Verify my installation →
+          Verify Installation →
         </button>
       )}
 
       {status === "checking" && (
         <div
           style={{
-            padding: "14px",
-            background: "rgba(255,255,255,0.06)",
-            borderRadius: "4px",
+            padding: 16,
             textAlign: "center",
-            fontSize: 13,
-            color: "rgba(255,255,255,0.55)",
+            fontSize: 14,
+            color: "rgba(255,255,255,0.5)",
             fontFamily: "'General Sans', system-ui, sans-serif",
           }}
         >
           <span
             style={{
               display: "inline-block",
-              width: 14,
-              height: 14,
+              width: 16,
+              height: 16,
               border: "2px solid rgba(255,255,255,0.15)",
               borderTop: "2px solid rgba(255,255,255,0.7)",
               borderRadius: "50%",
               animation: "spin 0.8s linear infinite",
-              marginRight: 8,
+              marginRight: 10,
               verticalAlign: "middle",
             }}
           />
@@ -296,77 +675,140 @@ function VerifyBlock({ brandId }: { brandId: string }) {
       )}
 
       {status === "success" && (
-        <div
-          style={{
-            padding: "16px 18px",
-            background: "rgba(34,197,94,0.12)",
-            border: "1px solid rgba(34,197,94,0.3)",
-            borderRadius: "4px",
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-          }}
-        >
+        <div style={{ position: "relative" }}>
+          <Confetti />
           <div
             style={{
-              width: 32,
-              height: 32,
-              borderRadius: "50%",
-              background: "rgba(34,197,94,0.2)",
+              padding: "22px 24px",
+              background: "rgba(34,197,94,0.12)",
+              border: "1px solid rgba(34,197,94,0.35)",
+              borderRadius: 8,
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
+              gap: 16,
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(134,239,172,0.9)" strokeWidth="2.5">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          </div>
-          <div>
-            <p
+            <div
               style={{
-                fontSize: 14,
-                fontWeight: 600,
-                color: "rgba(134,239,172,0.9)",
-                fontFamily: "'General Sans', system-ui, sans-serif",
-                marginBottom: 2,
+                width: 44,
+                height: 44,
+                borderRadius: "50%",
+                background: "rgba(34,197,94,0.2)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
               }}
             >
-              You&apos;re all set — AI can now discover your brand identity
-            </p>
-            <p style={{ fontSize: 12, color: "rgba(134,239,172,0.55)", fontFamily: "'General Sans', system-ui, sans-serif" }}>
-              {brandId && `Brand ID: ${brandId}`}
-            </p>
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="rgba(134,239,172,0.95)"
+                strokeWidth="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <div>
+              <p
+                style={{
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: "rgba(134,239,172,0.95)",
+                  fontFamily: "'General Sans', system-ui, sans-serif",
+                  marginBottom: 5,
+                }}
+              >
+                You&apos;re live. AI agents can now find your brand.
+              </p>
+              <p
+                style={{
+                  fontSize: 13,
+                  color: "rgba(134,239,172,0.5)",
+                  fontFamily: "'General Sans', system-ui, sans-serif",
+                }}
+              >
+                Visits from AI agents will appear in your analytics shortly.
+              </p>
+            </div>
           </div>
         </div>
       )}
 
       {status === "fail" && (
-        <div
-          style={{
-            padding: "14px 16px",
-            background: "rgba(220,38,38,0.1)",
-            border: "1px solid rgba(220,38,38,0.25)",
-            borderRadius: "4px",
-            marginBottom: 10,
-          }}
-        >
-          <p
+        <div>
+          <div
             style={{
-              fontSize: 13,
-              color: "rgba(252,165,165,0.85)",
-              fontFamily: "'General Sans', system-ui, sans-serif",
-              marginBottom: 8,
+              padding: "16px 18px",
+              background: "rgba(220,38,38,0.1)",
+              border: "1px solid rgba(220,38,38,0.25)",
+              borderRadius: 6,
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 14,
+              marginBottom: 10,
             }}
           >
-            {errorMsg || "We couldn't detect the code yet — it can take a few minutes."}
-          </p>
+            <div
+              style={{
+                width: 34,
+                height: 34,
+                borderRadius: "50%",
+                background: "rgba(220,38,38,0.15)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+                marginTop: 1,
+              }}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="rgba(252,165,165,0.9)"
+                strokeWidth="2.5"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </div>
+            <div>
+              <p
+                style={{
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: "rgba(252,165,165,0.9)",
+                  fontFamily: "'General Sans', system-ui, sans-serif",
+                  marginBottom: errorMsg ? 5 : 0,
+                }}
+              >
+                Script not detected — make sure you saved after pasting.
+              </p>
+              {errorMsg && (
+                <p
+                  style={{
+                    fontSize: 12,
+                    color: "rgba(252,165,165,0.5)",
+                    fontFamily: "'General Sans', system-ui, sans-serif",
+                  }}
+                >
+                  {errorMsg}
+                </p>
+              )}
+            </div>
+          </div>
           <button
-            onClick={() => setStatus("idle")}
+            onClick={() => {
+              setStatus("idle");
+              setErrorMsg("");
+            }}
             style={{
-              fontSize: 12,
-              color: "rgba(252,165,165,0.6)",
+              fontSize: 13,
+              color: "rgba(255,255,255,0.4)",
               background: "none",
               border: "none",
               cursor: "pointer",
@@ -382,695 +824,293 @@ function VerifyBlock({ brandId }: { brandId: string }) {
   );
 }
 
-/** "Need help?" bar — shown on every step */
-function HelpBar() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "12px 16px",
-        background: "rgba(255,255,255,0.05)",
-        border: "1px solid rgba(255,255,255,0.08)",
-        borderRadius: "4px",
-        marginTop: 12,
-      }}
-    >
-      <p
-        style={{
-          fontSize: 12,
-          color: "rgba(255,255,255,0.45)",
-          fontFamily: "'General Sans', system-ui, sans-serif",
-        }}
-      >
-        Not sure where to paste? We&apos;ll do it for you.
-      </p>
-      <a
-        href="mailto:install@esina.app?subject=Help me install ESINA"
-        style={{
-          fontSize: 12,
-          color: "rgba(255,255,255,0.75)",
-          fontWeight: 600,
-          textDecoration: "none",
-          fontFamily: "'General Sans', system-ui, sans-serif",
-          padding: "6px 12px",
-          background: "rgba(255,255,255,0.1)",
-          borderRadius: "4px",
-          transition: "background 0.15s",
-          whiteSpace: "nowrap",
-          flexShrink: 0,
-          marginLeft: 12,
-        }}
-      >
-        We&apos;ll install it →
-      </a>
-    </div>
-  );
-}
+// ── Platform tab data ─────────────────────────────────────────────────────────
 
-/** Single numbered step row */
-function Step({
-  num,
-  instruction,
-  visual,
-  extra,
-}: {
-  num: number;
-  instruction: React.ReactNode;
-  visual?: React.ReactNode;
-  extra?: React.ReactNode;
-}) {
-  return (
-    <div style={{ marginBottom: 28 }}>
-      <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: visual ? 12 : 0 }}>
-        <div
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: "4px",
-            background: "rgba(255,255,255,0.12)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
-        >
-          <span
-            className="font-goldman"
-            style={{ fontSize: 14, color: "white", fontWeight: 700, lineHeight: 1 }}
-          >
-            {num}
-          </span>
-        </div>
-        <div
-          style={{
-            fontSize: 14,
-            color: "rgba(255,255,255,0.85)",
-            lineHeight: 1.6,
-            fontFamily: "'General Sans', system-ui, sans-serif",
-            paddingTop: 6,
-          }}
-        >
-          {instruction}
-        </div>
-      </div>
-      {visual && <div style={{ marginLeft: 46 }}>{visual}</div>}
-      {extra && <div style={{ marginLeft: 46 }}>{extra}</div>}
-    </div>
-  );
-}
-
-// ── Platform instruction sets ─────────────────────────────────────────────────
-
-function ShopifyInstructions({ brandId }: { brandId: string }) {
-  return (
-    <>
-      <Step num={1} instruction="Log into your Shopify store at admin.shopify.com." visual={
-        <BrowserFrame url="admin.shopify.com/store/login">
-          <div style={{ padding: "32px 24px", background: "#fff", textAlign: "center" }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: "#1a1a1a", marginBottom: 20 }}>Log in to Shopify</div>
-            <div style={{ maxWidth: 300, margin: "0 auto" }}>
-              <div style={{ padding: "10px 14px", border: "1px solid #e0e0e0", borderRadius: 4, marginBottom: 10, textAlign: "left", color: "#aaa", fontSize: 13 }}>Email address</div>
-              <div style={{ padding: "10px 14px", border: "1px solid #e0e0e0", borderRadius: 4, marginBottom: 16, textAlign: "left", color: "#aaa", fontSize: 13 }}>Password</div>
-              <div style={{ padding: "10px", background: "#008060", borderRadius: 4, color: "white", fontSize: 13, fontWeight: 600 }}>Log in</div>
-            </div>
-          </div>
-        </BrowserFrame>
-      } />
-
-      <Step num={2} instruction={<>In the left menu, click <strong>Online Store</strong>.</>} visual={
-        <BrowserFrame url="admin.shopify.com">
-          <div style={{ display: "flex", minHeight: 120 }}>
-            <div style={{ width: 200, background: "#1a1a1a", padding: "12px 0" }}>
-              {["Home", "Orders", "Products", "Customers"].map(item => (
-                <div key={item} style={{ padding: "8px 16px", color: "rgba(255,255,255,0.45)", fontSize: 13 }}>{item}</div>
-              ))}
-              <div style={{ padding: "8px 16px", display: "flex", alignItems: "center", gap: 6 }}>
-                <Highlight label="Online Store" />
-              </div>
-            </div>
-            <div style={{ flex: 1, padding: 24, color: "#888", fontSize: 13 }}>← click here</div>
-          </div>
-        </BrowserFrame>
-      } />
-
-      <Step num={3} instruction={<>Next to your theme name, click the <strong>⋯ three-dot button</strong>, then click <strong>Edit code</strong>.</>} visual={
-        <BrowserFrame url="admin.shopify.com/themes">
-          <div style={{ padding: 20 }}>
-            <div style={{ border: "1px solid #e0e0e0", borderRadius: 6, padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <div>
-                <div style={{ fontWeight: 600, fontSize: 13, color: "#1a1a1a" }}>Dawn (current theme)</div>
-                <div style={{ fontSize: 11, color: "#888" }}>Last saved 2 days ago</div>
-              </div>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <div style={{ padding: "6px 12px", border: "1px solid #e0e0e0", borderRadius: 4, fontSize: 12 }}>Customize</div>
-                <div style={{ padding: "6px 10px", border: "2.5px solid #f97316", borderRadius: 4, fontSize: 12, color: "#9a3d00", fontWeight: 600, background: "rgba(249,115,22,0.08)" }}>⋯ &lt;— click here</div>
-              </div>
-            </div>
-            <div style={{ marginTop: 8, padding: "8px 12px", background: "rgba(249,115,22,0.08)", border: "2px solid #f97316", borderRadius: 4, width: 130, fontSize: 13, fontWeight: 600, color: "#9a3d00" }}>
-              ▶ Edit code &lt;— then this
-            </div>
-          </div>
-        </BrowserFrame>
-      } />
-
-      <Step num={4} instruction={<>In the left sidebar, click the file called <strong>theme.liquid</strong>.</>} visual={
-        <BrowserFrame url="admin.shopify.com/themes/code">
-          <div style={{ display: "flex", minHeight: 130 }}>
-            <div style={{ width: 180, background: "#f6f6f7", padding: "12px 0", borderRight: "1px solid #e0e0e0" }}>
-              <div style={{ padding: "6px 12px", fontSize: 11, color: "#888", textTransform: "uppercase", letterSpacing: "0.05em" }}>Layout</div>
-              {["password.liquid", "gift_card.liquid"].map(f => (
-                <div key={f} style={{ padding: "6px 16px", fontSize: 12, color: "#555" }}>{f}</div>
-              ))}
-              <div style={{ padding: "6px 16px", display: "flex", alignItems: "center", gap: 6 }}>
-                <Highlight label="theme.liquid" />
-              </div>
-            </div>
-            <div style={{ flex: 1, padding: 16, fontFamily: "monospace", fontSize: 11, color: "#888" }}>
-              Click theme.liquid to open it →
-            </div>
-          </div>
-        </BrowserFrame>
-      } />
-
-      <Step num={5} instruction={<>Scroll to find the <code style={{ background: "rgba(255,255,255,0.1)", padding: "1px 5px", borderRadius: 2, fontSize: 12 }}>&lt;/head&gt;</code> tag near the top, then paste your code <strong>on the line just above it</strong>.</>} visual={
-        <BrowserFrame url="admin.shopify.com/themes/code">
-          <div style={{ padding: "16px", fontFamily: "'SF Mono','Fira Code',monospace", fontSize: 12, background: "#1e1e1e", color: "#d4d4d4", lineHeight: 1.7 }}>
-            <div style={{ color: "#808080" }}>  ...</div>
-            <div style={{ color: "#808080" }}>  &lt;meta name="viewport" content="..."&gt;</div>
-            <div style={{ background: "rgba(249,115,22,0.25)", border: "1.5px solid #f97316", borderRadius: 2, padding: "1px 4px", margin: "2px 0", color: "#fbd38d" }}>
-              👆 PASTE YOUR CODE HERE (the line above &lt;/head&gt;)
-            </div>
-            <div style={{ color: "#569cd6" }}>&lt;/head&gt;</div>
-          </div>
-        </BrowserFrame>
-      } extra={<div style={{ marginTop: 12 }}><CopyCodeBlock brandId={brandId} /></div>} />
-
-      <Step num={6} instruction={<>Click the green <strong>Save</strong> button in the top-right corner of the editor.</>} visual={
-        <BrowserFrame url="admin.shopify.com/themes/code">
-          <div style={{ padding: "10px 16px", background: "#f6f6f7", borderBottom: "1px solid #e0e0e0", display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 8 }}>
-            <div style={{ padding: "6px 12px", border: "1px solid #e0e0e0", borderRadius: 4, fontSize: 12, color: "#555" }}>Discard</div>
-            <div style={{ padding: "6px 14px", background: "rgba(249,115,22,0.12)", border: "2.5px solid #f97316", borderRadius: 4, fontSize: 12, fontWeight: 700, color: "#9a3d00" }}>
-              Save ← click this
-            </div>
-          </div>
-          <div style={{ padding: 16, fontFamily: "monospace", fontSize: 11, color: "#888" }}>…your code is here…</div>
-        </BrowserFrame>
-      } />
-
-      <Step num={7} instruction="Come back here and verify your installation below." extra={<VerifyBlock brandId={brandId} />} />
-
-      <HelpBar />
-    </>
-  );
-}
-
-function SquarespaceInstructions({ brandId }: { brandId: string }) {
-  return (
-    <>
-      <Step num={1} instruction="Log into your Squarespace account at account.squarespace.com." visual={
-        <BrowserFrame url="account.squarespace.com">
-          <div style={{ padding: "32px 24px", textAlign: "center" }}>
-            <div style={{ fontSize: 20, fontWeight: 700, color: "#1a1a1a", marginBottom: 20 }}>Log in to Squarespace</div>
-            <div style={{ maxWidth: 280, margin: "0 auto" }}>
-              <div style={{ padding: "10px 14px", border: "1px solid #e0e0e0", borderRadius: 4, marginBottom: 10, textAlign: "left", color: "#aaa", fontSize: 13 }}>Email</div>
-              <div style={{ padding: "10px", background: "#000", borderRadius: 4, color: "white", fontSize: 13, fontWeight: 600 }}>Continue</div>
-            </div>
-          </div>
-        </BrowserFrame>
-      } />
-
-      <Step num={2} instruction={<>In the left menu, click <strong>Settings</strong> (the gear icon at the bottom).</>} visual={
-        <BrowserFrame url="yoursite.squarespace.com/config">
-          <div style={{ display: "flex", minHeight: 120 }}>
-            <div style={{ width: 54, background: "#1a1a1a", display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 16, gap: 20 }}>
-              {["⊞", "✦", "✉", "📊"].map((icon, i) => (
-                <div key={i} style={{ color: "rgba(255,255,255,0.35)", fontSize: 16 }}>{icon}</div>
-              ))}
-              <div style={{ marginTop: "auto", paddingBottom: 16 }}>
-                <Highlight label="⚙" />
-              </div>
-            </div>
-            <div style={{ flex: 1, padding: 24, color: "#888", fontSize: 13 }}>← Settings gear at the bottom</div>
-          </div>
-        </BrowserFrame>
-      } />
-
-      <Step num={3} instruction={<>Scroll down and click <strong>Advanced</strong>.</>} visual={
-        <BrowserFrame url="yoursite.squarespace.com/config/settings">
-          <div style={{ padding: 20 }}>
-            {["General", "Domains", "Billing", "Permissions"].map(item => (
-              <div key={item} style={{ padding: "10px 0", borderBottom: "1px solid #f0f0f0", color: "#555", fontSize: 13 }}>{item}</div>
-            ))}
-            <div style={{ padding: "10px 0", display: "flex", alignItems: "center", gap: 8 }}>
-              <Highlight label="Advanced ← click this" />
-            </div>
-          </div>
-        </BrowserFrame>
-      } />
-
-      <Step num={4} instruction={<>Click <strong>Code Injection</strong>.</>} visual={
-        <BrowserFrame url="yoursite.squarespace.com/config/settings/advanced">
-          <div style={{ padding: 20 }}>
-            {["URL Mappings", "SSL", "External API Keys"].map(item => (
-              <div key={item} style={{ padding: "10px 0", borderBottom: "1px solid #f0f0f0", color: "#555", fontSize: 13 }}>{item}</div>
-            ))}
-            <div style={{ padding: "10px 0", display: "flex", alignItems: "center", gap: 8 }}>
-              <Highlight label="Code Injection ← click this" />
-            </div>
-          </div>
-        </BrowserFrame>
-      } />
-
-      <Step num={5} instruction={<>Paste your code in the <strong>Header</strong> box (the very top box on the page). Then click <strong>Save</strong>.</>} visual={
-        <BrowserFrame url="yoursite.squarespace.com/config/settings/advanced/code-injection">
-          <div style={{ padding: 16 }}>
-            <div style={{ fontSize: 12, color: "#888", marginBottom: 6 }}>Header</div>
-            <div style={{ border: "2.5px solid #f97316", borderRadius: 4, padding: 12, background: "rgba(249,115,22,0.04)", minHeight: 60, fontFamily: "monospace", fontSize: 11, color: "#f97316" }}>
-              👆 PASTE YOUR CODE IN THIS BOX
-            </div>
-            <div style={{ marginTop: 12, fontSize: 12, color: "#888" }}>Footer</div>
-            <div style={{ border: "1px solid #e0e0e0", borderRadius: 4, padding: 12, minHeight: 40, background: "#fafafa" }} />
-          </div>
-        </BrowserFrame>
-      } extra={<div style={{ marginTop: 12 }}><CopyCodeBlock brandId={brandId} /></div>} />
-
-      <Step num={6} instruction={<>Click the <strong>Save</strong> button at the top of the page.</>} />
-
-      <Step num={7} instruction="Come back here and verify your installation." extra={<VerifyBlock brandId={brandId} />} />
-
-      <HelpBar />
-    </>
-  );
-}
-
-function WixInstructions({ brandId }: { brandId: string }) {
-  return (
-    <>
-      <Step num={1} instruction="Log into your Wix account at manage.wix.com." visual={
-        <BrowserFrame url="manage.wix.com">
-          <div style={{ padding: "32px 24px", textAlign: "center", background: "linear-gradient(135deg, #0057e7 0%, #6b7cff 100%)" }}>
-            <div style={{ fontSize: 20, fontWeight: 700, color: "white", marginBottom: 20 }}>Log in to Wix</div>
-            <div style={{ maxWidth: 280, margin: "0 auto" }}>
-              <div style={{ padding: "10px 14px", background: "white", borderRadius: 4, marginBottom: 10, textAlign: "left", color: "#aaa", fontSize: 13 }}>Email</div>
-              <div style={{ padding: "10px", background: "#0057e7", border: "2px solid white", borderRadius: 4, color: "white", fontSize: 13, fontWeight: 600 }}>Log in</div>
-            </div>
-          </div>
-        </BrowserFrame>
-      } />
-
-      <Step num={2} instruction={<>In the left menu, click <strong>Settings</strong>.</>} visual={
-        <BrowserFrame url="manage.wix.com/dashboard">
-          <div style={{ display: "flex", minHeight: 120 }}>
-            <div style={{ width: 200, background: "#f7f8fa", padding: "12px 0", borderRight: "1px solid #e0e0e0" }}>
-              {["Dashboard", "Blog", "Store", "Contacts"].map(item => (
-                <div key={item} style={{ padding: "9px 16px", fontSize: 13, color: "#555" }}>{item}</div>
-              ))}
-              <div style={{ padding: "9px 16px" }}>
-                <Highlight label="Settings ← click here" />
-              </div>
-            </div>
-            <div style={{ flex: 1, padding: 24, color: "#888", fontSize: 13 }}>Your site dashboard</div>
-          </div>
-        </BrowserFrame>
-      } />
-
-      <Step num={3} instruction={<>Scroll down to find <strong>Custom Code</strong> and click it.</>} visual={
-        <BrowserFrame url="manage.wix.com/settings">
-          <div style={{ padding: 20 }}>
-            {["General Info", "Business Hours", "Domains", "Roles & Permissions"].map(item => (
-              <div key={item} style={{ padding: "10px 0", borderBottom: "1px solid #f0f0f0", color: "#555", fontSize: 13 }}>{item}</div>
-            ))}
-            <div style={{ padding: "10px 0" }}>
-              <Highlight label="Custom Code ← scroll here and click" />
-            </div>
-          </div>
-        </BrowserFrame>
-      } />
-
-      <Step num={4} instruction={<>Click the <strong>+ Add Custom Code</strong> button.</>} visual={
-        <BrowserFrame url="manage.wix.com/settings/custom-code">
-          <div style={{ padding: 20 }}>
-            <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 12, color: "#1a1a1a" }}>Custom Code</div>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-              <Highlight label="+ Add Custom Code ← click this button" />
-            </div>
-          </div>
-        </BrowserFrame>
-      } />
-
-      <Step num={5} instruction={<>Paste your code. Make sure <strong>"All pages"</strong> and <strong>"Head"</strong> are both selected, then click <strong>Apply</strong>.</>} visual={
-        <BrowserFrame url="manage.wix.com/settings/custom-code/new">
-          <div style={{ padding: 16 }}>
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 12, color: "#888", marginBottom: 6 }}>Paste your code snippet</div>
-              <div style={{ border: "2.5px solid #f97316", borderRadius: 4, padding: 10, background: "rgba(249,115,22,0.04)", minHeight: 50, fontFamily: "monospace", fontSize: 11, color: "#f97316" }}>
-                👆 PASTE YOUR CODE HERE
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>Add to pages</div>
-                <div style={{ padding: "7px 10px", border: "2px solid #f97316", borderRadius: 4, fontSize: 12, color: "#9a3d00", fontWeight: 600, background: "rgba(249,115,22,0.08)" }}>
-                  ✓ All pages
-                </div>
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>Place code in</div>
-                <div style={{ padding: "7px 10px", border: "2px solid #f97316", borderRadius: 4, fontSize: 12, color: "#9a3d00", fontWeight: 600, background: "rgba(249,115,22,0.08)" }}>
-                  ✓ Head
-                </div>
-              </div>
-            </div>
-          </div>
-        </BrowserFrame>
-      } extra={<div style={{ marginTop: 12 }}><CopyCodeBlock brandId={brandId} /></div>} />
-
-      <Step num={6} instruction="Come back here and verify your installation." extra={<VerifyBlock brandId={brandId} />} />
-
-      <HelpBar />
-    </>
-  );
-}
-
-function WordPressInstructions({ brandId }: { brandId: string }) {
-  return (
-    <>
-      <Step num={1} instruction={<>Log into your WordPress admin at <strong>yoursite.com/wp-admin</strong>.</>} visual={
-        <BrowserFrame url="yoursite.com/wp-admin">
-          <div style={{ padding: "32px 24px", textAlign: "center", background: "#f0f0f1" }}>
-            <div style={{ fontSize: 20, fontWeight: 700, color: "#1d2327", marginBottom: 20 }}>WordPress</div>
-            <div style={{ maxWidth: 280, margin: "0 auto", background: "white", padding: 20, borderRadius: 4, boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-              <div style={{ padding: "8px 12px", border: "1px solid #8c8f94", borderRadius: 4, marginBottom: 10, textAlign: "left", color: "#aaa", fontSize: 13 }}>Username or Email</div>
-              <div style={{ padding: "8px 12px", border: "1px solid #8c8f94", borderRadius: 4, marginBottom: 12, textAlign: "left", color: "#aaa", fontSize: 13 }}>Password</div>
-              <div style={{ padding: "10px", background: "#2271b1", borderRadius: 4, color: "white", fontSize: 13, fontWeight: 600 }}>Log In</div>
-            </div>
-          </div>
-        </BrowserFrame>
-      } />
-
-      <Step num={2} instruction={<>In the left menu, hover over <strong>Plugins</strong>, then click <strong>Add New</strong>.</>} visual={
-        <BrowserFrame url="yoursite.com/wp-admin/plugins.php">
-          <div style={{ display: "flex", minHeight: 130 }}>
-            <div style={{ width: 180, background: "#1d2327", padding: "12px 0" }}>
-              {["Dashboard", "Posts", "Media", "Pages"].map(item => (
-                <div key={item} style={{ padding: "8px 16px", color: "rgba(255,255,255,0.4)", fontSize: 12 }}>{item}</div>
-              ))}
-              <div style={{ padding: "8px 16px", color: "rgba(255,255,255,0.4)", fontSize: 12 }}>Plugins</div>
-              <div style={{ padding: "6px 24px" }}>
-                <Highlight label="Add New ← click this" />
-              </div>
-            </div>
-            <div style={{ flex: 1, padding: 20, color: "#888", fontSize: 13 }}>WordPress Admin</div>
-          </div>
-        </BrowserFrame>
-      } />
-
-      <Step num={3} instruction={<>In the search box, type <strong>WPCode</strong>. When it appears, click <strong>Install Now</strong>, then <strong>Activate</strong>.</>} visual={
-        <BrowserFrame url="yoursite.com/wp-admin/plugin-install.php">
-          <div style={{ padding: 16 }}>
-            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-              <div style={{ flex: 1, padding: "8px 12px", border: "1px solid #8c8f94", borderRadius: 4, fontFamily: "monospace", fontSize: 13, color: "#1a1a1a" }}>WPCode</div>
-            </div>
-            <div style={{ border: "1px solid #e0e0e0", borderRadius: 4, padding: 14, display: "flex", alignItems: "center", gap: 14 }}>
-              <div style={{ width: 40, height: 40, background: "#1d2327", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 18 }}>W</div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: 13 }}>WPCode — Insert Headers and Footers</div>
-                <div style={{ fontSize: 11, color: "#888" }}>The easiest way to add custom code</div>
-              </div>
-              <div>
-                <Highlight label="Install Now →" />
-              </div>
-            </div>
-          </div>
-        </BrowserFrame>
-      } />
-
-      <Step num={4} instruction={<>In the left menu, click <strong>Code Snippets</strong> → <strong>Header &amp; Footer</strong>.</>} visual={
-        <BrowserFrame url="yoursite.com/wp-admin/admin.php?page=wpcode-headers-footers">
-          <div style={{ display: "flex", minHeight: 100 }}>
-            <div style={{ width: 180, background: "#1d2327", padding: "12px 0" }}>
-              {["Dashboard", "Posts"].map(item => (
-                <div key={item} style={{ padding: "8px 16px", color: "rgba(255,255,255,0.4)", fontSize: 12 }}>{item}</div>
-              ))}
-              <div style={{ padding: "8px 16px", color: "rgba(255,255,255,0.4)", fontSize: 12 }}>Code Snippets</div>
-              <div style={{ padding: "6px 24px" }}>
-                <Highlight label="Header & Footer" />
-              </div>
-            </div>
-            <div style={{ flex: 1, padding: 20 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: "#1a1a1a" }}>Header &amp; Footer Code</div>
-              <div style={{ fontSize: 12, color: "#888", marginBottom: 6 }}>Header</div>
-              <div style={{ border: "2.5px solid #f97316", borderRadius: 4, padding: 10, background: "rgba(249,115,22,0.04)", minHeight: 50, fontFamily: "monospace", fontSize: 11, color: "#f97316" }}>
-                👆 PASTE YOUR CODE IN THIS BOX
-              </div>
-            </div>
-          </div>
-        </BrowserFrame>
-      } extra={<div style={{ marginTop: 12 }}><CopyCodeBlock brandId={brandId} /></div>} />
-
-      <Step num={5} instruction={<>Click the <strong>Save Changes</strong> button.</>} />
-
-      <Step num={6} instruction="Come back here and verify your installation." extra={<VerifyBlock brandId={brandId} />} />
-
-      <HelpBar />
-    </>
-  );
-}
-
-function OtherInstructions({ brandId }: { brandId: string }) {
-  return (
-    <>
-      <div
-        style={{
-          padding: "20px 20px",
-          background: "rgba(255,255,255,0.05)",
-          border: "1px solid rgba(255,255,255,0.08)",
-          borderRadius: "6px",
-          marginBottom: 20,
-          fontFamily: "'General Sans', system-ui, sans-serif",
-        }}
-      >
-        <p style={{ fontSize: 14, color: "rgba(255,255,255,0.8)", lineHeight: 1.7, marginBottom: 0 }}>
-          Copy the code below and paste it somewhere near the very top of every page on your website — before it closes the opening section. If you&apos;re not sure where exactly, just hit the button below and we&apos;ll take care of it for you.
-        </p>
-      </div>
-
-      <CopyCodeBlock brandId={brandId} />
-
-      <div style={{ marginTop: 16 }}>
-        <VerifyBlock brandId={brandId} />
-      </div>
-
-      <HelpBar />
-    </>
-  );
-}
-
-// ── Platform selection screen ─────────────────────────────────────────────────
-
-const PLATFORMS: { id: Platform; label: string; icon: string; desc: string }[] = [
-  { id: "shopify", label: "Shopify", icon: "🛍", desc: "Shopify stores" },
-  { id: "squarespace", label: "Squarespace", icon: "⬛", desc: "Squarespace sites" },
-  { id: "wix", label: "Wix", icon: "✦", desc: "Wix websites" },
-  { id: "wordpress", label: "WordPress", icon: "⊞", desc: "WordPress sites" },
-  { id: "other", label: "Something else", icon: "⚡", desc: "Any other platform" },
+const PLATFORMS: { id: Platform; label: string; emoji: string }[] = [
+  { id: "shopify",      label: "Shopify",      emoji: "🛍️" },
+  { id: "squarespace",  label: "Squarespace",  emoji: "⬛" },
+  { id: "wix",          label: "Wix",          emoji: "✦"  },
+  { id: "wordpress",    label: "WordPress",    emoji: "⊞"  },
+  { id: "framer",       label: "Framer",       emoji: "◈"  },
+  { id: "webflow",      label: "Webflow",      emoji: "◉"  },
+  { id: "other",        label: "Other",        emoji: "⚡" },
 ];
 
 // ── Main export ───────────────────────────────────────────────────────────────
 
 export function InstallGuide({ brandId, brandName }: InstallGuideProps) {
-  const [platform, setPlatform] = useState<Platform | null>(null);
-  const [showAudit, setShowAudit] = useState(false);
+  const [platform, setPlatform] = useState<Platform>("shopify");
 
-  // Audit link is available before platform selection
   const auditPath = `/audit/${brandId}`;
 
   return (
     <div className="min-h-screen" style={{ paddingTop: 88 }}>
       <div className="max-w-2xl mx-auto px-6 py-10">
 
-        {/* ── Header ─────────────────────────────────────────────── */}
+        {/* ── Header ─────────────────────────────────────────────────── */}
         <div className="mb-10 fade-up-1">
-          <div
-            className="w-12 h-12 flex items-center justify-center mb-6"
-            style={{ background: "rgba(0,0,0,0.15)", borderRadius: "2px" }}
-          >
-            <svg className="w-5 h-5" viewBox="0 0 20 20" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="1.5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 10l5 5 7-8" />
-            </svg>
-          </div>
-          <h1 className="font-goldman text-3xl text-white mb-2" style={{ fontWeight: 700 }}>
-            {brandName} is live.
-          </h1>
-          <p className="text-sm leading-relaxed mb-6" style={{ color: "rgba(255,255,255,0.45)" }}>
-            Your brand identity profile is ready. Now add one line to your website so AI can find you.
-          </p>
-          <div className="flex gap-3">
-            <a
-              href={auditPath}
-              style={{
-                padding: "8px 16px",
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                borderRadius: "4px",
-                color: "rgba(255,255,255,0.65)",
-                fontSize: 12,
-                textDecoration: "none",
-                fontFamily: "'General Sans', system-ui, sans-serif",
-              }}
-            >
-              View your AI audit report →
-            </a>
-          </div>
-        </div>
-
-        <div style={{ height: 1, background: "rgba(255,255,255,0.08)", marginBottom: 32 }} />
-
-        {/* ── Platform selection ──────────────────────────────────── */}
-        {!platform && (
-          <div className="fade-up-2">
-            <h2
-              className="font-goldman text-xl text-white mb-2"
-              style={{ fontWeight: 700 }}
-            >
-              What platform is your website on?
-            </h2>
-            <p className="text-sm mb-8" style={{ color: "rgba(255,255,255,0.4)", fontFamily: "'General Sans', system-ui, sans-serif" }}>
-              We&apos;ll show you exactly where to paste — one screenshot at a time.
-            </p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
-              {PLATFORMS.filter(p => p.id !== "other").map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => setPlatform(p.id)}
-                  style={{
-                    padding: "20px 16px",
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    textAlign: "left",
-                    transition: "background 0.15s, border-color 0.15s",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.background = "rgba(255,255,255,0.1)";
-                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.background = "rgba(255,255,255,0.06)";
-                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
-                  }}
-                >
-                  <span style={{ fontSize: 24 }}>{p.icon}</span>
-                  <div>
-                    <p
-                      className="font-goldman"
-                      style={{ fontSize: 14, color: "white", fontWeight: 700, marginBottom: 2 }}
-                    >
-                      {p.label}
-                    </p>
-                    <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "'General Sans', system-ui, sans-serif" }}>
-                      {p.desc}
-                    </p>
-                  </div>
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setPlatform("other")}
-              style={{
-                width: "100%",
-                padding: "16px",
-                background: "rgba(255,255,255,0.04)",
-                border: "1px dashed rgba(255,255,255,0.12)",
-                borderRadius: "6px",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                transition: "background 0.15s",
-              }}
-              onMouseOver={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; }}
-              onMouseOut={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
-            >
-              <span style={{ fontSize: 20 }}>⚡</span>
-              <div style={{ textAlign: "left" }}>
-                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", fontFamily: "'General Sans', system-ui, sans-serif", marginBottom: 1 }}>
-                  Something else / custom site
-                </p>
-                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", fontFamily: "'General Sans', system-ui, sans-serif" }}>
-                  Framer, Webflow, custom code, etc.
-                </p>
-              </div>
-            </button>
-          </div>
-        )}
-
-        {/* ── Platform instructions ───────────────────────────────── */}
-        {platform && (
-          <div className="fade-up-1">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <p className="section-tag mb-1">install instructions</p>
-                <h2 className="font-goldman text-xl text-white" style={{ fontWeight: 700 }}>
-                  {PLATFORMS.find(p => p.id === platform)?.icon}{" "}
-                  {PLATFORMS.find(p => p.id === platform)?.label}
-                </h2>
-              </div>
-              <button
-                onClick={() => setPlatform(null)}
-                style={{
-                  fontSize: 12,
-                  color: "rgba(255,255,255,0.35)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  fontFamily: "'General Sans', system-ui, sans-serif",
-                  padding: "4px 8px",
-                }}
-              >
-                ← change platform
-              </button>
-            </div>
-
-            {platform === "shopify" && <ShopifyInstructions brandId={brandId} />}
-            {platform === "squarespace" && <SquarespaceInstructions brandId={brandId} />}
-            {platform === "wix" && <WixInstructions brandId={brandId} />}
-            {platform === "wordpress" && <WordPressInstructions brandId={brandId} />}
-            {platform === "other" && <OtherInstructions brandId={brandId} />}
-
-            {/* Bottom audit link */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
             <div
               style={{
-                marginTop: 32,
-                paddingTop: 24,
-                borderTop: "1px solid rgba(255,255,255,0.06)",
+                width: 26,
+                height: 26,
+                borderRadius: "50%",
+                background: "rgba(34,197,94,0.18)",
+                border: "1px solid rgba(34,197,94,0.4)",
                 display: "flex",
+                alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <a
-                href={auditPath}
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="rgba(134,239,172,0.9)"
+                strokeWidth="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <p
+              style={{
+                fontSize: 13,
+                color: "rgba(134,239,172,0.75)",
+                fontFamily: "'General Sans', system-ui, sans-serif",
+              }}
+            >
+              brand profile created
+            </p>
+          </div>
+
+          <h1
+            className="font-goldman text-3xl text-white mb-2"
+            style={{ fontWeight: 700 }}
+          >
+            {brandName} is ready.
+          </h1>
+          <p
+            className="text-sm mb-6"
+            style={{
+              color: "rgba(255,255,255,0.4)",
+              fontFamily: "'General Sans', system-ui, sans-serif",
+            }}
+          >
+            One last step — add your brand to AI recommendations.
+          </p>
+          <a
+            href={auditPath}
+            style={{
+              fontSize: 12,
+              color: "rgba(255,255,255,0.4)",
+              fontFamily: "'General Sans', system-ui, sans-serif",
+              textDecoration: "none",
+              borderBottom: "1px solid rgba(255,255,255,0.15)",
+              paddingBottom: 1,
+            }}
+          >
+            View your AI audit report →
+          </a>
+        </div>
+
+        <div
+          style={{
+            height: 1,
+            background: "rgba(255,255,255,0.08)",
+            marginBottom: 36,
+          }}
+        />
+
+        {/* ── Copy block ─────────────────────────────────────────────── */}
+        <div className="mb-8 fade-up-2">
+          <p className="section-tag mb-3">one-time setup</p>
+          <h2
+            className="font-goldman text-2xl text-white mb-2"
+            style={{ fontWeight: 700 }}
+          >
+            Paste this one line into your website settings.
+          </h2>
+          <p
+            className="text-sm mb-6"
+            style={{
+              color: "rgba(255,255,255,0.4)",
+              fontFamily: "'General Sans', system-ui, sans-serif",
+            }}
+          >
+            That&apos;s it. AI agents will start finding your brand immediately.
+          </p>
+          <CopyCodeBlock brandId={brandId} />
+        </div>
+
+        <div
+          style={{
+            height: 1,
+            background: "rgba(255,255,255,0.08)",
+            marginBottom: 36,
+          }}
+        />
+
+        {/* ── Platform tabs + steps ───────────────────────────────────── */}
+        <div className="fade-up-3">
+          <p className="section-tag mb-4">where to paste it</p>
+
+          {/* Scrollable tab row */}
+          <div
+            style={{
+              display: "flex",
+              gap: 6,
+              overflowX: "auto",
+              paddingBottom: 4,
+              marginBottom: 28,
+              scrollbarWidth: "none",
+            }}
+          >
+            {PLATFORMS.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setPlatform(p.id)}
                 style={{
+                  flexShrink: 0,
+                  padding: "8px 14px",
+                  background:
+                    platform === p.id
+                      ? "rgba(255,255,255,0.12)"
+                      : "rgba(255,255,255,0.04)",
+                  border: `1px solid ${
+                    platform === p.id
+                      ? "rgba(255,255,255,0.22)"
+                      : "rgba(255,255,255,0.07)"
+                  }`,
+                  borderRadius: 6,
+                  cursor: "pointer",
                   fontSize: 13,
-                  color: "rgba(255,255,255,0.4)",
+                  fontWeight: platform === p.id ? 600 : 400,
+                  color:
+                    platform === p.id
+                      ? "white"
+                      : "rgba(255,255,255,0.45)",
                   fontFamily: "'General Sans', system-ui, sans-serif",
-                  textDecoration: "none",
+                  transition: "all 0.15s",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
                 }}
               >
-                Skip to your AI audit report →
-              </a>
-            </div>
+                <span style={{ fontSize: 14 }}>{p.emoji}</span>
+                {p.label}
+              </button>
+            ))}
           </div>
-        )}
+
+          {/* Step instructions */}
+          <div>
+            {platform === "shopify"     && <ShopifyInstructions />}
+            {platform === "squarespace" && <SquarespaceInstructions />}
+            {platform === "wix"         && <WixInstructions />}
+            {platform === "wordpress"   && <WordPressInstructions />}
+            {platform === "framer"      && <FramerInstructions />}
+            {platform === "webflow"     && <WebflowInstructions />}
+            {platform === "other"       && <OtherInstructions />}
+          </div>
+        </div>
+
+        <div
+          style={{
+            height: 1,
+            background: "rgba(255,255,255,0.08)",
+            marginBottom: 36,
+          }}
+        />
+
+        {/* ── Verify ─────────────────────────────────────────────────── */}
+        <div className="fade-up-4">
+          <p className="section-tag mb-3">verify</p>
+          <h2
+            className="font-goldman text-xl text-white mb-1"
+            style={{ fontWeight: 700 }}
+          >
+            Verify Installation
+          </h2>
+          <p
+            className="text-sm mb-6"
+            style={{
+              color: "rgba(255,255,255,0.4)",
+              fontFamily: "'General Sans', system-ui, sans-serif",
+            }}
+          >
+            After pasting and saving, enter your website URL to confirm
+            everything is working.
+          </p>
+          <VerifyBlock brandId={brandId} />
+        </div>
+
+        {/* ── Need help ──────────────────────────────────────────────── */}
+        <div
+          style={{
+            marginTop: 24,
+            padding: "18px 20px",
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.06)",
+            borderRadius: 8,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 16,
+          }}
+        >
+          <p
+            style={{
+              fontSize: 14,
+              color: "rgba(255,255,255,0.4)",
+              fontFamily: "'General Sans', system-ui, sans-serif",
+            }}
+          >
+            Need help? We&apos;ll do it for you.
+          </p>
+          <a
+            href="mailto:install@esina.app?subject=Help me install ESINA on my website"
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              color: "white",
+              fontFamily: "'General Sans', system-ui, sans-serif",
+              textDecoration: "none",
+              padding: "9px 16px",
+              background: "rgba(255,255,255,0.1)",
+              border: "1px solid rgba(255,255,255,0.15)",
+              borderRadius: 6,
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+            }}
+          >
+            Book a quick call →
+          </a>
+        </div>
+
+        {/* ── Bottom audit link ───────────────────────────────────────── */}
+        <div
+          style={{
+            textAlign: "center",
+            marginTop: 36,
+            paddingTop: 24,
+            borderTop: "1px solid rgba(255,255,255,0.06)",
+          }}
+        >
+          <a
+            href={auditPath}
+            style={{
+              fontSize: 13,
+              color: "rgba(255,255,255,0.3)",
+              fontFamily: "'General Sans', system-ui, sans-serif",
+              textDecoration: "none",
+            }}
+          >
+            Skip to your AI audit report →
+          </a>
+        </div>
       </div>
 
-      {/* Spinner keyframe for verify button */}
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
