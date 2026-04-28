@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -11,6 +12,50 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+// ── Metadata ────────────────────────────────────────────────────────────────
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const { slug } = params;
+
+  const client = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { data: brands } = await client
+    .from("brand_profiles")
+    .select("brand_name, category, price_tier, archetypes, differentiation_claim, identity_text");
+
+  const brand = (brands || []).find((b) => brandSlug(b.brand_name) === slug);
+  if (!brand) return { title: "Brand | ESINA" };
+
+  const archetypes =
+    (brand.archetypes as { archetype: string; weight: number; primary: boolean }[]) || [];
+  const primary =
+    archetypes.find((a) => a.primary)?.archetype || archetypes[0]?.archetype || "";
+
+  const titleParts = [brand.brand_name];
+  if (primary) titleParts.push(primary.charAt(0).toUpperCase() + primary.slice(1));
+  if (brand.category) titleParts.push(brand.category);
+  titleParts.push("ESINA");
+
+  const rawDescription =
+    (brand.differentiation_claim as string) ||
+    (brand.identity_text ? String(brand.identity_text).slice(0, 300) : "");
+  const description =
+    rawDescription.slice(0, 160).trim() ||
+    `${brand.brand_name} brand identity profile on ESINA — archetypes, values, style, and community signals for AI matching.`;
+
+  return {
+    title: titleParts.join(" | "),
+    description,
+  };
+}
 
 // ── Narrative generation ────────────────────────────────────────────────────
 
@@ -50,9 +95,14 @@ async function generateNarrative(brand: Record<string, unknown>): Promise<string
         role: "system",
         content:
           "You are a brand identity writer. Given a brand's structured data, write exactly 2–3 sentences " +
-          "capturing its essence. Write in third person, present tense. Be specific and concrete — avoid " +
-          "generic marketing language. Focus on what makes this brand distinct: its archetype, aesthetic, " +
-          "values, and the community it serves. Return only the narrative sentences, no extra text.",
+          "that directly answer 'tell me about this brand and who it's for.' " +
+          "The FIRST sentence must name the brand, say what it is, and identify exactly who buys it — " +
+          "be specific about the type of person, not a demographic (e.g. 'for women who reject fast fashion' " +
+          "not 'for women aged 25-35'). " +
+          "The second sentence covers what makes it distinct: its aesthetic, archetype, or point of view. " +
+          "The optional third sentence can note a community or cultural identity it belongs to. " +
+          "Write in third person, present tense. Be concrete — avoid generic marketing language. " +
+          "Return only the narrative sentences, no extra text.",
       },
       { role: "user", content: prompt },
     ],

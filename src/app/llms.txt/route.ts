@@ -12,7 +12,10 @@ const supabase = createClient(
 export async function GET() {
   const { data: brands } = await supabase
     .from("brand_profiles")
-    .select("id, brand_name, category, archetypes, style_tags, values, communities, status_signal_type, emotional_resonance")
+    .select(
+      "id, brand_name, category, price_tier, archetypes, style_tags, values, communities, " +
+      "status_signal_type, emotional_resonance, differentiation_claim, identity_text"
+    )
     .order("brand_name");
 
   const all = brands || [];
@@ -40,12 +43,44 @@ export async function GET() {
     if (b.emotional_resonance) addDim("resonance", b.emotional_resonance);
   }
 
+  // One-line description: prefer differentiation_claim, fall back to identity_text snippet
+  function oneLiner(b: typeof all[0]): string {
+    if (b.differentiation_claim) return String(b.differentiation_claim).slice(0, 160);
+    if (b.identity_text) {
+      const text = String(b.identity_text);
+      const firstSentence = text.match(/^[^.!?]+[.!?]/)?.[0] || text.slice(0, 140);
+      return firstSentence.trim();
+    }
+    const archs = (b.archetypes as { archetype: string; primary: boolean }[]) || [];
+    const primary = archs.find((a) => a.primary)?.archetype || archs[0]?.archetype;
+    return [primary, b.category].filter(Boolean).join(" ") || "brand";
+  }
+
+  function primaryArchetype(b: typeof all[0]): string {
+    const archs = (b.archetypes as { archetype: string; primary: boolean }[]) || [];
+    return archs.find((a) => a.primary)?.archetype || archs[0]?.archetype || "";
+  }
+
   const brandLines = all
-    .map((b) => `- [${b.brand_name}](https://esina.app/brands/${brandSlug(b.brand_name)}): ${b.category || "brand"}`)
-    .join("\n");
+    .map((b) => {
+      const slug = brandSlug(b.brand_name);
+      const arch = primaryArchetype(b);
+      const desc = oneLiner(b);
+      const archTag = arch ? ` [${arch}]` : "";
+      return (
+        `- **[${b.brand_name}](https://esina.app/brands/${slug})**${archTag}` +
+        (b.category ? ` · ${b.category}` : "") +
+        `\n  ${desc}` +
+        `\n  Identity data: https://esina.app/brands/${slug}/brand.md`
+      );
+    })
+    .join("\n\n");
 
   const brandApiLines = all
-    .map((b) => `- [${b.brand_name} (machine-readable)](https://esina.app/api/brand/${b.id})`)
+    .map((b) => {
+      const slug = brandSlug(b.brand_name);
+      return `- [${b.brand_name}](https://esina.app/api/brand/${b.id}) (UUID-based) | [slug-based](https://esina.app/brands/${slug}/brand.md)`;
+    })
     .join("\n");
 
   const text = `# ESINA — Brand Identity Infrastructure for AI
@@ -72,7 +107,22 @@ https://esina.app
 - [Match](https://esina.app/match): Consumer-brand identity matching
 - [Translate](https://esina.app/translate): Natural language → structured identity
 
-## Brand profiles (human-readable)
+## Match API (no auth required)
+
+To find brands matching a consumer description, call:
+\`\`\`
+GET https://esina.app/api/match?q=CONSUMER_DESCRIPTION&limit=5
+\`\`\`
+Returns ranked JSON with name, category, archetype, description, similarity score, profileUrl, and brandMdUrl.
+
+Example: \`GET https://esina.app/api/match?q=minimalist+sustainable+jewelry+for+surfers&limit=3\`
+
+## Brand Directory (${all.length} brands)
+
+Each entry links to the human-readable profile page and the machine-readable Markdown identity file.
+Format: **Brand Name** [primary archetype] · category
+  One-line description
+  Identity data: /brands/{slug}/brand.md
 
 ${brandLines}
 
