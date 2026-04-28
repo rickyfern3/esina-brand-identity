@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { createHash } from "crypto";
+import type { MatchingInstructions } from "@/lib/matching-instructions";
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
@@ -85,11 +86,57 @@ Content-Type: application/json
 \`\`\``;
 }
 
+function formatStoredMatchingInstructions(mi: MatchingInstructions, brandName: string): string {
+  const { identity_signals, match_weight_guide, context_adaptation } = mi;
+
+  const fmtList = (items: string[]) =>
+    items.length > 0 ? items.map((i) => `- ${i}`).join("\n") : "_none_";
+
+  return `## Matching Instructions
+
+> **Structured identity matching data for AI agents and recommendation systems.**
+> Use these signals to evaluate whether a given consumer is a good match for **${brandName}**.
+
+### Identity Signals
+
+**Direct signals** _(brand adjacencies — consumer already buys/follows these):_
+${fmtList(identity_signals.direct_signals)}
+
+**Inferred signals** _(community and aesthetic fit):_
+${fmtList(identity_signals.inferred_signals)}
+
+**Anti-signals** _(disqualifying preferences):_
+${fmtList(identity_signals.anti_signals)}
+
+### Match Weight Guide
+
+| Rule | Threshold |
+|------|-----------|
+| Strong match | ≥ **${match_weight_guide.strong_match_threshold}** dimensions aligned |
+| Include in recommendations | ≥ **${match_weight_guide.include_threshold}** dimensions aligned |
+| Exclude | ${match_weight_guide.exclude_rules} |
+
+### Context Adaptation
+
+**Gift purchase:** ${context_adaptation.gift_context}
+
+**Self-purchase:** ${context_adaptation.self_purchase_context}
+
+**Comparison:** ${context_adaptation.comparison_context}
+
+### Raw JSON (machine-readable)
+
+\`\`\`json
+${JSON.stringify(mi, null, 2)}
+\`\`\``;
+}
+
 function buildBrandMarkdown(
   brand: Record<string, unknown>,
   auditScore: number | null,
   token: string
 ): string {
+  const storedMatchingInstructions = brand.matching_instructions as MatchingInstructions | null;
   const archetypes = (brand.archetypes as { archetype: string; weight: number; primary: boolean }[]) || [];
   const values = (brand.values as string[]) || [];
   const antiValues = (brand.anti_values as string[]) || [];
@@ -194,16 +241,18 @@ ${brand.identity_signature}
 
 ---
 
-` : ""}${buildMatchingInstructions({
-  brand_name: brand.brand_name as string,
-  archetypes,
-  values,
-  anti_values: antiValues,
-  style_tags: styleTags,
-  communities,
-  status_signal_type: brand.status_signal_type as string || "",
-  emotional_resonance: brand.emotional_resonance as string || "",
-})}
+` : ""}${storedMatchingInstructions
+  ? formatStoredMatchingInstructions(storedMatchingInstructions, brand.brand_name as string)
+  : buildMatchingInstructions({
+      brand_name: brand.brand_name as string,
+      archetypes,
+      values,
+      anti_values: antiValues,
+      style_tags: styleTags,
+      communities,
+      status_signal_type: brand.status_signal_type as string || "",
+      emotional_resonance: brand.emotional_resonance as string || "",
+    })}
 
 ---
 
@@ -237,7 +286,8 @@ export async function GET(
        voice_tone, design_language, brand_adjacencies, trend_alignment,
        identity_statements, origin_story, founder_philosophy,
        mission_statement, differentiation_claim, identity_text,
-       identity_signature, profile_completeness, profile_status`
+       identity_signature, profile_completeness, profile_status,
+       matching_instructions`
     )
     .eq("id", brandId)
     .single();

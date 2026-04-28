@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import OpenAI from "openai";
 import { generateIdentityText } from "@/lib/identity-text";
 import { calculateGapAnalysis, type BrandSelfReport, type AIPerception } from "@/lib/gap-analysis";
+import { generateMatchingInstructions } from "@/lib/matching-instructions";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -365,6 +366,18 @@ export async function POST(req: NextRequest) {
       identity_signature: identitySignature,
       identity_embedding: embedding,
       onboard_source: "card_flow",
+      matching_instructions: generateMatchingInstructions({
+        brand_adjacencies: (extracted.brand_adjacencies as string[]) || [],
+        communities: ((extracted.communities as string[]) || []).slice(0, 5),
+        style_tags: sanitizeArr(extracted.style_tags, VALID_STYLE_TAGS).slice(0, 5),
+        anti_values: sanitizeArr(extracted.anti_values, VALID_ANTI_VALUES).slice(0, 3),
+        values: sanitizeArr(extracted.values, VALID_VALUES).slice(0, 5),
+        emotional_resonance: sanitizeEnum(extracted.emotional_resonance, VALID_EMOTIONAL),
+        status_signal_type: sanitizeEnum(extracted.status_signal_type, VALID_STATUS_SIGNALS),
+        origin_story: (extracted.origin_story as string) || null,
+        differentiation_claim: (extracted.differentiation_claim as string) || null,
+        archetypes: sanitizedArchetypes,
+      }),
     };
 
     const { data: brand, error: insertErr } = await supabase
