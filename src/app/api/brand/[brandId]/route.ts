@@ -261,7 +261,88 @@ _Install the attribution pixel: \`<script src="https://esina.app/esina.js?brand=
 `;
 }
 
+// ── JSON-LD builder ────────────────────────────────────────────────────────
+// Returns a schema.org Organization object with ESINA identity extensions.
+// Used by the esina.js pixel (injected into <head> for AI crawlers) and
+// by any system requesting ?format=jsonld directly.
+
+function buildJsonLd(brand: Record<string, unknown>): Record<string, unknown> {
+  const archetypes = (brand.archetypes as { archetype: string; weight: number; primary: boolean }[]) || [];
+  const values     = (brand.values     as string[]) || [];
+  const antiValues = (brand.anti_values as string[]) || [];
+  const styleTags  = (brand.style_tags  as string[]) || [];
+  const communities = (brand.communities as string[]) || [];
+  const brandAdjacencies = (brand.brand_adjacencies as string[]) || [];
+  const identityStatements = ((brand.identity_statements as string[]) || []).filter(Boolean);
+  const primaryArchetype = archetypes.find((a) => a.primary)?.archetype || archetypes[0]?.archetype || null;
+
+  return {
+    "@context": {
+      "@vocab": "https://schema.org/",
+      "esina": "https://esina.app/schema/v1#",
+    },
+    "@type": "Organization",
+    "@id": `https://esina.app/brands/${slugify(brand.brand_name as string)}`,
+
+    // schema.org standard fields
+    "name": brand.brand_name,
+    "description": brand.identity_text || brand.identity_signature || null,
+    "knowsAbout": values.map((v) => v.replace(/_/g, " ")),
+    "keywords": [
+      ...values.map((v) => v.replace(/_/g, " ")),
+      ...styleTags.map((t) => t.replace(/_/g, " ")),
+      ...(primaryArchetype ? [primaryArchetype] : []),
+    ],
+
+    // ESINA identity extensions
+    "esina:brandId": brand.id,
+    "esina:category": brand.category,
+    "esina:priceTier": brand.price_tier,
+    "esina:archetypes": archetypes.map((a) => ({
+      "esina:archetype": a.archetype,
+      "esina:weight": a.weight,
+      "esina:primary": a.primary,
+    })),
+    "esina:primaryArchetype": primaryArchetype,
+    "esina:values": values,
+    "esina:antiValues": antiValues,
+    "esina:styleTags": styleTags,
+    "esina:communities": communities,
+    "esina:brandAdjacencies": brandAdjacencies,
+    "esina:statusSignal": brand.status_signal_type || null,
+    "esina:emotionalResonance": brand.emotional_resonance || null,
+    "esina:voiceTone": brand.voice_tone || null,
+    "esina:designLanguage": brand.design_language || null,
+    "esina:sustainabilityLevel": brand.sustainability_level || null,
+    "esina:identityStatements": identityStatements,
+    "esina:originStory": brand.origin_story || null,
+    "esina:differentiationClaim": brand.differentiation_claim || null,
+
+    // The full identity signature is the primary source for semantic matching
+    "esina:identitySignature": brand.identity_signature || null,
+
+    // Structured matching guidance (null if not yet generated)
+    "esina:matchingInstructions": (brand.matching_instructions as Record<string, unknown>) || null,
+
+    // Attribution
+    "esina:profileUrl": `https://esina.app/api/brand/${brand.id}`,
+    "esina:pixelScript": `https://esina.app/api/esina.js?brand=${brand.id}`,
+  };
+}
+
 // ── Route ──────────────────────────────────────────────────────────────
+
+// Handle CORS preflight for ?format=jsonld requests from the pixel
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Accept, Content-Type",
+    },
+  });
+}
 
 export async function GET(
   req: NextRequest,
@@ -275,6 +356,8 @@ export async function GET(
       headers: { "Content-Type": "text/markdown; charset=utf-8" },
     });
   }
+
+  const wantJsonLd = req.nextUrl.searchParams.get("format") === "jsonld";
 
   // 1. Fetch brand profile
   const { data: brand, error: brandErr } = await supabase
@@ -293,9 +376,35 @@ export async function GET(
     .single();
 
   if (brandErr || !brand) {
+    if (wantJsonLd) {
+      return new NextResponse(JSON.stringify({ error: "brand_not_found" }), {
+        status: 404,
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
+    }
     return new NextResponse(`# Brand Not Found\n\nNo brand with ID \`${brandId}\` exists in the ESINA database.\n`, {
       status: 404,
       headers: { "Content-Type": "text/markdown; charset=utf-8" },
+    });
+  }
+
+  // 2a. JSON-LD fast path (no audit score, no serve log — keep it lightweight for the pixel)
+  if (wantJsonLd) {
+    const jsonLd = buildJsonLd(brand);
+    return new NextResponse(JSON.stringify(jsonLd), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/ld+json; charset=utf-8",
+        // CORS — this endpoint is fetched client-side from third-party domains
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        // Cache longer than markdown — identity data changes less often
+        "Cache-Control": "public, max-age=600, stale-while-revalidate=3600",
+        "Vary": "Accept-Encoding",
+      },
     });
   }
 
